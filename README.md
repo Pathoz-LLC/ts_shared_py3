@@ -1,2 +1,13 @@
-# ts_py3_shared
-shared models, messages, enums and constants for various ts microservices
+# ts_shared_py3
+contains shared models, messages, enums and constants for various ts microservices
+
+
+#### to install from github
+python3 -m pip install -e git@github.com:Pathoz-LLC/ts_shared_py3.git
+
+
+#### to build for pypy
+python3 -m pip install --upgrade build
+
+from here:
+https://packaging.python.org/en/latest/tutorials/packaging-projects/
