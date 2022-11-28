@@ -5,9 +5,9 @@ from enum import IntEnum, unique
 from collections import namedtuple
 from random import randint
 
-# import google.cloud.ndb as ndb
+#
 
-from scoring.alloc import AllocType  # , AllocLookup
+from common.enums.alloc import AllocType  # , AllocLookup
 from common.enums.commitLevel import DisplayCommitLvl
 
 # from .alloc import AllocType

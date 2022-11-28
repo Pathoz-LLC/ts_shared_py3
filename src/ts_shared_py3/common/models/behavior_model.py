@@ -7,7 +7,7 @@ from common.config.behavior.beh_constants import (
     FEELING_ONLY_CODE_NEG,
     FEELING_ONLY_CODE_POS,
 )
-from common.models.baseNdb_model import BaseNdbModel
+from baseNdb_model import BaseNdbModel
 from common.config.behavior.load_yaml import BehaviorSourceSingleton
 
 from random import randint  # for mock data
