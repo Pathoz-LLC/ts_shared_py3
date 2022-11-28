@@ -7,7 +7,7 @@ import random
 # from google.cloud.ndb import msgprop
 
 # from protorpc import messages
-from common.enums.activityType import ActivityType
+from .activityType import ActivityType
 
 # from common.schemas.tracking import CommitLvlApiMsg, DevotionLevelListMessage
 

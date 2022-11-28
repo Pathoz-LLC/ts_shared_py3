@@ -6,12 +6,12 @@ from datetime import datetime, date, time
 from collections import namedtuple
 
 #
-from common.models.tracking import Tracking
-from common.models.baseNdb_model import BaseNdbModel
-from common.models.interval_model import Interval
+from .tracking import Tracking
+from .baseNdb_model import BaseNdbModel
+from .interval_model import Interval
 
 # from common.utils.date_conv import date_to_message, message_to_date
-from common.utils.date_conv import overlappingDates
+from ..utils.date_conv import overlappingDates
 
 
 # creating a flat immutable struc that is easy to pass around in complex logic below

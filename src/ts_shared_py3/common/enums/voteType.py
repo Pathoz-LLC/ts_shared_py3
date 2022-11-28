@@ -3,7 +3,7 @@ from enum import IntEnum, unique
 import random
 
 # import google.cloud.ndb as ndb
-from constants import VALUES_MAX_SLIDER_POSITION, BEH_MAX_SLIDER_POSITION
+from ...constants import VALUES_MAX_SLIDER_POSITION, BEH_MAX_SLIDER_POSITION
 
 
 @unique

@@ -2,18 +2,18 @@ from __future__ import annotations
 from datetime import date, timedelta
 import random
 import google.cloud.ndb as ndb
-from common.models.baseNdb_model import BaseNdbModel
+from .baseNdb_model import BaseNdbModel
 
-from common.schemas.tracking import IntervalMessage
-from common.enums.commitLevel import DisplayCommitLvl
-from common.utils.date_conv import (
+from ..schemas.tracking import IntervalMessage
+from ..enums.commitLevel import DisplayCommitLvl
+from ..utils.date_conv import (
     calcOverlappingDays,
     overlappingDates,
 )
 
 # from common.utils.date_conv import DateMessage, date_to_message
 
-from constants import DISTANT_FUTURE_DATE
+from ...constants import DISTANT_FUTURE_DATE
 
 # class AccuracyRating(messages.Enum):
 #     # Governs data validation

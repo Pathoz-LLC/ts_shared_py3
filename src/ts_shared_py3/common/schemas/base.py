@@ -2,7 +2,7 @@ import marshmallow as ma
 
 #
 from .ndbkey_jwt import NdbKeyField
-from constants import ISO_8601_DATE_FORMAT
+from ...constants import ISO_8601_DATE_FORMAT
 
 
 class _ReplaceWithRealNdbModel:

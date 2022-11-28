@@ -3,8 +3,6 @@ contains shared models, messages, enums and constants for various ts microservic
 
 #### to validate deps
 python src/main_validate.py
-python -m pip install flask
-pip freeze > requirements.txt
 
 
 #### to install from github
@@ -19,6 +17,15 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 
 
+#### grpcio install on M1 mac
+pip uninstall grpcio
+export GRPC_PYTHON_LDFLAGS=" -framework CoreFoundation"
+pip install grpcio --no-binary :all:
+
+
+##### misc pip installer
+python -m pip install flask
+pip freeze > requirements.txt
 
 
 #### to build for pypy

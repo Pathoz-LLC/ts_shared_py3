@@ -22,10 +22,14 @@ import json  # dumps( {} ) turns dict into string
 from marshmallow.fields import Number
 
 #
-from constants import APP_IMPACT_WEIGHT_MAX, IMPACT_WEIGHT_DECIMALS, FEELING_CD_PREFIX
+from ....constants import (
+    APP_IMPACT_WEIGHT_MAX,
+    IMPACT_WEIGHT_DECIMALS,
+    FEELING_CD_PREFIX,
+)
 
 # from common.models.behavior_model import PersonBehavior
-from common.utils.singleton import Singleton
+from ....common.utils.singleton import Singleton
 from .beh_constants import (
     SHOWALL_CAT_LABEL,
     SHOWALL_CODE_PREFIX,
@@ -352,7 +356,10 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # forRowInYaml(projRoot + 'common/behavior/behaviors.yaml', makePerRowFunc(BehaviorRowYaml, behaviorsDict))
         return BehaviorSourceSingleton(projRoot)
 
-    def __init__(self: BehaviorSourceSingleton, projRoot: str = ""):
+    def __init__(
+        self: BehaviorSourceSingleton,
+        projRoot: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/",
+    ):  # ts_shared_py3/src/
         """initialize the full object graph & also create master dict by code
 
         masterDict = {code: BehaviorCatNode}
@@ -362,9 +369,16 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         NOTE: hidden behaviors may be a problem for showing parent category on Behavior stats
         """
         categoriesDict: map[str, BehCatNode] = dict()
+
+        # import os
+
+        # dir_path = os.path.dirname(os.path.realpath(__file__))
+        # print(dir_path)
+
         # forRowInYaml returns a list which we can ignore here
         forRowInYaml(
-            projRoot + "common/config/behavior/category.yaml",
+            projRoot
+            + "common/config/behavior/category.yaml",  # common/config/behavior/
             makePerRowFunc(True, categoriesDict),
         )
         behaviorsDict: map[str, BehCatNode] = dict()  # behavior
