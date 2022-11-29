@@ -10,7 +10,7 @@ from ...common.enums.alloc import AllocType  # , AllocLookup
 from ...common.enums.commitLevel import DisplayCommitLvl
 
 # from .alloc import AllocType
-from constants import IMPACT_WEIGHT_DECIMALS
+from ...constants import IMPACT_WEIGHT_DECIMALS
 
 VAL_ASSESS_TYPES = []  # SET below to subset of ScoreRuleType when module loads
 
