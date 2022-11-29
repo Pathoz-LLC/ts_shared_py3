@@ -2,8 +2,8 @@ from __future__ import annotations
 import marshmallow as ma
 
 #
+from ..api_data_classes import scoring as DataClasses
 from .base import NdbBaseSchema, NdbBaseSchemaWithKey
-import common.api_data_classes.scoring as DataClasses
 
 """
 the whole job of these schema objects is to define the format/structure
