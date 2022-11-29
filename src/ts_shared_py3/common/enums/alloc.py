@@ -3,7 +3,7 @@ from enum import IntEnum, unique
 from math import floor, log
 
 #
-from common.utils.singleton import Singleton
+from ...common.utils.singleton import Singleton
 
 """ When row-scores are grouped into days, buckets or months
     it's important that the more impactful entries
@@ -65,7 +65,7 @@ def _deriveHighestAlloc(someInt: int) -> AllocType:
         return AllocType.PRESCORE
 
     ex = _deriveHighestBitSet(someInt)
-    intRepr = int(2 ** ex)
+    intRepr = int(2**ex)
     assert intRepr < 33, "bit too high to construct AllocType {0}".format(intRepr)
     return AllocType(intRepr)
 
