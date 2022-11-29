@@ -3,12 +3,12 @@ from datetime import date, datetime, timedelta, time
 import google.cloud.ndb as ndb
 
 #
-from common.config.behavior.beh_constants import (
+from ...common.config.behavior.beh_constants import (
     FEELING_ONLY_CODE_NEG,
     FEELING_ONLY_CODE_POS,
 )
-from baseNdb_model import BaseNdbModel
-from common.config.behavior.load_yaml import BehaviorSourceSingleton
+from .baseNdb_model import BaseNdbModel
+from ...common.config.behavior.load_yaml import BehaviorSourceSingleton
 
 from random import randint  # for mock data
 
