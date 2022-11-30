@@ -1,9 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
+# from dataclass_wizard import JSONWizard
+
 
 @dataclass
-class BaseApiData:
+class BaseApiData(JSONWizard):
     """simple dict of data-types from JSON payload"""
 
     def __init__(self, /, **kwargs) -> None:
