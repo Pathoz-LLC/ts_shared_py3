@@ -1,14 +1,11 @@
-import json
-from dataclass_wizard import JSONWizard
-
 from datetime import date
-from dataclasses import dataclass, field, fields, make_dataclass
+from typing import ClassVar, Type
+from dataclasses import field, fields, make_dataclass
+from marshmallow_dataclass import dataclass
+from marshmallow import Schema
 
 from .base import BaseApiData
-from ts_shared_py3.common.messages.tracking import TrackingPayloadMessage
-import constants
-
-# usage:
+from ...common.schemas.tracking import TrackingPayloadMessage
 
 
 @dataclass
@@ -16,6 +13,8 @@ class BehaviorKeysMessage(BaseApiData):
     surveyId: int = field(default=2)
     personId: int = field(default=0, required=True)
     priorMonthsToLoad: int = field(default=0)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -25,6 +24,8 @@ class BehaviorStatsFilterMessage(BaseApiData):
     zipCode: str = field(default="")
     lat: float = field(default=0.0)
     lon: float = field(default=0.0)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 BehaviorStatsRequestMessage = make_dataclass(
@@ -50,6 +51,8 @@ class BehaviorRowMsg(BaseApiData):
     positive: bool = field(default=False)
     categoryCode: str = field(default="general")
     # origOccurDateTime: int = field(default=0)11)  # used to find same rec upon update/replace
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 # what swift is sending is below:
@@ -78,6 +81,8 @@ class BehaviorHistoryMessage(BaseApiData):
     items = list[BehaviorRowMsg] = []
     firstLogDtTm: float = field(default=0.0)  # as epoch
     lastLogDtTm: float = field(default=0.0)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 # new behavior entries summary logic below
@@ -93,6 +98,8 @@ class StatsAndMetricsMsg(BaseApiData):
     feelingsScore: float = field(default=0.0)
     maleReportCount: int = field(default=0)
     femaleReportCount: int = field(default=0)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -123,6 +130,8 @@ class BehEntryWrapperMessage(BaseApiData):
     rowType: str = field(default="beh")  # or cl (commitLevel)
     # when rowType == cl, then only fields in use are: behaviorCode, shareDetails, occurDateTime
     # stats = BaseApiDataField(StatsAndMetricsMsg, 21)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -137,6 +146,8 @@ class BehaviorLogSummaryMessage(BaseApiData):
     count: int = field(default=0, required=True)
     entries: list[BehEntryWrapperMessage] = []
     phaseHistory: list[TrackingPayloadMessage] = []
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -144,6 +155,8 @@ class BehaviorSearchTermMsg(BaseApiData):
     userId: str = field(default="", required=True)
     searchPhrase: str = field(default="", required=True)
     failed: bool = field(default=False)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 # full behavior list
@@ -160,6 +173,8 @@ class BehOrCatMsg(BaseApiData):
     isPositive: bool = field(default=False, required=True)
     sort: int = field(default=100, required=True)
     keywords: str = field(default="", required=True)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -167,6 +182,8 @@ class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", required=True)
     children: str = field(default="", repeated=True)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -175,6 +192,8 @@ class FullBehaviorListMsg(BaseApiData):
     masterList: list[BehOrCatMsg] = []
     topCategoryCodes: str = field(default="", repeated=True)
     graph: list[NodeListMsg] = []
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 # return list of NEGATIVE top level category codes
@@ -189,12 +208,16 @@ class CatCodeTextMsg(BaseApiData):
     # perhaps we should reset availCount each time they add a prospect??
     iconName: str = field(default="", required=True)
     pos: bool = field(default=False)(6, required=True, default=False)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
 class TopCategoriesMsg(BaseApiData):
     # list for client
     items: list[CatCodeTextMsg] = []
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 # global stats about behavior
@@ -203,6 +226,8 @@ class BehStatMsg(BaseApiData):
     # embedded in VoteTypeMsg
     totCount: int = field(default=0, required=True)
     slotCounts: int = field(default=0, repeated=True)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -225,6 +250,8 @@ class VoteTypeMsg(BaseApiData):
     feeling: list[BehStatMsg] = []
     concern: list[BehStatMsg] = []
     frequency: list[BehStatMsg] = []
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -238,7 +265,7 @@ class VoteTypeMsgAdapter:
         }
 
     @staticmethod
-    def fromDict(dct):
+    def fromDict(dct: dict):
         feel = dct.get("feeling", {})
         if not isinstance(feel, BehStatMsg):
             feel = BehStatMsgAdapter.fromDict(feel)
@@ -258,10 +285,16 @@ class BehVoteStatsMsg(BaseApiData):
     male: list[VoteTypeMsg] = []
     unknown: list[VoteTypeMsg] = []
     categoryName: str = field(default="", required=True)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
 class BehVoteStatAdapter:
+
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
+
     @staticmethod
     def toDict(behVoteStatsMsg):
         return {
@@ -296,3 +329,5 @@ class BehSrchLogMsg(BaseApiData):
     foundCount: int = field(default=0, required=True)
     # behCode ultimately Selected is for future
     behCodeSelected: str = field(default="")
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
