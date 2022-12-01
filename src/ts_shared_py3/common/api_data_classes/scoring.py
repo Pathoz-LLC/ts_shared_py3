@@ -19,7 +19,7 @@ class RequRelationshipOverviewData(BaseApiData):
     queryEndDt: date = None
     # Deprecated
     # monthsBackFromNow & prior flds are deprecated (use queryStart and queryEnd above)
-    monthsBackFromNow: int = field(default=3)
+    monthsBackFromNow: int = field(default=3, metadata=dict(validate=123))
     priorUserScore: float = field(default=0.5)
     priorCommunityScore: int = field(default=0.5)
 

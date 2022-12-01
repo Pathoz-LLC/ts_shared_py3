@@ -1,11 +1,18 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
+# from datetime import datetime, date, time
+
+from dataclasses import dataclass, Field  # , field, fields, make_dataclass
+
+# from marshmallow_dataclass import NewType, field_for_schema
 # from dataclass_wizard import JSONWizard
 
 
+# IPv4 = NewType('IPv4', str, validate=marshmallow.validate.Regexp(r'^([0-9]{1,3}\.){3}[0-9]{1,3}$'))
+
+
 @dataclass
-class BaseApiData(JSONWizard):
+class BaseApiData:
     """simple dict of data-types from JSON payload"""
 
     def __init__(self, /, **kwargs) -> None:
@@ -24,3 +31,7 @@ class BaseApiData(JSONWizard):
     #         self._updateAtts(dictOrSchema)
     #     else:
     #         raise Exception("invalid argument")
+
+    # def blah(self: BaseApiData) -> None:
+    #     # demo
+    #     fld: Field = field_for_schema(date, metadata=dict(blah=123))

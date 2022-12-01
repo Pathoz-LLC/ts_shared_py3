@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 #
-# from marshmallow import fields
+from marshmallow_dataclass import add_schema
 
 # #
 # from .base import NdbBaseSchema
 # from .tracking import TrackingPayloadMessage
 from api_data_classes.behavior import *
 
-""" this file is NIU for scoring server
-    usage:
+"""
     from common.schemas.behavior import *
 
 
