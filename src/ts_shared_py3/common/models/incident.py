@@ -6,9 +6,10 @@ from datetime import datetime, date, time
 from collections import namedtuple
 
 #
+from ..api_data_classes.tracking import IncidentRowMessage
 from .tracking import Tracking
 from .baseNdb_model import BaseNdbModel
-from .interval_model import Interval
+from .interval import Interval
 
 # from common.utils.date_conv import date_to_message, message_to_date
 from ..utils.date_conv import overlappingDates
@@ -208,3 +209,54 @@ class Incident(BaseNdbModel):
         """
         self.overlapDays = self.userInterval.overlapDayCount(self.reportingUserInterval)
         self.earliestOverlapDate = self.overlapStartDate
+
+    def toMsg(self):
+        """
+        this is in use & should hang off of "IncidentRowMessageConverter" (below)
+        which Rob built for testing
+
+        Args:
+            incdt(Incident):
+
+        Returns:
+            IncidentRowMessage:
+        """
+        irm = IncidentRowMessage()
+        irm.incidentId = self.key.id()
+        # irm.userTruthOpinion = self.userTruthOpinion.number
+        irm.evidenceStatus = self.evidenceStatus.value
+        irm.reportingUserId = self.reportingUserId
+        irm.reportingUserSex = (self.reportingUserSex or Sex.UNKNOWN).value
+        irm.earliestOverlapDate = self.earliestOverlapDate
+        irm.overlapDays = self.overlapDays
+        irm.userIntervalRowNum = self.userIntervalRowNum
+        irm.reportingUserIntervalRowNum = self.reportingUserIntervalRowNum
+        irm.repUserIntervalReviseHistory = self.repUserIntervalReviseHistory
+        irm.addDateTime = self.addDateTime.date()
+        irm.modDateTime = self.modDateTime.date()
+        # convert intervals to messages
+
+        irm.userInterval = self.userInterval.toMsg()
+        irm.reportingUserInterval = self.reportingUserInterval.toMsg()
+
+        # check for unbounded intervals
+        intervalEndDateUser = self.userInterval.endDate
+        intervalEndDateReporter = self.reportingUserInterval.endDate
+        # send a sensible date (today) to the client
+        # FIXME:  this is a temp fix:  we should really check the DB
+        # to see if that phase was ever ended;  of course that data-change
+        # should have spawned another incident check which might resolve it?
+        # following code is FUCKED!  cant figure how to update the date
+        # today = date.today()
+        # if intervalEndDateUser == DISTANT_FUTURE_DATE:
+        #     # irm.userInterval.endDate = protopigeon.to_message(today, message_types.DateTimeField)
+        #     irm.userInterval.endDate = today
+        #     # irm.userInterval.endDate.month = today.month
+        #     # irm.userInterval.endDate.year = today.year
+        # if intervalEndDateReporter == DISTANT_FUTURE_DATE:
+        #     # irm.reportingUserInterval.endDate = protopigeon.to_message(today, message_types.DateTimeField)
+        #     # irm.reportingUserInterval.endDate = pptm(date.today(), protopigeon.types.DateMessage)
+        #     irm.reportingUserInterval.endDate = intervalEndDateReporter.value_to_message(today)
+        #     # irm.reportingUserInterval.endDate.month = today.month
+        #     # irm.reportingUserInterval.endDate.year = today.year
+        return irm
