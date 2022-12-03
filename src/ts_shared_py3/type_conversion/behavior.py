@@ -1,6 +1,6 @@
 # from datetime import datetime
 import google.cloud.ndb as ndb
-from ..models.behavior_model import Entry
+from ..models.beh_entry import Entry
 from ..utils.date_conv import dateTime_from_epoch
 
 

@@ -14,14 +14,14 @@ import google.cloud.ndb as ndb
 # from ..async_tasks.stats import StatsTasks
 
 from ..enums.sex import Sex  # , NdbSexProp
-from ..enums.voteType import VoteType, NdbVoteTypeProp
+from ..enums.voteType import VoteType  # , NdbVoteTypeProp
 from ..schemas.behavior import BehVoteStatsMsg, VoteTypeMsg, BehStatMsg
 from ..schemas.behavior import (
     BehVoteStatAdapter,
     VoteTypeMsgAdapter,
     BehStatMsgAdapter,
 )
-from common.config.behavior.load_yaml import BehaviorSourceSingleton
+from ..config.behavior.load_yaml import BehaviorSourceSingleton
 
 # from common.firebase.readWrite import firebase_put
 
