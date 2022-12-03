@@ -13,7 +13,7 @@ from ..utils.date_conv import (
 
 # from common.utils.date_conv import DateMessage, date_to_message
 
-from ...constants import DISTANT_FUTURE_DATE
+from ..constants import DISTANT_FUTURE_DATE
 
 # class AccuracyRating(messages.Enum):
 #     # Governs data validation

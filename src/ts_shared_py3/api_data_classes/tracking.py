@@ -58,7 +58,7 @@ class TrackingPayloadMessage(BaseApiData):
     persId: int = field(default=0, metadata=dict(required=True))
     enabled: bool = field(default=True)
     # repeating intervals:
-    phases: list[IntervalMessage] = []
+    phases: list[IntervalMessage] = field(default_factory=lambda: [])
 
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -87,7 +87,7 @@ class IncidentRowMessage(BaseApiData):
     # if reporting user changes their dates, store old vals here
     repUserIntervalReviseHistory: str = field(default="")
 
-    reportingUserIntervalRowNum: int = field(default=0, required=False)
+    reportingUserIntervalRowNum: int = field(default=0)
     reportingUserSex: Sex = field(default=0, metadata=dict(required=True))
     # a sequential user ID starting from 1 to keep privacy
     reportingUserDisplayID: int = field(default=0, metadata=dict(required=True))
@@ -102,7 +102,7 @@ class IncidentDetailsMessage(BaseApiData):
     asOfDate: date = field()
     persId: int = field(default=0, metadata=dict(required=True))
     userOverlapCount: int = field(default=0, metadata=dict(required=True))
-    items: list[IncidentRowMessage] = []
+    items: list[IncidentRowMessage] = field(default_factory=lambda: [])
 
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -119,6 +119,6 @@ class IncidentTruthMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class DevotionLevelListMessage(BaseApiData):
-    items: list[CommitLvlApiMsg] = []
+    items: list[CommitLvlApiMsg] = field(default_factory=lambda: [])
 
     Schema: ClassVar[Type[Schema]] = Schema

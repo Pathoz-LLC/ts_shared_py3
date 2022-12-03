@@ -5,12 +5,12 @@ import google.cloud.ndb as ndb
 from typing import Optional, Iterable  # List
 
 #
-from ...scoring.commBehImpactConsenus import CommImpactConsensus
+from ..scoring.commBehImpactConsenus import CommImpactConsensus
 from ..models.baseNdb_model import BaseNdbModel
 from ..enums.commitLevel import DisplayCommitLvl, LogicCommitLvl
 from .interval import Interval
 from ..utils.date_conv import calcOverlappingDays, dateTime_to_epoch
-from ...constants import DISTANT_FUTURE_DATE
+from ..constants import DISTANT_FUTURE_DATE
 
 log = logging.getLogger("tracking")
 communityRiskStats = CommImpactConsensus()
