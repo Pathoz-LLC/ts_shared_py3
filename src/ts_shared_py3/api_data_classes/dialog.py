@@ -12,21 +12,21 @@ from ..schemas.tracking import TrackingPayloadMessage
 @dataclass(base_schema=NdbBaseSchema)
 class RelationshipPhaseSetupMessage(BaseApiData):
     # to set up a dialog object
-    use_id: str = field(default="", required=True)
-    per_id: int = field(default=0, required=True)
-    personName: str = field(default="", required=True)
-    curCommitLevel: str = field(default="", required=True)
-    startTrackingDate: date = field(required=True)
-    breakupCount: int = field(default=0, required=True)
+    use_id: str = field(default="", metadata=dict(required=True))
+    per_id: int = field(default=0, metadata=dict(required=True))
+    personName: str = field(default="", metadata=dict(required=True))
+    curCommitLevel: str = field(default="", metadata=dict(required=True))
+    startTrackingDate: date = field(metadata=dict(required=True))
+    breakupCount: int = field(default=0, metadata=dict(required=True))
 
 
 @dataclass(base_schema=NdbBaseSchema)
 class DialogAnswerMessage(BaseApiData):
     # to request the next question
     use_id: str = field(default="")
-    per_id: int = field(default=0, required=True)
+    per_id: int = field(default=0, metadata=dict(required=True))
     que_id: int = field(
-        default=0, required=True
+        default=0, metadata=dict(required=True)
     )  # only needed if revising a prior answer;  otherwise, its curIdx
     last_answer: str = field(default="")
 

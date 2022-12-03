@@ -26,8 +26,8 @@ class CommitLvlApiMsg(BaseApiData):
 class CommitLvlUpdateMsg(BaseApiData):
     """used to update CommitLvl for in-active users"""
 
-    persId: int = field(default=0, required=True)
-    userId: int = field(default=0, required=True)
+    persId: int = field(default=0, metadata=dict(required=True))
+    userId: int = field(default=0, metadata=dict(required=True))
     commitLvlDisplayCd: str = field(default="")
     startDate: date = field()
     # notificationId serves for authentication b4 changing data
@@ -42,7 +42,7 @@ class IntervalMessage(BaseApiData):
     oldStartDate is key for update/delete
     """
 
-    persId: int = field(default=0, required=True)
+    persId: int = field(default=0, metadata=dict(required=True))
     # oldStartDate is key to find which row edited or deleted; ignored for Add
     oldStartDate: date = field()
     startDate: date = field()
@@ -55,7 +55,7 @@ class IntervalMessage(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class TrackingPayloadMessage(BaseApiData):
     # the std msg to update a tracking record
-    persId: int = field(default=0, required=True)
+    persId: int = field(default=0, metadata=dict(required=True))
     enabled: bool = field(default=True)
     # repeating intervals:
     phases: list[IntervalMessage] = []
@@ -67,16 +67,16 @@ class TrackingPayloadMessage(BaseApiData):
 class IncidentRowMessage(BaseApiData):
     """ """
 
-    incidentId: int = field(default=0, required=True)
-    userTruthOpinion: int = field(default=0, required=True)
-    evidenceStatus: int = field(default=0, required=True)
+    incidentId: int = field(default=0, metadata=dict(required=True))
+    userTruthOpinion: int = field(default=0, metadata=dict(required=True))
+    evidenceStatus: int = field(default=0, metadata=dict(required=True))
 
     # details: reportingUser is the OTHER user
     reportingUserId: str = field(default="")
     earliestOverlapDate: date = field()
 
-    overlapDays: int = field(default=0, required=True)
-    userIntervalRowNum: int = field(default=0, required=True)
+    overlapDays: int = field(default=0, metadata=dict(required=True))
+    userIntervalRowNum: int = field(default=0, metadata=dict(required=True))
     userInterval: IntervalMessage = None
     reportingUserInterval: IntervalMessage = None
 
@@ -86,30 +86,30 @@ class IncidentRowMessage(BaseApiData):
     addDateTime: date = field()
     modDateTime: date = field()
     reportingUserIntervalRowNum: int = field(default=0, required=False)
-    reportingUserSex: Sex = field(default=0, required=True)
+    reportingUserSex: Sex = field(default=0, metadata=dict(required=True))
     # a sequential user ID starting from 1 to keep privacy
-    reportingUserDisplayID: int = field(default=0, required=True)
+    reportingUserDisplayID: int = field(default=0, metadata=dict(required=True))
     # how many distinct incidents has this user had with prospect
-    reportingUserIncdSeqNum: int = field(default=0, required=True)
+    reportingUserIncdSeqNum: int = field(default=0, metadata=dict(required=True))
 
     Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass(base_schema=NdbBaseSchema)
 class IncidentDetailsMessage(BaseApiData):
-    persId: int = field(default=0, required=True)
+    persId: int = field(default=0, metadata=dict(required=True))
     asOfDate: date = field()
     items: list[IncidentRowMessage] = []
-    userOverlapCount: int = field(default=0, required=True)
+    userOverlapCount: int = field(default=0, metadata=dict(required=True))
 
     Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass(base_schema=NdbBaseSchema)
 class IncidentTruthMessage(BaseApiData):
-    incidentId: int = field(default=0, required=True)
+    incidentId: int = field(default=0, metadata=dict(required=True))
     incidentTruthVote: int = field(
-        default=0, required=True
+        default=0, metadata=dict(required=True)
     )  # 0 means not seen; 1-4 = true->false
 
     Schema: ClassVar[Type[Schema]] = Schema

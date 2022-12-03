@@ -19,8 +19,8 @@ class PersonRowMsg(BaseApiData):
     last: str = field(default="")
     email: str = field(default="")
     dob: date = field()
-    sex: Sex = field(default=Sex.UNKNOWN, required=True)
-    redFlagBits: int = field(default=0, required=False)
+    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
+    redFlagBits: int = field(default=0)
     city: str = field(default="")
     state: str = field(default="")
     zip: str = field(default="")
@@ -36,11 +36,11 @@ class PersonRowMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class PersonLocalRowMsg(BaseApiData):
     nickname: str = field(default="")
-    devotionLevel: int = field(default=0, required=True)
+    devotionLevel: int = field(default=0, metadata=dict(required=True))
     imagePath: str = field(default="")
-    # overallScore: int = field(default=0, required=True)
+    # overallScore: int = field(default=0, metadata=dict(required=True))
     monitorStatus: str = field(default="ACTIVE")
-    # redFlagBits: int = field(default=0, required=True)
+    # redFlagBits: int = field(default=0, metadata=dict(required=True))
     modDateTime: datetime = field()
     xtra: str = field(default="")
     addDateTime: datetime = field()
@@ -55,7 +55,7 @@ class PersonLocalRowMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class PersonIdMessage(BaseApiData):
     # returned for create
-    perId: int = field(default=0, required=True)
+    perId: int = field(default=0, metadata=dict(required=True))
     requestOptions: str = field(default="")
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -71,7 +71,7 @@ class PersonPhoneMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class PersonIdentifierMessage(BaseApiData):
-    perId: int = field(default=0, required=True)
+    perId: int = field(default=0, metadata=dict(required=True))
     idValue: str = field(default="")
     idType: str = field(default="")
     #
@@ -80,7 +80,7 @@ class PersonIdentifierMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class PersonMockDataMsg(BaseApiData):
-    perId: int = field(default=0, required=True)
+    perId: int = field(default=0, metadata=dict(required=True))
     fileName: str = field(default="better")
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -106,39 +106,39 @@ class IncidentUpdateOpinionMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-#     personId: int = field(default=0, required=True)
+#     personId: int = field(default=0, metadata=dict(required=True))
 #     # either these vals
-#     incidentId: int = field(default=0, required=True)
+#     incidentId: int = field(default=0, metadata=dict(required=True))
 #     truthOpinion: str = field(default="")
 #     # or these vals
 #     # actually these are handled when user answers a question
-#     # questionId: int = field(default=0, required=True)
-#     # howOften: int = field(default=0, required=True)
-#     # tellStrength: int = field(default=0, required=True)
+#     # questionId: int = field(default=0, metadata=dict(required=True))
+#     # howOften: int = field(default=0, metadata=dict(required=True))
+#     # tellStrength: int = field(default=0, metadata=dict(required=True))
 
 
 @dataclass(base_schema=NdbBaseSchema)
 class RedFlagReportMsg(BaseApiData):
     """ """
 
-    personId: int = field(default=0, required=True)
+    personId: int = field(default=0, metadata=dict(required=True))
     userId: str = field(default="")
-    flagType: int = field(default=0, required=True)
+    flagType: int = field(default=0, metadata=dict(required=True))
     comment: str = field(default="")
     url: str = field(default="")
     beganDateTime: datetime = field()
-    rescinded: int = field(default=0, required=True)
+    rescinded: int = field(default=0, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass(base_schema=NdbBaseSchema)
 class RedFlagSummaryMsg(BaseApiData):
-    personId: int = field(default=0, required=True)
-    revengeCount: int = field(default=0, required=True)
-    catfishCount: int = field(default=0, required=True)
-    cheatedCount: int = field(default=0, required=True)
-    daterapeCount: int = field(default=0, required=True)
+    personId: int = field(default=0, metadata=dict(required=True))
+    revengeCount: int = field(default=0, metadata=dict(required=True))
+    catfishCount: int = field(default=0, metadata=dict(required=True))
+    cheatedCount: int = field(default=0, metadata=dict(required=True))
+    daterapeCount: int = field(default=0, metadata=dict(required=True))
     reports: list[RedFlagReportMsg] = []
     #
     Schema: ClassVar[Type[Schema]] = Schema

@@ -28,7 +28,7 @@ class ChatInfoMessage(BaseApiData):
     jpw: str = field(default="")
     jnick: str = field(default="")
     thread_id: int = field(
-        default=0, required=True
+        default=0, metadata=dict(required=True)
     )  # tell client the ChatLog ID  (purpose unclear)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -44,10 +44,10 @@ class ChatInfoMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class PushNotifyMessage(BaseApiData):
-    userId: str = field(default="", required=True)
-    regToken: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    regToken: str = field(default="", metadata=dict(required=True))
     deviceType: str = field(
-        default="", required=True
+        default="", metadata=dict(required=True)
     )  # actual device type;  to decide between apns & gcm
     enable: bool = field(default=True)
     isAndroid: bool = field(default=False)
@@ -57,9 +57,9 @@ class PushNotifyMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class SubscribeTagPnMessage(BaseApiData):
-    userId: str = field(default="", required=True)
-    regToken: str = field(default="", required=True)
-    tag: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    regToken: str = field(default="", metadata=dict(required=True))
+    tag: str = field(default="", metadata=dict(required=True))
     allDevices: bool = field(default=True)
     remove: bool = field(default=True)
     #

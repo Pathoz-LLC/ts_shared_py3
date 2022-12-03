@@ -14,26 +14,26 @@ class CommStatsMsg(BaseApiData):
     startDtTm: date = field()
     endDtTm: date = field()
     # count of total msgs I've sent in this period
-    myMsgCount: int = field(default=0, required=True)
-    theirMsgCount: int = field(default=0, required=True)
+    myMsgCount: int = field(default=0, metadata=dict(required=True))
+    theirMsgCount: int = field(default=0, metadata=dict(required=True))
     # Wpm == avg words per msg
-    myAvgWpmCount: int = field(default=0, required=True)
-    theirAvgWpmCount: int = field(default=0, required=True)
+    myAvgWpmCount: int = field(default=0, metadata=dict(required=True))
+    theirAvgWpmCount: int = field(default=0, metadata=dict(required=True))
     # LTR = avg length time to respond in minutes
-    myAvgLtr: int = field(default=0, required=True)
+    myAvgLtr: int = field(default=0, metadata=dict(required=True))
     theirAvgLtr: int = field(default=0, required=False)
     # initiate = starting convo after x (eg 12) hours
-    myInitiateCount: int = field(default=0, required=True)
+    myInitiateCount: int = field(default=0, metadata=dict(required=True))
     theirInitiateCount: int = field(default=0, required=False)
     # ended = # of times person stopped responding for x (eg 12) hrs
-    myEndedCount: int = field(default=0, required=True)
-    theirEndedCount: int = field(default=0, required=True)
+    myEndedCount: int = field(default=0, metadata=dict(required=True))
+    theirEndedCount: int = field(default=0, metadata=dict(required=True))
     # drinkHrsStart = # of times person initiates msgs after drinking hrs
-    myDrinkHrsStartCount: int = field(default=0, required=True)
-    theirDrinkHrsStartCount: int = field(default=0, required=True)
+    myDrinkHrsStartCount: int = field(default=0, metadata=dict(required=True))
+    theirDrinkHrsStartCount: int = field(default=0, metadata=dict(required=True))
     # overall score based on all stats
-    myOverallScore: int = field(default=50, required=True)
-    theirOverallScore: int = field(default=50, required=True)
+    myOverallScore: int = field(default=50, metadata=dict(required=True))
+    theirOverallScore: int = field(default=50, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -47,9 +47,9 @@ class CommStatsListMsg(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class CommunicationEventMsg(BaseApiData):
-    fromUser: bool = field(default=False, required=True)
+    fromUser: bool = field(default=False, metadata=dict(required=True))
     sentDttm: date = field()
-    wordCount: int = field(default=0, required=True)
+    wordCount: int = field(default=0, metadata=dict(required=True))
     text: str = field(default="")
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -58,7 +58,7 @@ class CommunicationEventMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class CommunicationRawTranscriptMsg(BaseApiData):
     # raw msg transcript data
-    persId: int = field(default=0, required=True)
+    persId: int = field(default=0, metadata=dict(required=True))
     startDtTm: date = field()
     endDtTm: date = field()
     messages: list[CommunicationEventMsg] = []
@@ -69,10 +69,10 @@ class CommunicationRawTranscriptMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class CommunicationPrefsMsg(BaseApiData):
     # prefs
-    allowTextAnalyss: bool = field(default=False, required=True)
-    makeTextAnnon: bool = field(default=False, required=True)
+    allowTextAnalyss: bool = field(default=False, metadata=dict(required=True))
+    makeTextAnnon: bool = field(default=False, metadata=dict(required=True))
     pathToMsgDb: str = field(default="")
-    dataHarvestSchedule: int = field(default=0, required=True)
+    dataHarvestSchedule: int = field(default=0, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -82,7 +82,7 @@ class PhoneNumMsg(BaseApiData):
     #
     phoneNum: str = field(default="")
     monitorStatus: str = field(default="")
-    personId: int = field(default=0, required=True)
+    personId: int = field(default=0, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

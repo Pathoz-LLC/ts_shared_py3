@@ -12,7 +12,7 @@ from ..schemas.tracking import TrackingPayloadMessage
 @dataclass(base_schema=NdbBaseSchema)
 class BehaviorKeysMessage(BaseApiData):
     surveyId: int = field(default=2)
-    personId: int = field(default=0, required=True)
+    personId: int = field(default=0, metadata=dict(required=True))
     priorMonthsToLoad: int = field(
         default=3,
         metadata=dict(
@@ -26,7 +26,7 @@ class BehaviorKeysMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class BehaviorStatsFilterMessage(BaseApiData):
-    behaviorCode: str = field(required=True)
+    behaviorCode: str = field(metadata=dict(required=True))
     state: str = field(default="")
     zipCode: str = field(default="")
     lat: float = field(default=0.0)
@@ -43,7 +43,7 @@ BehaviorStatsRequestMessage = make_dataclass(
 # BehaviorRowMsg = model_message(Entry, exclude=('addDateTime', 'modifyDateTime') )
 @dataclass(base_schema=NdbBaseSchema)
 class BehaviorRowMsg(BaseApiData):
-    behaviorCode: str = field(required=True)
+    behaviorCode: str = field(metadata=dict(required=True))
     feelingStrength: int = field(default=0)  # 0-4
     significanceStrength: int = field(default=0)  # NIU
     comments: str = field(default="")
@@ -51,7 +51,7 @@ class BehaviorRowMsg(BaseApiData):
     lon: float = field(default=0.0)
     shareDetails: str = field(default="")
     surveyId: int = field(default=2)
-    personId: int = field(default=0, required=True)
+    personId: int = field(default=0, metadata=dict(required=True))
     # Occur SHOULD allow time component
     occurDateTime: float = field(default=0.0)
     behaviorId: int = field(default=-1)  # used to find same rec upon update/replace
@@ -113,11 +113,11 @@ class StatsAndMetricsMsg(BaseApiData):
 class BehEntryWrapperMessage(BaseApiData):
     """also used to include phases/intervals in the list of beh-entries"""
 
-    behaviorCode: str = field(default="", required=True)
-    feelingStrength: int = field(default=0, required=True)
+    behaviorCode: str = field(default="", metadata=dict(required=True))
+    feelingStrength: int = field(default=0, metadata=dict(required=True))
     longitude: float = field(default=0.0)
     comments: str = field(default="")
-    shareDetails: str = field(default="", required=True)
+    shareDetails: str = field(default="", metadata=dict(required=True))
     occurDateTime: float = field(default=0.0)  # as Epoch
     addDateTime: float = field(default=0.0)
     modifyDateTime: float = field(default=0.0)
@@ -130,7 +130,7 @@ class BehEntryWrapperMessage(BaseApiData):
     rootCat: str = field(default="")
     parentCatLabel: str = field(default="")
     rootCatLabel: str = field(default="")
-    personName: str = field(default="", required=True)
+    personName: str = field(default="", metadata=dict(required=True))
     latitude: float = field(default=0.0)
     commRiskScore: float = field(default=0.0)
     # dont really need rowType currently because rootCat == commitLevel in "cl" case
@@ -143,14 +143,14 @@ class BehEntryWrapperMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class BehaviorLogSummaryMessage(BaseApiData):
-    beganDatingDt: date = field(required=True)
+    beganDatingDt: date = field(metadata=dict(required=True))
     endedDatingDt: date = field()
-    persId: int = field(default=0, required=True)
-    persName: str = field(default="", required=True)
+    persId: int = field(default=0, metadata=dict(required=True))
+    persName: str = field(default="", metadata=dict(required=True))
     persCurRelStatus: str = field(default="CASUAL")  # enums.DisplayCommitLvl
-    firstEntryDttm: float = field(default=0.0, required=True)  # as epoch
-    lastEntryDttm: float = field(default=0.0, required=True)
-    count: int = field(default=0, required=True)
+    firstEntryDttm: float = field(default=0.0, metadata=dict(required=True))  # as epoch
+    lastEntryDttm: float = field(default=0.0, metadata=dict(required=True))
+    count: int = field(default=0, metadata=dict(required=True))
     entries: list[BehEntryWrapperMessage] = []
     phaseHistory: list[TrackingPayloadMessage] = []
     #
@@ -159,8 +159,8 @@ class BehaviorLogSummaryMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class BehaviorSearchTermMsg(BaseApiData):
-    userId: str = field(default="", required=True)
-    searchPhrase: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    searchPhrase: str = field(default="", metadata=dict(required=True))
     failed: bool = field(default=False)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -170,16 +170,16 @@ class BehaviorSearchTermMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class BehOrCatMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
-    code: str = field(default="", required=True)
-    parentCode: str = field(default="", required=True)
-    catCode: str = field(default="", required=True)
+    code: str = field(default="", metadata=dict(required=True))
+    parentCode: str = field(default="", metadata=dict(required=True))
+    catCode: str = field(default="", metadata=dict(required=True))
     oppositeCode: str = field(default="")
-    text: str = field(default="", required=True)
-    catDescription: str = field(default="", required=True)
-    isCategory: bool = field(default=False, required=True)
-    isPositive: bool = field(default=False, required=True)
-    sort: int = field(default=100, required=True)
-    keywords: str = field(default="", required=True)
+    text: str = field(default="", metadata=dict(required=True))
+    catDescription: str = field(default="", metadata=dict(required=True))
+    isCategory: bool = field(default=False, metadata=dict(required=True))
+    isPositive: bool = field(default=False, metadata=dict(required=True))
+    sort: int = field(default=100, metadata=dict(required=True))
+    keywords: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -187,7 +187,7 @@ class BehOrCatMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
-    code: str = field(default="", required=True)
+    code: str = field(default="", metadata=dict(required=True))
     children: str = field(default="", repeated=True)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -207,14 +207,14 @@ class FullBehaviorListMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class CatCodeTextMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
-    code: str = field(default="", required=True)
-    name: str = field(default="", required=True)
+    code: str = field(default="", metadata=dict(required=True))
+    name: str = field(default="", metadata=dict(required=True))
     # how many ??'s left unanswered
-    answerCount: int = field(default=0, required=True)
-    availCount: int = field(default=10, required=True)
+    answerCount: int = field(default=0, metadata=dict(required=True))
+    availCount: int = field(default=10, metadata=dict(required=True))
     # perhaps we should reset availCount each time they add a prospect??
-    iconName: str = field(default="", required=True)
-    pos: bool = field(default=False)(6, required=True, default=False)
+    iconName: str = field(default="", metadata=dict(required=True))
+    pos: bool = field(default=False)(6, metadata=dict(required=True), default=False)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -231,7 +231,7 @@ class TopCategoriesMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class BehStatMsg(BaseApiData):
     # embedded in VoteTypeMsg
-    totCount: int = field(default=0, required=True)
+    totCount: int = field(default=0, metadata=dict(required=True))
     slotCounts: int = field(default=0, repeated=True)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -287,11 +287,11 @@ class VoteTypeMsgAdapter:
 
 @dataclass(base_schema=NdbBaseSchema)
 class BehVoteStatsMsg(BaseApiData):
-    behaviorCode: str = field(default="", required=True)
+    behaviorCode: str = field(default="", metadata=dict(required=True))
     female: list[VoteTypeMsg] = []
     male: list[VoteTypeMsg] = []
     unknown: list[VoteTypeMsg] = []
-    categoryName: str = field(default="", required=True)
+    categoryName: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -332,8 +332,8 @@ class BehVoteStatAdapter:
 
 @dataclass(base_schema=NdbBaseSchema)
 class BehSrchLogMsg(BaseApiData):
-    searchStr: str = field(default="", required=True)
-    foundCount: int = field(default=0, required=True)
+    searchStr: str = field(default="", metadata=dict(required=True))
+    foundCount: int = field(default=0, metadata=dict(required=True))
     # behCode ultimately Selected is for future
     behCodeSelected: str = field(default="")
     #

@@ -15,14 +15,14 @@ from ..schemas.base import NdbBaseSchema
 class IapReceipt(BaseApiData):
     """raw data from apple receipts"""
 
-    receiptAsB64EncStr: str = field(required=True)
-    origTransID: str = field(required=True)
+    receiptAsB64EncStr: str = field(metadata=dict(required=True))
+    origTransID: str = field(metadata=dict(required=True))
 
 
 @dataclass(base_schema=NdbBaseSchema)
 class IapVerify(BaseApiData):
     """ """
 
-    status: int = field(default=0, required=True)
-    oldAccountLevel: int = field(default=0, required=True)
-    newAccountLevel: int = field(default=1, required=True)
+    status: int = field(default=0, metadata=dict(required=True))
+    oldAccountLevel: int = field(default=0, metadata=dict(required=True))
+    newAccountLevel: int = field(default=1, metadata=dict(required=True))

@@ -23,9 +23,11 @@ class ValueOrStatsReqMsg(BaseApiData):
         leave categoryCode blank to load ALL prior answers when calling values.loadPriorAnswers
     """
 
-    categoryCode: str = field(required=True)
-    behCode: str = field(default="", required=True)  # optional only sent to load stats
-    count: int = field(default=0, required=True)
+    categoryCode: str = field(metadata=dict(required=True))
+    behCode: str = field(
+        default="", metadata=dict(required=True)
+    )  # optional only sent to load stats
+    count: int = field(default=0, metadata=dict(required=True))
     # randomizeCat: bool = field(default=False)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -36,10 +38,12 @@ class ValueOrStatsReqMsg(BaseApiData):
 class PersonFrequencyMsg(BaseApiData):
     """used to set how often each prospect does a deception tell"""
 
-    personID: int = field(default=0, required=True)
-    frequency: int = field(default=0, required=True)
+    personID: int = field(default=0, metadata=dict(required=True))
+    frequency: int = field(default=0, metadata=dict(required=True))
     # must send old answer so stats can be adjusted upon change; > 0 means rec-update
-    origFrequency: int = field(default=-1, required=True)  # range 1 <= xx <= 4
+    origFrequency: int = field(
+        default=-1, metadata=dict(required=True)
+    )  # range 1 <= xx <= 4
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -56,11 +60,13 @@ class ValueRateMsg(BaseApiData):
             you should also receive isEditDontBumpCount == True
     """
 
-    behCode: str = field(required=True)
-    categoryCode: str = field(required=True)  # required to find proper storage shard
-    concernVote: int = field(default=2, required=True)
+    behCode: str = field(metadata=dict(required=True))
+    categoryCode: str = field(
+        metadata=dict(required=True)
+    )  # required to find proper storage shard
+    concernVote: int = field(default=2, metadata=dict(required=True))
     # send old answer so stats can be adjusted upon change (not yet implemented)
-    origConcernVote: int = field(default=-1, required=True)
+    origConcernVote: int = field(default=-1, metadata=dict(required=True))
     frequencies: list[PersonFrequencyMsg] = []
     changeDt: date = None
     # decrementQuota=False tells server that this is a catch-up frequency answer
@@ -79,14 +85,14 @@ class BehaviorAssessMsg(BaseApiData):
 
     """
 
-    behCode: str = field(required=True)
-    catCode: str = field(default="", required=True)
-    subCat: str = field(default="", required=True)
+    behCode: str = field(metadata=dict(required=True))
+    catCode: str = field(default="", metadata=dict(required=True))
+    subCat: str = field(default="", metadata=dict(required=True))
     text: str = field(default="")
     # prior answer
     hasPriorAnswer: bool = field(default=False)
     priorAnswer: ValueRateMsg = None
-    categoryName: str = field(default="", required=True)
+    categoryName: str = field(default="", metadata=dict(required=True))
     filterKeywords: str = field(required=False)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -97,7 +103,7 @@ class BehaviorAssessMsg(BaseApiData):
 class ValuesCollectionMsg(BaseApiData):
     """payload to add or update both global & per-prospect answers"""
 
-    availQuestCount: int = field(default=5, required=True)
+    availQuestCount: int = field(default=5, metadata=dict(required=True))
     # should be an entry in items for each behCode
     items: list[BehaviorAssessMsg] = []
     #

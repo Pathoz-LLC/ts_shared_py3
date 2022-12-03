@@ -26,32 +26,32 @@ class UserProfileMsg(BaseApiData):
     updating their profile
     """
 
-    userId: str = field(default="", required=True)
-    email: str = field(default="", required=True)
-    fullNameOrHandle: str = field(default="", required=True)
-    photoUrl: str = field(default="", required=True)
-    dob: date = field(required=True)
-    sex: Sex = field(default=Sex.UNKNOWN, required=True)
-    city: str = field(default="", required=True)
-    state: str = field(default="", required=True)
-    zip: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    email: str = field(default="", metadata=dict(required=True))
+    fullNameOrHandle: str = field(default="", metadata=dict(required=True))
+    photoUrl: str = field(default="", metadata=dict(required=True))
+    dob: date = field(metadata=dict(required=True))
+    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
+    city: str = field(default="", metadata=dict(required=True))
+    state: str = field(default="", metadata=dict(required=True))
+    zip: str = field(default="", metadata=dict(required=True))
 
-    first: str = field(default="", required=True)
-    last: str = field(default="", required=True)
+    first: str = field(default="", metadata=dict(required=True))
+    last: str = field(default="", metadata=dict(required=True))
 
     # 0==IOS;  1==Android, 2==Web
-    pushNotifyDeviceType: int = field(default=0, required=True)
+    pushNotifyDeviceType: int = field(default=0, metadata=dict(required=True))
 
-    deviceModel: str = field(default="na", required=True)
-    deviceID: str = field(default="", required=True)
+    deviceModel: str = field(default="na", metadata=dict(required=True))
+    deviceID: str = field(default="", metadata=dict(required=True))
 
-    promoCode: str = field(default="", required=True)
-    authProvider: str = field(default="email", required=True)
+    promoCode: str = field(default="", metadata=dict(required=True))
+    authProvider: str = field(default="email", metadata=dict(required=True))
 
-    jwt: str = field(default="", required=True)
+    jwt: str = field(default="", metadata=dict(required=True))
     latitude: float = field(default=0.0)
     longitude: float = field(default=0.0)
-    accountLevel: int = field(default=0, required=True)
+    accountLevel: int = field(default=0, metadata=dict(required=True))
 
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -64,13 +64,13 @@ class AppSettingsMsg(BaseApiData):
     allowPushNotifications: bool = field(default=True)
     breakupArchiveAllProspects: bool = field(default=False)
 
-    autoLockAfterMinutes: int = field(default=0, required=True)
+    autoLockAfterMinutes: int = field(default=0, metadata=dict(required=True))
     clearFeelingCheckReminders: bool = field(default=False)  # remove all alerts
 
-    blockedUserList: str = field(default="", required=True)
+    blockedUserList: str = field(default="", metadata=dict(required=True))
     unblockAllUsers: bool = field(default=False)  # clears blocks on specific users
     # after sign-up or log-in, this bearer token goes in the header for subsequent requests
-    apiToken: str = field(default="", required=True)
+    apiToken: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -78,8 +78,8 @@ class AppSettingsMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class UserAccountChangeMsg(BaseApiData):
     # when user buys a subscription to Gold or Diamond
-    userId: str = field(default="", required=True)
-    accountLevel: int = field(default=0, required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    accountLevel: int = field(default=0, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -93,8 +93,8 @@ class UserIdMessage(BaseApiData):
         eg request chat or block user
     """
 
-    userId: str = field(default="", required=True)
-    jwt: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    jwt: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -104,16 +104,16 @@ class UserIdMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class UserDemographicsMsg(BaseApiData):
-    handle: str = field(default="", required=True)
-    name: str = field(default="", required=True)
-    email: str = field(default="", required=True)
-    phone: str = field(default="", required=True)
-    dob: date = field(required=True)
-    sex: str = field(default="", required=True)
-    preferredSex: str = field(default="", required=True)
-    imageURL: str = field(default="", required=True)
-    city: str = field(default="", required=True)
-    state: str = field(default="", required=True)
+    handle: str = field(default="", metadata=dict(required=True))
+    name: str = field(default="", metadata=dict(required=True))
+    email: str = field(default="", metadata=dict(required=True))
+    phone: str = field(default="", metadata=dict(required=True))
+    dob: date = field(metadata=dict(required=True))
+    sex: str = field(default="", metadata=dict(required=True))
+    preferredSex: str = field(default="", metadata=dict(required=True))
+    imageURL: str = field(default="", metadata=dict(required=True))
+    city: str = field(default="", metadata=dict(required=True))
+    state: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -126,25 +126,25 @@ class UserBioMessage(BaseApiData):
         eg request chat or block user
     """
 
-    userId: str = field(default="", required=True)
-    handle: str = field(default="", required=True)
-    first: str = field(default="", required=True)
-    last: str = field(default="", required=True)
-    name: str = field(default="", required=True)
-    email: str = field(default="", required=True)
-    phone: str = field(default="", required=True)
-    dob: date = field(required=True)
-    sex: int = field(default=0, required=True)
-    preferredSex: int = field(default=0, required=True)
-    photoUrl: str = field(default="", required=True)
-    accountLevel: int = field(default=0, required=True)
-    provider_id: str = field(default="", required=True)
-    authToken: str = field(default="", required=True)
-    refreshToken: str = field(default="", required=True)
-    expiresOn: date = field(required=True)
-    lastLogin: date = field(required=True)
-    promoCode: str = field(default="", required=True)
-    city: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    handle: str = field(default="", metadata=dict(required=True))
+    first: str = field(default="", metadata=dict(required=True))
+    last: str = field(default="", metadata=dict(required=True))
+    name: str = field(default="", metadata=dict(required=True))
+    email: str = field(default="", metadata=dict(required=True))
+    phone: str = field(default="", metadata=dict(required=True))
+    dob: date = field(metadata=dict(required=True))
+    sex: int = field(default=0, metadata=dict(required=True))
+    preferredSex: int = field(default=0, metadata=dict(required=True))
+    photoUrl: str = field(default="", metadata=dict(required=True))
+    accountLevel: int = field(default=0, metadata=dict(required=True))
+    provider_id: str = field(default="", metadata=dict(required=True))
+    authToken: str = field(default="", metadata=dict(required=True))
+    refreshToken: str = field(default="", metadata=dict(required=True))
+    expiresOn: date = field(metadata=dict(required=True))
+    lastLogin: date = field(metadata=dict(required=True))
+    promoCode: str = field(default="", metadata=dict(required=True))
+    city: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -157,8 +157,8 @@ class UserCommunicationDetailsMsg(BaseApiData):
     READABLE values only (client settings not respected)
     """
 
-    otherUserID: str = field(default="", required=True)
-    prospectID: int = field(default=0, required=True)
+    otherUserID: str = field(default="", metadata=dict(required=True))
+    prospectID: int = field(default=0, metadata=dict(required=True))
 
     # client settable vals
     # user wants to talk
@@ -171,7 +171,7 @@ class UserCommunicationDetailsMsg(BaseApiData):
     saveBlockedValChanges: bool = field(default=False)
     saveSpamValChanges: bool = field(default=False)
     # change notes over time
-    comments: str = field(default="", required=True)
+    comments: str = field(default="", metadata=dict(required=True))
 
     # client readable values
     canContinueChat: bool = field(default=False)
@@ -187,20 +187,20 @@ UserAccountMessage = compose(UserBioMessage, AppSettingsMsg)
 @dataclass(base_schema=NdbBaseSchema)
 class UserLoginMsg(BaseApiData):
     # sent for login & create user acct
-    userId: str = field(default="", required=True)
-    email: str = field(default="", required=True)
-    name: str = field(default="", required=True)
-    phone: str = field(default="", required=True)
-    imageURL: str = field(default="", required=True)
-    provider: str = field(default="", required=True)
-    jwt: str = field(default="", required=True)
+    userId: str = field(default="", metadata=dict(required=True))
+    email: str = field(default="", metadata=dict(required=True))
+    name: str = field(default="", metadata=dict(required=True))
+    phone: str = field(default="", metadata=dict(required=True))
+    imageURL: str = field(default="", metadata=dict(required=True))
+    provider: str = field(default="", metadata=dict(required=True))
+    jwt: str = field(default="", metadata=dict(required=True))
     isNewUser: bool = field(default=False)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
     # # old_access_token is used to unify users who choose differet IDP's for login
     # # gitkit will handle it automatically if user has same email at each IDP
-    # old_access_token: str = field(default="", required=True)
+    # old_access_token: str = field(default="", metadata=dict(required=True))
     # idpProfileAtts = BaseApiDataField(UserBioMessage, 4, repeated=False)
 
 
