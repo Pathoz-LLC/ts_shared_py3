@@ -7,7 +7,10 @@ python src/main_validate.py
 
 #### to install from github
 python3 -m pip install git+https://github.com/Pathoz-LLC/ts_shared_py3.git#egg=ts_shared_py3
-or if you want it editable, add:  pip install -e
+or if you want it editable:
+    pip install -e /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3
+    pip uninstall ts_shared_py3
+
 
 
 ##### dev setup
@@ -29,7 +32,7 @@ python -m pip install flask
 pip freeze > requirements.txt
 
 
-#### to build for pypy
+#### to build this shared project for pypy (not needed at all)
 python3 -m pip install --upgrade build
 
 from here:
