@@ -6,10 +6,10 @@ from typing import Optional, Iterable  # List
 
 #
 from ...scoring.commBehImpactConsenus import CommImpactConsensus
-from ...common.models.baseNdb_model import BaseNdbModel
-from ...common.enums.commitLevel import DisplayCommitLvl, LogicCommitLvl
+from ..models.baseNdb_model import BaseNdbModel
+from ..enums.commitLevel import DisplayCommitLvl, LogicCommitLvl
 from .interval import Interval
-from ...common.utils.date_conv import calcOverlappingDays, dateTime_to_epoch
+from ..utils.date_conv import calcOverlappingDays, dateTime_to_epoch
 from ...constants import DISTANT_FUTURE_DATE
 
 log = logging.getLogger("tracking")

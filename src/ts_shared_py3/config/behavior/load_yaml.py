@@ -22,14 +22,14 @@ import json  # dumps( {} ) turns dict into string
 from marshmallow.fields import Number
 
 #
-from ....constants import (
+from ...constants import (
     APP_IMPACT_WEIGHT_MAX,
     IMPACT_WEIGHT_DECIMALS,
     FEELING_CD_PREFIX,
 )
 
 # from common.models.behavior_model import PersonBehavior
-from ....common.utils.singleton import Singleton
+from ...utils.singleton import Singleton
 from .beh_constants import (
     SHOWALL_CAT_LABEL,
     SHOWALL_CODE_PREFIX,
@@ -377,13 +377,12 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
         # forRowInYaml returns a list which we can ignore here
         forRowInYaml(
-            projRoot
-            + "common/config/behavior/category.yaml",  # common/config/behavior/
+            projRoot + "config/behavior/category.yaml",  # common/config/behavior/
             makePerRowFunc(True, categoriesDict),
         )
         behaviorsDict: map[str, BehCatNode] = dict()  # behavior
         forRowInYaml(
-            projRoot + "common/config/behavior/behaviors.yaml",
+            projRoot + "config/behavior/behaviors.yaml",
             makePerRowFunc(False, behaviorsDict),
         )
 

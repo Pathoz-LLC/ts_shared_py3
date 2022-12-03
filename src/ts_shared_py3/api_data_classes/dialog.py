@@ -5,8 +5,8 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ...common.schemas.base import NdbBaseSchema
-from ...common.schemas.tracking import TrackingPayloadMessage
+from ..schemas.base import NdbBaseSchema
+from ..schemas.tracking import TrackingPayloadMessage
 
 
 @dataclass(base_schema=NdbBaseSchema)

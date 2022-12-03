@@ -19,15 +19,15 @@ from random import randint
 # )
 
 # *********** end local testing
-from ..common.utils.singleton import Singleton
+from ..utils.singleton import Singleton
 
 # from common.models.behGlobal import BehaviorRollup, VoteTypeRollup
-from ..common.enums.voteType import VoteType
-from ..common.config.behavior.load_yaml import BehCatNode, BehaviorSourceSingleton
+from ..enums.voteType import VoteType
+from ..config.behavior.load_yaml import BehCatNode, BehaviorSourceSingleton
 
 #
 from ..constants import IMPACT_WEIGHT_DECIMALS, COMMIT_CHNG_CODE_CONST
-from ..common.config.behavior.beh_constants import FEELING_ONLY_CODE_NEG
+from ..config.behavior.beh_constants import FEELING_ONLY_CODE_NEG
 
 # this module serves ONLY to keep stats of
 # latest community consensus on negative behaviors

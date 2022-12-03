@@ -5,7 +5,7 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ...common.schemas.base import NdbBaseSchema
+from ..schemas.base import NdbBaseSchema
 
 # NOT SURE IF THIS FILE IS USED/NEEDED
 

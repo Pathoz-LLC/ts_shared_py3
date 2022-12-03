@@ -6,8 +6,8 @@ from collections import namedtuple
 from random import randint
 
 #
-from ...common.enums.alloc import AllocType  # , AllocLookup
-from ...common.enums.commitLevel import DisplayCommitLvl
+from ..enums.alloc import AllocType  # , AllocLookup
+from ..enums.commitLevel import DisplayCommitLvl
 
 # from .alloc import AllocType
 from ...constants import IMPACT_WEIGHT_DECIMALS

@@ -2,12 +2,12 @@ from random import randint
 from collections import namedtuple
 import google.cloud.ndb as ndb
 
-from ...common.models.user import User
-from ...common.models.person import PersonLocal
+from ..models.user import User
+from ..models.person import PersonLocal
 from .pn_exceptions import UserNotFoundErr, MissingReqFieldErr
 
 # FIXME
-from ...common.firebase.admin import tsFirebaseApp
+from ..firebase.admin import tsFirebaseApp
 
 # firebase api
 from firebase_admin.messaging import Message, send

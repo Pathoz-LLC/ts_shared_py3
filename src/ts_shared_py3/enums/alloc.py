@@ -3,7 +3,7 @@ from enum import IntEnum, unique
 from math import floor, log
 
 #
-from ...common.utils.singleton import Singleton
+from ..utils.singleton import Singleton
 
 """ When row-scores are grouped into days, buckets or months
     it's important that the more impactful entries

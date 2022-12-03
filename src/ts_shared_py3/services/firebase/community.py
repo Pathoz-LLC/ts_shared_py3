@@ -6,9 +6,9 @@ from common.utils.date_conv import (
     date_to_epoch,
     date_from_epoch,
 )
-from ...common.models.behavior import BehaviorSourceSingleton
-from ...common.enums.activityType import ActivityType
-from ...common.enums.sex import Sex
+from ..models.behavior import BehaviorSourceSingleton
+from ..enums.activityType import ActivityType
+from ..enums.sex import Sex
 
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 
