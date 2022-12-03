@@ -85,9 +85,9 @@ class BehaviorRowMsg(BaseApiData):
 class BehaviorHistoryMessage(BaseApiData):
     beganDatingDate: date = field()
     endedDatingDate: date = field()
-    items = list[BehaviorRowMsg] = []
     firstLogDtTm: float = field(default=0.0)  # as epoch
     lastLogDtTm: float = field(default=0.0)
+    items = list[BehaviorRowMsg] = []
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -143,8 +143,9 @@ class BehEntryWrapperMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class BehaviorLogSummaryMessage(BaseApiData):
-    beganDatingDt: date = field(metadata=dict(required=True))
     endedDatingDt: date = field()
+    beganDatingDt: date = field(metadata=dict(required=True))
+
     persId: int = field(default=0, metadata=dict(required=True))
     persName: str = field(default="", metadata=dict(required=True))
     persCurRelStatus: str = field(default="CASUAL")  # enums.DisplayCommitLvl
@@ -196,8 +197,8 @@ class NodeListMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class FullBehaviorListMsg(BaseApiData):
     # top level msg returned to client
-    masterList: list[BehOrCatMsg] = []
     topCategoryCodes: str = field(default="", repeated=True)
+    masterList: list[BehOrCatMsg] = []
     graph: list[NodeListMsg] = []
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -288,10 +289,10 @@ class VoteTypeMsgAdapter:
 @dataclass(base_schema=NdbBaseSchema)
 class BehVoteStatsMsg(BaseApiData):
     behaviorCode: str = field(default="", metadata=dict(required=True))
+    categoryName: str = field(default="", metadata=dict(required=True))
     female: list[VoteTypeMsg] = []
     male: list[VoteTypeMsg] = []
     unknown: list[VoteTypeMsg] = []
-    categoryName: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

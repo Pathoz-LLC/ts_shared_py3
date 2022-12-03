@@ -47,8 +47,8 @@ class CommStatsListMsg(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class CommunicationEventMsg(BaseApiData):
-    fromUser: bool = field(default=False, metadata=dict(required=True))
     sentDttm: date = field()
+    fromUser: bool = field(default=False, metadata=dict(required=True))
     wordCount: int = field(default=0, metadata=dict(required=True))
     text: str = field(default="")
     #
@@ -58,9 +58,9 @@ class CommunicationEventMsg(BaseApiData):
 @dataclass(base_schema=NdbBaseSchema)
 class CommunicationRawTranscriptMsg(BaseApiData):
     # raw msg transcript data
-    persId: int = field(default=0, metadata=dict(required=True))
     startDtTm: date = field()
     endDtTm: date = field()
+    persId: int = field(default=0, metadata=dict(required=True))
     messages: list[CommunicationEventMsg] = []
     #
     Schema: ClassVar[Type[Schema]] = Schema

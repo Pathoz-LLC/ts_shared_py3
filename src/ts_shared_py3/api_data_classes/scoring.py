@@ -12,11 +12,12 @@ class RequRelationshipOverviewData(BaseApiData):
     request returns a ProspectScoreData
     """
 
+    queryStartDt: date = None
+    queryEndDt: date = None
+
     userId: str = field(default="0")
     persId: int = field(default=0)
     persName: str = field(default="")
-    queryStartDt: date = None
-    queryEndDt: date = None
     # Deprecated
     # monthsBackFromNow & prior flds are deprecated (use queryStart and queryEnd above)
     monthsBackFromNow: int = field(default=3, metadata=dict(validate=123))
@@ -92,11 +93,13 @@ class ScoreMetadataData(BaseApiData):
 @dataclass
 class ProspectScoreData(BaseApiData):
     # ProspectScoreMsg; rolls together current score with prior-period scores
-    persId: int = field(default=0)
     curPeriodDetails: CurPhaseRelStateData = None
-    # priorPeriodScores are the buckets/windows of consolidated scores (ie a point on graph)
     priorPeriodScores: list[OneWindowScoreData] = None
+    metadata: ScoreMetadataData = None  # field()
+
+    persId: int = field(default=0)
+    # priorPeriodScores are the buckets/windows of consolidated scores (ie a point on graph)
     incidentCount: int = field(default=0)
     redFlagBits: int = field(default=0)
-    metadata: ScoreMetadataData = None  # field()
+
     # bucketWidthDays: int = field(default=0)

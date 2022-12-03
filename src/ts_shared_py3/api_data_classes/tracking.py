@@ -26,10 +26,10 @@ class CommitLvlApiMsg(BaseApiData):
 class CommitLvlUpdateMsg(BaseApiData):
     """used to update CommitLvl for in-active users"""
 
+    startDate: date = field()
     persId: int = field(default=0, metadata=dict(required=True))
     userId: int = field(default=0, metadata=dict(required=True))
     commitLvlDisplayCd: str = field(default="")
-    startDate: date = field()
     # notificationId serves for authentication b4 changing data
     notificationId: str = field(default="")
 
@@ -42,12 +42,12 @@ class IntervalMessage(BaseApiData):
     oldStartDate is key for update/delete
     """
 
-    persId: int = field(default=0, metadata=dict(required=True))
     # oldStartDate is key to find which row edited or deleted; ignored for Add
     oldStartDate: date = field()
     startDate: date = field()
     endDate: date = field()
     commitLvl: CommitLvlApiMsg = field()
+    persId: int = field(default=0, metadata=dict(required=True))
 
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -67,13 +67,16 @@ class TrackingPayloadMessage(BaseApiData):
 class IncidentRowMessage(BaseApiData):
     """ """
 
+    earliestOverlapDate: date = field()
+    addDateTime: date = field()
+    modDateTime: date = field()
+
     incidentId: int = field(default=0, metadata=dict(required=True))
     userTruthOpinion: int = field(default=0, metadata=dict(required=True))
     evidenceStatus: int = field(default=0, metadata=dict(required=True))
 
     # details: reportingUser is the OTHER user
     reportingUserId: str = field(default="")
-    earliestOverlapDate: date = field()
 
     overlapDays: int = field(default=0, metadata=dict(required=True))
     userIntervalRowNum: int = field(default=0, metadata=dict(required=True))
@@ -83,8 +86,7 @@ class IncidentRowMessage(BaseApiData):
     # housekeeping
     # if reporting user changes their dates, store old vals here
     repUserIntervalReviseHistory: str = field(default="")
-    addDateTime: date = field()
-    modDateTime: date = field()
+
     reportingUserIntervalRowNum: int = field(default=0, required=False)
     reportingUserSex: Sex = field(default=0, metadata=dict(required=True))
     # a sequential user ID starting from 1 to keep privacy
@@ -97,10 +99,10 @@ class IncidentRowMessage(BaseApiData):
 
 @dataclass(base_schema=NdbBaseSchema)
 class IncidentDetailsMessage(BaseApiData):
-    persId: int = field(default=0, metadata=dict(required=True))
     asOfDate: date = field()
-    items: list[IncidentRowMessage] = []
+    persId: int = field(default=0, metadata=dict(required=True))
     userOverlapCount: int = field(default=0, metadata=dict(required=True))
+    items: list[IncidentRowMessage] = []
 
     Schema: ClassVar[Type[Schema]] = Schema
 

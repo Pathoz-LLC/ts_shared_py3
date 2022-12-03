@@ -52,8 +52,8 @@ class QuestionAsMessage(BaseApiData):
 class PendingRelPhaseQuestions(BaseApiData):
     # allows returning multiple questions at once
     # but typically sends one at a time
-    questions: list[QuestionAsMessage] = []
     noMoreQuestions: bool = field(default=False)
+    questions: list[QuestionAsMessage] = []
     # when items.count == 0, then use phases as the final result
     # now the server builds the phases / intervals & so next value is not needed
     # phases = BaseApiDataField(IntervalMessage, 3, repeated=True)

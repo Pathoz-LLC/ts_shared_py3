@@ -60,10 +60,11 @@ class ValueRateMsg(BaseApiData):
             you should also receive isEditDontBumpCount == True
     """
 
-    behCode: str = field(metadata=dict(required=True))
+    behCode: str = field(default="", metadata=dict(required=True))
     categoryCode: str = field(
-        metadata=dict(required=True)
+        default="", metadata=dict(required=True)
     )  # required to find proper storage shard
+
     concernVote: int = field(default=2, metadata=dict(required=True))
     # send old answer so stats can be adjusted upon change (not yet implemented)
     origConcernVote: int = field(default=-1, metadata=dict(required=True))
@@ -85,13 +86,14 @@ class BehaviorAssessMsg(BaseApiData):
 
     """
 
+    priorAnswer: ValueRateMsg = None
+
     behCode: str = field(metadata=dict(required=True))
     catCode: str = field(default="", metadata=dict(required=True))
     subCat: str = field(default="", metadata=dict(required=True))
     text: str = field(default="")
     # prior answer
     hasPriorAnswer: bool = field(default=False)
-    priorAnswer: ValueRateMsg = None
     categoryName: str = field(default="", metadata=dict(required=True))
     filterKeywords: str = field(required=False)
     #

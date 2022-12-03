@@ -12,9 +12,9 @@ from ..schemas.base import NdbBaseSchema
 
 @dataclass(base_schema=NdbBaseSchema)
 class ForgeNewsMsg(BaseApiData):
+    eventTypeIdList: str = field(metadata=dict(required=True))
     newsPerMinute: int = field(default=6, metadata=dict(required=True))
     runTimeSecs: int = field(default=40, metadata=dict(required=True))
-    eventTypeIdList: str = field(metadata=dict(required=True))
 
 
 @dataclass(base_schema=NdbBaseSchema)

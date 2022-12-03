@@ -13,18 +13,19 @@ from ..enums.sex import Sex
 
 @dataclass(base_schema=NdbBaseSchema)
 class PersonRowMsg(BaseApiData):
-    id: str = field(default="")
+    dob: date = field()
+    addDateTime: date = field()
+    id: str = field()
+
     mobile: str = field(default="")
     first: str = field(default="")
     last: str = field(default="")
     email: str = field(default="")
-    dob: date = field()
     sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
     redFlagBits: int = field(default=0)
     city: str = field(default="")
     state: str = field(default="")
     zip: str = field(default="")
-    addDateTime: date = field()
 
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -35,15 +36,16 @@ class PersonRowMsg(BaseApiData):
 # PersonLocalRowMsg.field_by_name('createReason').required=False
 @dataclass(base_schema=NdbBaseSchema)
 class PersonLocalRowMsg(BaseApiData):
+    modDateTime: datetime = field()
+    addDateTime: datetime = field()
+
     nickname: str = field(default="")
     devotionLevel: int = field(default=0, metadata=dict(required=True))
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
     monitorStatus: str = field(default="ACTIVE")
     # redFlagBits: int = field(default=0, metadata=dict(required=True))
-    modDateTime: datetime = field()
     xtra: str = field(default="")
-    addDateTime: datetime = field()
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)
     reminderFrequency: str = field(default="never")
     tsConfidenceScore: float = field(default=0.0)
@@ -86,13 +88,14 @@ class PersonMockDataMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
+# FIXME
 # for creating & updating people you follow
-PersonLocalMessage = compose(PersonIdMessage, PersonLocalRowMsg)
-# PersonLocalRowMsg contains full stats payload
-PersonMessage = compose(PersonIdMessage, PersonRowMsg, PersonLocalRowMsg)
+# PersonLocalMessage = compose(PersonIdMessage, PersonLocalRowMsg)
+# # PersonLocalRowMsg contains full stats payload
+# PersonMessage = compose(PersonIdMessage, PersonRowMsg, PersonLocalRowMsg)
 
 # list of active people you follow
-PersonListMessage: list[PersonMessage]
+# PersonListMessage: list[PersonMessage]
 
 # mostly hooks for testers
 PersonIdMessageCollection: list[PersonIdMessage]
@@ -121,12 +124,13 @@ class IncidentUpdateOpinionMessage(BaseApiData):
 class RedFlagReportMsg(BaseApiData):
     """ """
 
+    beganDateTime: datetime = field()
+
     personId: int = field(default=0, metadata=dict(required=True))
     userId: str = field(default="")
     flagType: int = field(default=0, metadata=dict(required=True))
     comment: str = field(default="")
     url: str = field(default="")
-    beganDateTime: datetime = field()
     rescinded: int = field(default=0, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema

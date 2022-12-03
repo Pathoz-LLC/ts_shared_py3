@@ -26,11 +26,12 @@ class UserProfileMsg(BaseApiData):
     updating their profile
     """
 
+    dob: date = field(metadata=dict(required=True))
+
     userId: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     fullNameOrHandle: str = field(default="", metadata=dict(required=True))
     photoUrl: str = field(default="", metadata=dict(required=True))
-    dob: date = field(metadata=dict(required=True))
     sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
     city: str = field(default="", metadata=dict(required=True))
     state: str = field(default="", metadata=dict(required=True))
@@ -126,6 +127,8 @@ class UserBioMessage(BaseApiData):
         eg request chat or block user
     """
 
+    dob: date = field(metadata=dict(required=True))
+
     userId: str = field(default="", metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
     first: str = field(default="", metadata=dict(required=True))
@@ -133,7 +136,6 @@ class UserBioMessage(BaseApiData):
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    dob: date = field(metadata=dict(required=True))
     sex: int = field(default=0, metadata=dict(required=True))
     preferredSex: int = field(default=0, metadata=dict(required=True))
     photoUrl: str = field(default="", metadata=dict(required=True))
@@ -181,7 +183,7 @@ class UserCommunicationDetailsMsg(BaseApiData):
 
 
 # check if next msg is in use
-UserAccountMessage = compose(UserBioMessage, AppSettingsMsg)
+# UserAccountMessage = compose(UserBioMessage, AppSettingsMsg)
 
 
 @dataclass(base_schema=NdbBaseSchema)
@@ -205,48 +207,49 @@ class UserLoginMsg(BaseApiData):
 
 
 def castUserAndSettingsToAcctMsg(user, appSettings):
+    pass
     # msg = protopigeon.to_message(user, UserAccountMessage)
-    msg = UserAccountMessage()
-    msg.userId = user.id_
-    logging.info("User email is: %s" % (user.email))
-    msg.email = user.email
+    # msg = UserAccountMessage()
+    # msg.userId = user.id_
+    # logging.info("User email is: %s" % (user.email))
+    # msg.email = user.email
 
-    msg.handle = user.last
-    msg.first = user.first
-    msg.last = user.last
-    msg.name = user.name
-    msg.phone = user.phone
-    dobAsDate = user.dob
+    # msg.handle = user.last
+    # msg.first = user.first
+    # msg.last = user.last
+    # msg.name = user.name
+    # msg.phone = user.phone
+    # dobAsDate = user.dob
 
-    if not dobAsDate is None and isinstance(dobAsDate, date):
-        msg.dob = dobAsDate
-    else:
-        msg.dob = date(1994, 1, 1)
-        logging.error(
-            "dob is a %s & holds %s; setting to 1994" % (type(dobAsDate), dobAsDate)
-        )
-    msg.sex = user.sex
-    msg.preferredSex = user.preferredSex
-    msg.photoUrl = user.photoUrl
-    msg.accountLevel = user.accountLevel
-    msg.provider_id = user.provider_id
-    msg.authToken = user.authToken
-    msg.expiresOn = user.expiresOn
-    msg.lastLogin = user.lastLogin
-    msg.promoCode = user.promoCode
+    # if not dobAsDate is None and isinstance(dobAsDate, date):
+    #     msg.dob = dobAsDate
+    # else:
+    #     msg.dob = date(1994, 1, 1)
+    #     logging.error(
+    #         "dob is a %s & holds %s; setting to 1994" % (type(dobAsDate), dobAsDate)
+    #     )
+    # msg.sex = user.sex
+    # msg.preferredSex = user.preferredSex
+    # msg.photoUrl = user.photoUrl
+    # msg.accountLevel = user.accountLevel
+    # msg.provider_id = user.provider_id
+    # msg.authToken = user.authToken
+    # msg.expiresOn = user.expiresOn
+    # msg.lastLogin = user.lastLogin
+    # msg.promoCode = user.promoCode
 
-    # msg.email = user.email  # being dropped above
-    # msg.handle = "" # user.handle
-    msg.defaultCountryCode = appSettings.defaultCountryCode
-    msg.trustMode = appSettings.trustMode
-    # msg.userPin = appSettings.userPin
-    # msg.requirePinToOpenApp = appSettings.requirePinToOpenApp
-    # msg.autoLockAfterMinutes = appSettings.autoLockAfterMinutes
-    msg.allowChatRequests = appSettings.allowChatRequests
-    msg.enablePushNotifications = appSettings.enablePushNotifications
-    # msg.disableNotifyOnAdd = appSettings.disableNotifyOnAdd
-    # msg.poseQuestionFrequency = appSettings.poseQuestionFrequency
-    msg.userId = user.id_
-    # logging.debug('User Acct msg: UID={0}'.format(user.id_))
-    assert user.id_ == user.user_id, "TS UIDs should match Firebase Auth UIDs"
-    return msg
+    # # msg.email = user.email  # being dropped above
+    # # msg.handle = "" # user.handle
+    # msg.defaultCountryCode = appSettings.defaultCountryCode
+    # msg.trustMode = appSettings.trustMode
+    # # msg.userPin = appSettings.userPin
+    # # msg.requirePinToOpenApp = appSettings.requirePinToOpenApp
+    # # msg.autoLockAfterMinutes = appSettings.autoLockAfterMinutes
+    # msg.allowChatRequests = appSettings.allowChatRequests
+    # msg.enablePushNotifications = appSettings.enablePushNotifications
+    # # msg.disableNotifyOnAdd = appSettings.disableNotifyOnAdd
+    # # msg.poseQuestionFrequency = appSettings.poseQuestionFrequency
+    # msg.userId = user.id_
+    # # logging.debug('User Acct msg: UID={0}'.format(user.id_))
+    # assert user.id_ == user.user_id, "TS UIDs should match Firebase Auth UIDs"
+    # return msg
