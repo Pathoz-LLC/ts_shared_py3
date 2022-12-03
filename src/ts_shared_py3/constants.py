@@ -1,6 +1,12 @@
 import os
 from datetime import date
 
+PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "playerbusterapi")
+BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "playerbusterapi.appspot.com/")
+FIR_CREDS_FILENAME = os.environ.get(
+    "FIR_CREDS_FILENAME", "playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json"
+)
+
 # END DATE for latest Interval/Phase that has not ended
 DISTANT_FUTURE_DATE = date(4000, 12, 31)
 # impossible date before app was available
@@ -61,6 +67,7 @@ DERIVE_FINAL_FROM_GROUP = False
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
 
+FIREBASE_CREDS_PATH = "common/auth/{0}".format(FIR_CREDS_FILENAME)
 
 # # User Score section;  must add to 1
 # USER_PCT_WEIGHT_DAILY_FEELINGS = 0.5
