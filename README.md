@@ -6,7 +6,8 @@ python src/main_validate.py
 
 
 #### to install from github
-python3 -m pip install -e git+https://github.com/Pathoz-LLC/ts_shared_py3.git#egg=ts_shared_py3
+python3 -m pip install git+https://github.com/Pathoz-LLC/ts_shared_py3.git#egg=ts_shared_py3
+or if you want it editable, add:  pip install -e
 
 
 ##### dev setup
