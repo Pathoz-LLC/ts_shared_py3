@@ -1,8 +1,10 @@
 from datetime import date
+
 from typing import ClassVar, Type
 from dataclasses import field  # , fields, make_dataclass
 from marshmallow_dataclass import dataclass
-from marshmallow import Schema, validate
+
+from marshmallow import Schema  # , validate
 
 from .base import BaseApiData
 from ..schemas.base import NdbBaseSchema
@@ -17,6 +19,8 @@ class CommitLvlApiMsg(BaseApiData):
     iconName: str = field(default="")
     displayValue: str = field(default="")
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 @dataclass(base_schema=NdbBaseSchema)
 class CommitLvlUpdateMsg(BaseApiData):
@@ -28,6 +32,8 @@ class CommitLvlUpdateMsg(BaseApiData):
     startDate: date = field()
     # notificationId serves for authentication b4 changing data
     notificationId: str = field(default="")
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass(base_schema=NdbBaseSchema)
@@ -43,6 +49,8 @@ class IntervalMessage(BaseApiData):
     endDate: date = field()
     commitLvl: CommitLvlApiMsg = field()
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 @dataclass(base_schema=NdbBaseSchema)
 class TrackingPayloadMessage(BaseApiData):
@@ -51,6 +59,8 @@ class TrackingPayloadMessage(BaseApiData):
     enabled: bool = field(default=True)
     # repeating intervals:
     phases: list[IntervalMessage] = []
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass(base_schema=NdbBaseSchema)
@@ -82,6 +92,8 @@ class IncidentRowMessage(BaseApiData):
     # how many distinct incidents has this user had with prospect
     reportingUserIncdSeqNum: int = field(default=0, required=True)
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 @dataclass(base_schema=NdbBaseSchema)
 class IncidentDetailsMessage(BaseApiData):
@@ -89,6 +101,8 @@ class IncidentDetailsMessage(BaseApiData):
     asOfDate: date = field()
     items: list[IncidentRowMessage] = []
     userOverlapCount: int = field(default=0, required=True)
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass(base_schema=NdbBaseSchema)
@@ -98,7 +112,11 @@ class IncidentTruthMessage(BaseApiData):
         default=0, required=True
     )  # 0 means not seen; 1-4 = true->false
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 @dataclass(base_schema=NdbBaseSchema)
 class DevotionLevelListMessage(BaseApiData):
     items: list[CommitLvlApiMsg] = []
+
+    Schema: ClassVar[Type[Schema]] = Schema

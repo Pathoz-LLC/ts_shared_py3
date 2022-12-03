@@ -8,7 +8,8 @@ from .base import BaseApiData
 from ..schemas.base import NdbBaseSchema
 from ..enums.sex import Sex
 
-some shit code
+# FIXME
+
 
 @dataclass(base_schema=NdbBaseSchema)
 class PersonRowMsg(BaseApiData):
