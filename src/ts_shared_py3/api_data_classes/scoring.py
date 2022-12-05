@@ -103,3 +103,10 @@ class ProspectScoreData(BaseApiData):
     redFlagBits: int = field(default=0)
 
     # bucketWidthDays: int = field(default=0)
+
+
+RequRelationshipOverviewData.Schema.__model__ = RequRelationshipOverviewData
+OneWindowScoreData.Schema.__model__ = OneWindowScoreData
+CurPhaseRelStateData.Schema.__model__ = CurPhaseRelStateData
+ScoreMetadataData.Schema.__model__ = ScoreMetadataData
+ProspectScoreData.Schema.__model__ = ProspectScoreData

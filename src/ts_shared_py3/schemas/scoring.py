@@ -3,7 +3,7 @@ import marshmallow as ma
 
 #
 from ..api_data_classes import scoring as DataClasses
-from .base import NdbBaseSchema, NdbBaseSchemaWithKey
+from .base import DataClassBaseSchema, NdbBaseSchemaWithKey
 
 """
 the whole job of these schema objects is to define the format/structure
@@ -54,7 +54,7 @@ class RequRelationshipOverviewSchema(ma.Schema):
         return rec
 
 
-class OneWindowScoreMsg(NdbBaseSchema):
+class OneWindowScoreMsg(DataClassBaseSchema):
     """
     A single point on the relationship trends graph
     there is a wrapper for this obj at:
@@ -91,7 +91,7 @@ class OneWindowScoreMsg(NdbBaseSchema):
     # valuesAssessCounts = ma.fields.Int(default=0)
 
 
-class CurPhaseRelStateMsg(NdbBaseSchema):
+class CurPhaseRelStateMsg(DataClassBaseSchema):
     """includes text descriptions of each score
     to go with CurPhaseRelState Message
 
@@ -115,7 +115,7 @@ class CurPhaseRelStateMsg(NdbBaseSchema):
     # communicationScoreDescrip = ma.fields.String(6, default='')
 
 
-class ScoreMetadataSchema(NdbBaseSchema):
+class ScoreMetadataSchema(DataClassBaseSchema):
     """carries dates of the scores being returned
     dump_only=True means sent to client
     not received from client
@@ -131,7 +131,7 @@ class ScoreMetadataSchema(NdbBaseSchema):
     queryEndDt = ma.fields.Date(dump_only=True)
 
 
-class ProspectScoreSchema(NdbBaseSchema):
+class ProspectScoreSchema(DataClassBaseSchema):
     """full score payload for a given
     user / prospect combination
     when requested by client using:

@@ -5,13 +5,13 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 
 # usage:
 # from common.messages.iapReceipt import IapReceipt
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class IapReceipt(BaseApiData):
     """raw data from apple receipts"""
 
@@ -19,10 +19,14 @@ class IapReceipt(BaseApiData):
     origTransID: str = field(metadata=dict(required=True))
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class IapVerify(BaseApiData):
     """ """
 
     status: int = field(default=0, metadata=dict(required=True))
     oldAccountLevel: int = field(default=0, metadata=dict(required=True))
     newAccountLevel: int = field(default=1, metadata=dict(required=True))
+
+
+IapReceipt.Schema.__model__ = IapReceipt
+IapVerify.Schema.__model__ = IapVerify

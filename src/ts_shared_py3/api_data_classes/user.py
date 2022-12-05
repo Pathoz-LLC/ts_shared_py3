@@ -5,7 +5,7 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 from ..enums.sex import Sex
 
 # from common.utils.date_conv import date_to_message
@@ -20,7 +20,7 @@ import logging
 # dateTimeConverter = default_converters["DateTimeProperty"]
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserProfileMsg(BaseApiData):
     """for creating user & also for
     updating their profile
@@ -58,7 +58,7 @@ class UserProfileMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class AppSettingsMsg(BaseApiData):
     # support for app settings & batch operations
     allowIncidentTracking: bool = field(default=True)  # not in trust mode
@@ -76,7 +76,7 @@ class AppSettingsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserAccountChangeMsg(BaseApiData):
     # when user buys a subscription to Gold or Diamond
     userId: str = field(default="", metadata=dict(required=True))
@@ -85,7 +85,7 @@ class UserAccountChangeMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserIdMessage(BaseApiData):
     """used for login and for other cases described below
 
@@ -103,7 +103,7 @@ class UserIdMessage(BaseApiData):
 # old msg types below
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserDemographicsMsg(BaseApiData):
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
@@ -119,7 +119,7 @@ class UserDemographicsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserBioMessage(BaseApiData):
     """
     current app userID always comes in the endpoint request header
@@ -151,7 +151,7 @@ class UserBioMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserCommunicationDetailsMsg(BaseApiData):
     """any updates or notifications related to another user
 
@@ -186,7 +186,7 @@ class UserCommunicationDetailsMsg(BaseApiData):
 # UserAccountMessage = compose(UserBioMessage, AppSettingsMsg)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class UserLoginMsg(BaseApiData):
     # sent for login & create user acct
     userId: str = field(default="", metadata=dict(required=True))
@@ -253,3 +253,15 @@ def castUserAndSettingsToAcctMsg(user, appSettings):
     # # logging.debug('User Acct msg: UID={0}'.format(user.id_))
     # assert user.id_ == user.user_id, "TS UIDs should match Firebase Auth UIDs"
     # return msg
+
+
+UserProfileMsg.Schema.__model__ = UserProfileMsg
+
+AppSettingsMsg.Schema.__model__ = AppSettingsMsg
+
+UserAccountChangeMsg.Schema.__model__ = UserAccountChangeMsg
+UserIdMessage.Schema.__model__ = UserIdMessage
+UserDemographicsMsg.Schema.__model__ = UserDemographicsMsg
+UserBioMessage.Schema.__model__ = UserBioMessage
+UserCommunicationDetailsMsg.Schema.__model__ = UserCommunicationDetailsMsg
+UserLoginMsg.Schema.__model__ = UserLoginMsg

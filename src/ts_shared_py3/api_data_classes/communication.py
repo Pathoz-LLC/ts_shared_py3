@@ -5,10 +5,10 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommStatsMsg(BaseApiData):
     # stats for each time period
     startDtTm: date = field()
@@ -38,14 +38,14 @@ class CommStatsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommStatsListMsg(BaseApiData):
     periodStats: list[CommStatsMsg] = []
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommunicationEventMsg(BaseApiData):
     sentDttm: date = field()
     fromUser: bool = field(default=False, metadata=dict(required=True))
@@ -55,7 +55,7 @@ class CommunicationEventMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommunicationRawTranscriptMsg(BaseApiData):
     # raw msg transcript data
     startDtTm: date = field()
@@ -66,7 +66,7 @@ class CommunicationRawTranscriptMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommunicationPrefsMsg(BaseApiData):
     # prefs
     allowTextAnalyss: bool = field(default=False, metadata=dict(required=True))
@@ -77,7 +77,7 @@ class CommunicationPrefsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class PhoneNumMsg(BaseApiData):
     #
     phoneNum: str = field(default="")
@@ -87,10 +87,19 @@ class PhoneNumMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class FollowedPhoneNums(BaseApiData):
     #
     items: list[PhoneNumMsg] = []
 
     #
     Schema: ClassVar[Type[Schema]] = Schema
+
+
+CommStatsListMsg.Schema.__model__ = CommStatsListMsg
+CommunicationEventMsg.Schema.__model__ = CommunicationEventMsg
+CommunicationRawTranscriptMsg.Schema.__model__ = CommunicationRawTranscriptMsg
+
+CommunicationPrefsMsg.Schema.__model__ = CommunicationPrefsMsg
+PhoneNumMsg.Schema.__model__ = PhoneNumMsg
+FollowedPhoneNums.Schema.__model__ = FollowedPhoneNums

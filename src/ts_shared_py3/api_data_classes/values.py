@@ -5,14 +5,14 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 
 
 # from common.messages.values import ValueOrStatsReqMsg, ValueRateMsg, ValuesCollectionMsg
 
 
 # ask for next behavior to rate (assess your values)
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class ValueOrStatsReqMsg(BaseApiData):
     """obj used to construct a values client for reading
     (getting next questions, prior answers or global stats)
@@ -34,7 +34,7 @@ class ValueOrStatsReqMsg(BaseApiData):
 
 
 # user answers/votes on the question
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonFrequencyMsg(BaseApiData):
     """used to set how often each prospect does a deception tell"""
 
@@ -49,7 +49,7 @@ class PersonFrequencyMsg(BaseApiData):
 
 
 # value assess answer user sends back from client
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class ValueRateMsg(BaseApiData):
     """obj used to construct a values client for writing
 
@@ -79,7 +79,7 @@ class ValueRateMsg(BaseApiData):
 
 
 # a single behavior to rate
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorAssessMsg(BaseApiData):
     """a behavior in category
     with optional prior answers attached
@@ -101,7 +101,7 @@ class BehaviorAssessMsg(BaseApiData):
 
 
 # response from request is 1-n questions
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class ValuesCollectionMsg(BaseApiData):
     """payload to add or update both global & per-prospect answers"""
 
@@ -113,3 +113,9 @@ class ValuesCollectionMsg(BaseApiData):
 
 
 # ValuesCollectionMsg = list_message(BehaviorAssessMsg)
+
+ValueOrStatsReqMsg.Schema.__model__ = ValueOrStatsReqMsg
+PersonFrequencyMsg.Schema.__model__ = PersonFrequencyMsg
+ValueRateMsg.Schema.__model__ = ValueRateMsg
+BehaviorAssessMsg.Schema.__model__ = BehaviorAssessMsg
+ValuesCollectionMsg.Schema.__model__ = ValuesCollectionMsg

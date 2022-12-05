@@ -5,7 +5,7 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 
 """
 msg types related to users chatting
@@ -21,7 +21,7 @@ msg types related to users chatting
 # StartChatMessage = compose(InitChatMessage, ThreadIdMessage)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class ChatInfoMessage(BaseApiData):
     # tells the client how to auth at the XMPP server
     juser_id: str = field(default="")
@@ -42,7 +42,7 @@ class ChatInfoMessage(BaseApiData):
 #     thread_id = messages.IntegerField(4)    # tell client the ChatLog ID  (purpose unclear)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class PushNotifyMessage(BaseApiData):
     userId: str = field(default="", metadata=dict(required=True))
     regToken: str = field(default="", metadata=dict(required=True))
@@ -55,7 +55,7 @@ class PushNotifyMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class SubscribeTagPnMessage(BaseApiData):
     userId: str = field(default="", metadata=dict(required=True))
     regToken: str = field(default="", metadata=dict(required=True))
@@ -64,3 +64,8 @@ class SubscribeTagPnMessage(BaseApiData):
     remove: bool = field(default=True)
     #
     Schema: ClassVar[Type[Schema]] = Schema
+
+
+ChatInfoMessage.Schema.__model__ = ChatInfoMessage
+PushNotifyMessage.Schema.__model__ = PushNotifyMessage
+SubscribeTagPnMessage.Schema.__model__ = SubscribeTagPnMessage

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from typing import ClassVar, Type
 from dataclasses import field, fields, make_dataclass
@@ -5,11 +7,11 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema  # , make_schema_for_dc
 from ..schemas.tracking import TrackingPayloadMessage
 
 # example of validation
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorKeysMessage(BaseApiData):
     surveyId: int = field(default=2)
     personId: int = field(default=0, metadata=dict(required=True))
@@ -24,7 +26,7 @@ class BehaviorKeysMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorStatsFilterMessage(BaseApiData):
     behaviorCode: str = field(metadata=dict(required=True))
     state: str = field(default="")
@@ -41,7 +43,7 @@ BehaviorStatsRequestMessage = make_dataclass(
 )
 
 # BehaviorRowMsg = model_message(Entry, exclude=('addDateTime', 'modifyDateTime') )
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorRowMsg(BaseApiData):
     behaviorCode: str = field(metadata=dict(required=True))
     feelingStrength: int = field(default=0)  # 0-4
@@ -81,7 +83,7 @@ class BehaviorRowMsg(BaseApiData):
 # }
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorHistoryMessage(BaseApiData):
     beganDatingDate: date = field()
     endedDatingDate: date = field()
@@ -94,7 +96,7 @@ class BehaviorHistoryMessage(BaseApiData):
 
 # new behavior entries summary logic below
 # 11/20/17
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class StatsAndMetricsMsg(BaseApiData):
     influenceSummary: str = field(default="")
     communicationScore: float = field(default=0.0)
@@ -109,7 +111,7 @@ class StatsAndMetricsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehEntryWrapperMessage(BaseApiData):
     """also used to include phases/intervals in the list of beh-entries"""
 
@@ -141,7 +143,7 @@ class BehEntryWrapperMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorLogSummaryMessage(BaseApiData):
     endedDatingDt: date = field()
     beganDatingDt: date = field(metadata=dict(required=True))
@@ -158,7 +160,7 @@ class BehaviorLogSummaryMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehaviorSearchTermMsg(BaseApiData):
     userId: str = field(default="", metadata=dict(required=True))
     searchPhrase: str = field(default="", metadata=dict(required=True))
@@ -168,7 +170,7 @@ class BehaviorSearchTermMsg(BaseApiData):
 
 
 # full behavior list
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehOrCatMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
@@ -185,7 +187,7 @@ class BehOrCatMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
@@ -194,7 +196,7 @@ class NodeListMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class FullBehaviorListMsg(BaseApiData):
     # top level msg returned to client
     topCategoryCodes: str = field(default="", repeated=True)
@@ -205,7 +207,7 @@ class FullBehaviorListMsg(BaseApiData):
 
 
 # return list of NEGATIVE top level category codes
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CatCodeTextMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
@@ -220,7 +222,7 @@ class CatCodeTextMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class TopCategoriesMsg(BaseApiData):
     # list for client
     items: list[CatCodeTextMsg] = []
@@ -229,7 +231,7 @@ class TopCategoriesMsg(BaseApiData):
 
 
 # global stats about behavior
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehStatMsg(BaseApiData):
     # embedded in VoteTypeMsg
     totCount: int = field(default=0, metadata=dict(required=True))
@@ -238,7 +240,7 @@ class BehStatMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehStatMsgAdapter:
     @staticmethod
     def toDict(behStatMsg):
@@ -252,7 +254,7 @@ class BehStatMsgAdapter:
         return BehStatMsg(totCount=tc, slotCounts=sc)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class VoteTypeMsg(BaseApiData):
     # embedded in BehVoteStatsMsg
     feeling: list[BehStatMsg] = []
@@ -262,7 +264,7 @@ class VoteTypeMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class VoteTypeMsgAdapter:
     @staticmethod
     def toDict(voteTypeMsg):
@@ -286,7 +288,7 @@ class VoteTypeMsgAdapter:
         return VoteTypeMsg(feeling=feel, concern=con, frequency=freq)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehVoteStatsMsg(BaseApiData):
     behaviorCode: str = field(default="", metadata=dict(required=True))
     categoryName: str = field(default="", metadata=dict(required=True))
@@ -297,7 +299,7 @@ class BehVoteStatsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehVoteStatAdapter:
 
     #
@@ -331,7 +333,7 @@ class BehVoteStatAdapter:
         )
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BehSrchLogMsg(BaseApiData):
     searchStr: str = field(default="", metadata=dict(required=True))
     foundCount: int = field(default=0, metadata=dict(required=True))
@@ -339,3 +341,29 @@ class BehSrchLogMsg(BaseApiData):
     behCodeSelected: str = field(default="")
     #
     Schema: ClassVar[Type[Schema]] = Schema
+
+
+# update all schemas to refer to the enclosing model
+# add the model so creation can work in reverse!
+BehaviorKeysMessage.Schema.__model__ = BehaviorKeysMessage
+BehaviorRowMsg.Schema.__model__ = BehaviorRowMsg
+BehaviorHistoryMessage.Schema.__model__ = BehaviorHistoryMessage
+StatsAndMetricsMsg.Schema.__model__ = StatsAndMetricsMsg
+BehEntryWrapperMessage.Schema.__model__ = BehEntryWrapperMessage
+BehaviorLogSummaryMessage.Schema.__model__ = BehaviorLogSummaryMessage
+
+BehaviorSearchTermMsg.Schema.__model__ = BehaviorSearchTermMsg
+BehOrCatMsg.Schema.__model__ = BehOrCatMsg
+NodeListMsg.Schema.__model__ = NodeListMsg
+FullBehaviorListMsg.Schema.__model__ = FullBehaviorListMsg
+CatCodeTextMsg.Schema.__model__ = CatCodeTextMsg
+
+TopCategoriesMsg.Schema.__model__ = TopCategoriesMsg
+BehStatMsg.Schema.__model__ = BehStatMsg
+BehStatMsgAdapter.Schema.__model__ = BehStatMsgAdapter
+VoteTypeMsg.Schema.__model__ = VoteTypeMsg
+
+VoteTypeMsgAdapter.Schema.__model__ = VoteTypeMsgAdapter
+BehVoteStatsMsg.Schema.__model__ = BehVoteStatsMsg
+BehVoteStatAdapter.Schema.__model__ = BehVoteStatAdapter
+BehSrchLogMsg.Schema.__model__ = BehSrchLogMsg

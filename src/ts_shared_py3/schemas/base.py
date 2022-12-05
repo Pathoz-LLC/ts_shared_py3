@@ -5,17 +5,19 @@ from .ndbkey_jwt import NdbKeyField
 from ..constants import ISO_8601_DATE_FORMAT
 
 
-class _ReplaceWithRealNdbModel:
+class _ReplaceWithRealDataClass:
     pass
 
 
-class NdbBaseSchema(ma.Schema):
+class DataClassBaseSchema(ma.Schema):
     """use this superclass for dataclass objects
     make sure you set the __model__ property
     in all subclasses
+
+    __model__ is a class variable
     """
 
-    __model__ = _ReplaceWithRealNdbModel
+    __model__ = _ReplaceWithRealDataClass
 
     class Meta:
         # fields = ('id', 'start_time', 'end_time')
@@ -26,7 +28,19 @@ class NdbBaseSchema(ma.Schema):
         return self.__model__(**loadedDataAsDict)
 
 
-class NdbBaseSchemaWithKey(NdbBaseSchema):
+class NdbBaseSchemaWithKey(DataClassBaseSchema):
     """use this superclass for NDB model objects"""
 
     key = NdbKeyField(required=True)
+
+
+# to generate a class
+# def make_schema_for_dc(datacls: type) -> DataClassBaseSchema:
+
+#     return type(
+#         "DCSFor{0}".format(datacls.__name__),
+#         (DataClassBaseSchema,),
+#         {
+#             "__model__": datacls,
+#         },
+#     )

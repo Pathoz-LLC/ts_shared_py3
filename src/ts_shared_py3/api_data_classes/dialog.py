@@ -5,11 +5,11 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 from ..schemas.tracking import TrackingPayloadMessage
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class RelationshipPhaseSetupMessage(BaseApiData):
     # to set up a dialog object
     use_id: str = field(default="", metadata=dict(required=True))
@@ -20,7 +20,7 @@ class RelationshipPhaseSetupMessage(BaseApiData):
     breakupCount: int = field(default=0, metadata=dict(required=True))
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class DialogAnswerMessage(BaseApiData):
     # to request the next question
     use_id: str = field(default="")
@@ -31,7 +31,7 @@ class DialogAnswerMessage(BaseApiData):
     last_answer: str = field(default="")
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class ResponseChoiceMessage(BaseApiData):
     # values from which the user can chose
     toShow: str = field(default="")
@@ -39,7 +39,7 @@ class ResponseChoiceMessage(BaseApiData):
     isDefault: bool = field(default=False)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class QuestionAsMessage(BaseApiData):
     # each question to ask user;  client receives list of these (usually only 1)
     question: str = field(default="")
@@ -48,7 +48,7 @@ class QuestionAsMessage(BaseApiData):
     que_id: str = field(default="")  # to use if you need to revise a prior answer
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class PendingRelPhaseQuestions(BaseApiData):
     # allows returning multiple questions at once
     # but typically sends one at a time
@@ -59,3 +59,10 @@ class PendingRelPhaseQuestions(BaseApiData):
     # phases = BaseApiDataField(IntervalMessage, 3, repeated=True)
     # userMsgKey: str = field(default="")(4, default="")  # to tell them why no more questions
     # use:  dailyLimitExceeded or noMoreQuestions
+
+
+RelationshipPhaseSetupMessage.Schema.__model__ = RelationshipPhaseSetupMessage
+DialogAnswerMessage.Schema.__model__ = DialogAnswerMessage
+ResponseChoiceMessage.Schema.__model__ = ResponseChoiceMessage
+QuestionAsMessage.Schema.__model__ = QuestionAsMessage
+PendingRelPhaseQuestions.Schema.__model__ = PendingRelPhaseQuestions

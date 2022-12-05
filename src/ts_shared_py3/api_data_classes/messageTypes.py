@@ -5,7 +5,7 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 
 
 def buildStatusMsg(code, msg, detail):
@@ -13,7 +13,7 @@ def buildStatusMsg(code, msg, detail):
     return StatusMessage(code=code, msg=msg, detail=dtl)
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class StatusMessage(BaseApiData):
     # used when Void msg is too uninformative
     code: str = field(default="")
@@ -23,7 +23,7 @@ class StatusMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class JsonMessage(BaseApiData):
     # used when Void msg is too uninformative
     json: str = field(default="")
@@ -31,7 +31,7 @@ class JsonMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class FilterMessage(BaseApiData):
     entityType: str = field(default="person")
     propertyName: str = field(default="monitorStatus")
@@ -42,3 +42,8 @@ class FilterMessage(BaseApiData):
 
 
 FilterMessageCollection: list[FilterMessage] = []
+
+
+StatusMessage.Schema.__model__ = StatusMessage
+JsonMessage.Schema.__model__ = JsonMessage
+FilterMessage.Schema.__model__ = FilterMessage

@@ -2,7 +2,7 @@ from __future__ import annotations
 from marshmallow import fields
 
 #
-from .base import NdbBaseSchema
+from .base import DataClassBaseSchema
 
 
 """ this file is NIU for scoring server
@@ -18,7 +18,7 @@ from .base import NdbBaseSchema
 """
 
 
-class CommitLvlApiMsg(NdbBaseSchema):
+class CommitLvlApiMsg(DataClassBaseSchema):
     # full descrip of a commitment level payload
     displayCode = fields.String()  # UI
     logicCode = fields.String()  # abstract code
@@ -26,7 +26,7 @@ class CommitLvlApiMsg(NdbBaseSchema):
     displayValue = fields.String()
 
 
-class CommitLvlUpdateMsg(NdbBaseSchema):
+class CommitLvlUpdateMsg(DataClassBaseSchema):
     """used to update CommitLvl for in-active users"""
 
     persId = fields.Integer(required=True)
@@ -37,7 +37,7 @@ class CommitLvlUpdateMsg(NdbBaseSchema):
     notificationId = fields.String(required=True, default="38248")
 
 
-class IntervalMessage(NdbBaseSchema):
+class IntervalMessage(DataClassBaseSchema):
     """used for add update delete
     oldStartDate is key for update/delete
     """
@@ -54,7 +54,7 @@ class IntervalMessage(NdbBaseSchema):
 #     pass
 
 
-class TrackingPayloadMessage(NdbBaseSchema):
+class TrackingPayloadMessage(DataClassBaseSchema):
     # the std msg to update a tracking record
     persId = fields.Integer()
     enabled = fields.Boolean(default=True)
@@ -62,7 +62,7 @@ class TrackingPayloadMessage(NdbBaseSchema):
     phases = fields.Nested(IntervalMessage(many=True))
 
 
-class IncidentRowMessage(NdbBaseSchema):
+class IncidentRowMessage(DataClassBaseSchema):
     """ """
 
     incidentId = fields.Integer(required=True)
@@ -91,19 +91,19 @@ class IncidentRowMessage(NdbBaseSchema):
     reportingUserIncdSeqNum = fields.Integer(default=1)
 
 
-class IncidentDetailsMessage(NdbBaseSchema):
+class IncidentDetailsMessage(DataClassBaseSchema):
     persId = fields.Integer()
     asOfDate = fields.Date()
     items = fields.Nested(IncidentRowMessage(many=True))
     userOverlapCount = fields.Integer(default=1)
 
 
-class IncidentTruthMessage(NdbBaseSchema):
+class IncidentTruthMessage(DataClassBaseSchema):
     incidentId = fields.Integer()
     incidentTruthVote = fields.Integer(default=0)  # 0 means not seen; 1-4 = true->false
 
 
-class DevotionLevelListMessage(NdbBaseSchema):
+class DevotionLevelListMessage(DataClassBaseSchema):
     items = fields.Nested(CommitLvlApiMsg(many=True))
 
 

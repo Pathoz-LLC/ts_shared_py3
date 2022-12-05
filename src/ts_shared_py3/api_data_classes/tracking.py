@@ -7,11 +7,11 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema  # , validate
 
 from .base import BaseApiData
-from ..schemas.base import NdbBaseSchema
+from ..schemas.base import DataClassBaseSchema
 from ..enums.sex import Sex
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommitLvlApiMsg(BaseApiData):
     # full descrip of a commitment level payload
     displayCode: str = field(default="")
@@ -22,7 +22,7 @@ class CommitLvlApiMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class CommitLvlUpdateMsg(BaseApiData):
     """used to update CommitLvl for in-active users"""
 
@@ -36,7 +36,7 @@ class CommitLvlUpdateMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class IntervalMessage(BaseApiData):
     """used for add update delete
     oldStartDate is key for update/delete
@@ -52,7 +52,7 @@ class IntervalMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class TrackingPayloadMessage(BaseApiData):
     # the std msg to update a tracking record
     persId: int = field(default=0, metadata=dict(required=True))
@@ -63,7 +63,7 @@ class TrackingPayloadMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class IncidentRowMessage(BaseApiData):
     """ """
 
@@ -97,7 +97,7 @@ class IncidentRowMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class IncidentDetailsMessage(BaseApiData):
     asOfDate: date = field()
     persId: int = field(default=0, metadata=dict(required=True))
@@ -107,7 +107,7 @@ class IncidentDetailsMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class IncidentTruthMessage(BaseApiData):
     incidentId: int = field(default=0, metadata=dict(required=True))
     incidentTruthVote: int = field(
@@ -117,8 +117,24 @@ class IncidentTruthMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=NdbBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class DevotionLevelListMessage(BaseApiData):
     items: list[CommitLvlApiMsg] = field(default_factory=lambda: [])
 
     Schema: ClassVar[Type[Schema]] = Schema
+
+
+CommitLvlApiMsg.Schema.__model__ = CommitLvlApiMsg
+
+CommitLvlUpdateMsg.Schema.__model__ = CommitLvlUpdateMsg
+
+IntervalMessage.Schema.__model__ = IntervalMessage
+
+TrackingPayloadMessage.Schema.__model__ = TrackingPayloadMessage
+
+IncidentRowMessage.Schema.__model__ = IncidentRowMessage
+
+IncidentDetailsMessage.Schema.__model__ = IncidentDetailsMessage
+
+IncidentTruthMessage.Schema.__model__ = IncidentTruthMessage
+DevotionLevelListMessage.Schema.__model__ = DevotionLevelListMessage
