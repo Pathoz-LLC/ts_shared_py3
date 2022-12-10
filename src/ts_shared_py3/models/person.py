@@ -8,9 +8,9 @@ from .values_beh_cat import UserAnswerStats
 # might set the 1st 5 vals of appUnique (mobile phone) as
 # parent/ancestor to group similar vals and keep ACID within that space
 from ..enums.sex import Sex
-from ..enums.commitLevel import DisplayCommitLvl  # , NdbCommitLvlProp
-from .person import PersonKeys, KeyTypeEnum
-from .user_model import User
+from ..enums.commitLevel import DisplayCommitLvl, NdbCommitLvlProp
+from .person_keys import PersonKeys, KeyTypeEnum
+from .user import User
 
 # advanced filter building and usage
 # field = "city"
@@ -65,12 +65,12 @@ class Person(BaseNdbModel):
     # loginToken = ndb.StringProperty(default='') # niu
     # privs = ndb.StringProperty(indexed=False)   # niu
 
-    mobile = ndb.StringProperty(
+    mobile = ndb.TextProperty(
         indexed=False
     )  # INTERNATIONAL MOBILE stored in case fail in personKeys.put()
-    first = ndb.StringProperty(indexed=False)
+    first = ndb.TextProperty(indexed=False)
     last = ndb.StringProperty()
-    alias = ndb.StringProperty(indexed=False)  # anon handle for chatting
+    alias = ndb.TextProperty(indexed=False)  # anon handle for chatting
     email = ndb.StringProperty(indexed=True)
     dob = ndb.DateProperty(indexed=False)
     # replace isFemale with this value to match client
@@ -81,12 +81,12 @@ class Person(BaseNdbModel):
     redFlagBits = ndb.IntegerProperty(default=0, indexed=False)
 
     # street = ndb.StringProperty()
-    city = ndb.StringProperty(indexed=False)
-    state = ndb.StringProperty(indexed=False)
+    city = ndb.TextProperty(indexed=False)
+    state = ndb.TextProperty(indexed=False)
     zip = ndb.StringProperty()
     # zip_4 = ndb.StringProperty()
-    tags = ndb.StringProperty(indexed=False)  # available for any use
-    xtra = ndb.StringProperty(indexed=False)
+    tags = ndb.TextProperty(indexed=False)  # available for any use
+    xtra = ndb.TextProperty(indexed=False)
 
     # auto vals
     addDateTime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -98,7 +98,7 @@ class Person(BaseNdbModel):
     # _use_datastore = False
     @staticmethod
     def searchByPhone(phoneString):
-        from common.models.personKeys_model import PersonKeys
+        from ..models.person_keys import PersonKeys
 
         # print('searching Person by phone on %s  (%s)' % (phoneString, type(phoneString)) )
         return PersonKeys.searchByPhone(phoneString)
@@ -185,13 +185,13 @@ class PersonLocal(BaseNdbModel):
     """per app-user values;  merged with Person for return to client"""
 
     # UI vals
-    nickname = ndb.StringProperty(indexed=False, required=True)
+    nickname = ndb.TextProperty(indexed=False, required=True)
     # store literal vals from:  common.models.devotion_level.DevotionLevel
     # devotionLevel= ndb.StringProperty(indexed=False, default='CASUAL')
     devotionLevel = NdbCommitLvlProp(
         required=True, default=DisplayCommitLvl.CASUAL, indexed=False
     )
-    imagePath = ndb.StringProperty(indexed=False, default="")
+    imagePath = ndb.TextProperty(indexed=False, default="")
     # default to mid-range score of 50 for new prospects
     # this is the ImpactCommunity.APP score converted to range 0-100
     recentTsConfidenceScore = ndb.FloatProperty(indexed=False, default=50.0)
@@ -204,7 +204,7 @@ class PersonLocal(BaseNdbModel):
     monitorStatus = ndb.msgprop.EnumProperty(
         MonitorStatus, default=MonitorStatus.ACTIVE
     )
-    reminderFrequency = ndb.StringProperty(indexed=False, default="never")
+    reminderFrequency = ndb.TextProperty(indexed=False, default="never")
 
     createReason = ndb.msgprop.EnumProperty(
         CreateReason, required=True, default=CreateReason.RELATIONSHIP, indexed=False
@@ -285,7 +285,7 @@ class PersonLocal(BaseNdbModel):
         # UserAnswerStats.zeroAllCatAnswerCounts(pl.userId)
 
         # add rec for by-prospect, activity date tracking
-        from common.models.person_activity import PersonActivity
+        from ..models.person_activity import PersonActivity
 
         PersonActivity.bumpFeeling(userKey.string_id(), personKey.integer_id(), True)
         return pl.key
@@ -299,7 +299,7 @@ class PersonLocal(BaseNdbModel):
         msg.devotionLevel = msg.get_assigned_value("devotionLevel") or "na"
 
     @staticmethod
-    def loadByUserKey(userKey, async=False):
+    def loadByUserKey(userKey, asnc=False):
         """loads all (even deleted or trust mode) for this user
         and then caller can filter based on value of monitorStatus
         return newest to oldest
@@ -308,7 +308,7 @@ class PersonLocal(BaseNdbModel):
         q.order(
             -PersonLocal.modDateTime
         )  # should be descending sort so newest SO's at top
-        if async:
+        if asnc:
             return q.fetch_async()
         else:
             return q.fetch()

@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import IntEnum, unique
 import random
 
-# import google.cloud.ndb as ndb
+from google.cloud.ndb import model
 from ..constants import VALUES_MAX_SLIDER_POSITION, BEH_MAX_SLIDER_POSITION
 
 
@@ -41,19 +41,19 @@ class VoteType(IntEnum):
         return VoteType(random.randint(1, 3))
 
 
-# class NdbVoteTypeProp(ndb.IntegerProperty):
-#     def _validate(self, value):
-#         if isinstance(value, (int, long)):
-#             return VoteType(value)
-#         elif isinstance(value, (str, unicode)):
-#             return VoteType(int(value))
-#         elif not isinstance(value, VoteType):
-#             raise TypeError("expected VoteType or integer, got %s" % repr(value))
+class NdbVoteTypeProp(model.IntegerProperty):
+    def _validate(self, value):
+        if isinstance(value, int):
+            return VoteType(value)
+        elif isinstance(value, str):
+            return VoteType(int(value))
+        elif not isinstance(value, VoteType):
+            raise TypeError("expected VoteType or integer, got %s" % repr(value))
 
-#     def _to_base_type(self, vt):
-#         if isinstance(vt, int):
-#             return vt
-#         return int(vt.value)  # Doesn't matter if it's an int or a long
+    def _to_base_type(self, vt: VoteType):
+        if isinstance(vt, int):
+            return vt
+        return int(vt.value)  # Doesn't matter if it's an int or a long
 
-#     def _from_base_type(self, value):
-#         return VoteType(value)  # return VoteType
+    def _from_base_type(self, value: int):
+        return VoteType(value)  # return VoteType

@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import Optional
 from enum import IntEnum, unique
+
+from google.cloud.ndb import model
 import random
 
 #
@@ -294,22 +296,22 @@ class DisplayCommitLvl(IntEnum):
     #     return DisplayCommitLvl(value)
 
 
-# class NdbCommitLvlProp(msgprop.EnumProperty):
-#     def _validate(self, value):
-#         if isinstance(value, (int)):
-#             return DisplayCommitLvl(value)
-#         elif isinstance(value, (bytes, str)):
-#             return DisplayCommitLvl(int(value))
-#         elif not isinstance(value, DisplayCommitLvl):
-#             raise TypeError(
-#                 "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
-#             )
+class NdbCommitLvlProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return DisplayCommitLvl(value)
+        elif isinstance(value, (bytes, str)):
+            return DisplayCommitLvl(int(value))
+        elif not isinstance(value, DisplayCommitLvl):
+            raise TypeError(
+                "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
+            )
 
-#     def _to_base_type(self, sx):
-#         # convert DisplayCommitLvl to int
-#         if isinstance(sx, int):
-#             return sx
-#         return int(sx.value)
+    def _to_base_type(self, sx: DisplayCommitLvl):
+        # convert DisplayCommitLvl to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
 
-#     def _from_base_type(self, value):
-#         return DisplayCommitLvl(value)  # return DisplayCommitLvl
+    def _from_base_type(self, value: int):
+        return DisplayCommitLvl(value)  # return DisplayCommitLvl

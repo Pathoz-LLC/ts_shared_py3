@@ -105,11 +105,11 @@ class UserIdMessage(BaseApiData):
 
 @dataclass(base_schema=DataClassBaseSchema)
 class UserDemographicsMsg(BaseApiData):
+    dob: date = field(metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    dob: date = field(metadata=dict(required=True))
     sex: str = field(default="", metadata=dict(required=True))
     preferredSex: str = field(default="", metadata=dict(required=True))
     imageURL: str = field(default="", metadata=dict(required=True))
@@ -128,6 +128,8 @@ class UserBioMessage(BaseApiData):
     """
 
     dob: date = field(metadata=dict(required=True))
+    expiresOn: date = field(metadata=dict(required=True))
+    lastLogin: date = field(metadata=dict(required=True))
 
     userId: str = field(default="", metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
@@ -143,8 +145,6 @@ class UserBioMessage(BaseApiData):
     provider_id: str = field(default="", metadata=dict(required=True))
     authToken: str = field(default="", metadata=dict(required=True))
     refreshToken: str = field(default="", metadata=dict(required=True))
-    expiresOn: date = field(metadata=dict(required=True))
-    lastLogin: date = field(metadata=dict(required=True))
     promoCode: str = field(default="", metadata=dict(required=True))
     city: str = field(default="", metadata=dict(required=True))
     #

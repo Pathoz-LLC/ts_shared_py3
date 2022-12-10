@@ -1,5 +1,6 @@
 from enum import IntEnum, unique
 from random import randint
+from google.cloud.ndb import model
 
 
 @unique
@@ -77,3 +78,24 @@ class ActivityType(IntEnum):
     @property
     def appliesToValues(self):
         return self.value > 39 and self.value < 50
+
+
+class NdbActivityTypeProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return ActivityType(value)
+        elif isinstance(value, (bytes, str)):
+            return ActivityType(int(value))
+        elif not isinstance(value, ActivityType):
+            raise TypeError(
+                "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
+            )
+
+    def _to_base_type(self, sx: ActivityType):
+        # convert ActivityType to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return ActivityType(value)

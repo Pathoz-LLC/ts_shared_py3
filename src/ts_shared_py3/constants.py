@@ -67,8 +67,7 @@ DERIVE_FINAL_FROM_GROUP = False
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
 
-FIREBASE_CREDS_PATH = "common/auth/{0}".format(FIR_CREDS_FILENAME)
-
+FIREBASE_CREDS_PATH = "ts_shared_py3/auth/{0}".format(FIR_CREDS_FILENAME)
 # # User Score section;  must add to 1
 # USER_PCT_WEIGHT_DAILY_FEELINGS = 0.5
 # USER_PCT_WEIGHT_TRUST_TELLS = 0.20

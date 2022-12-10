@@ -1,5 +1,6 @@
 from __future__ import annotations
 from enum import IntEnum, unique
+from google.cloud.ndb import model
 
 """ 
 
@@ -30,3 +31,24 @@ class ScoreScope(IntEnum):
         # change this to regulate which type of calculations are run below
         # Flock & communication are not yet in use;  ScoreScope.COMMUNITY,
         return [ScoreScope.APP_AND_USER, ScoreScope.COMMUNITY_HYBRID]
+
+
+class NdbScoreScopeProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return ScoreScope(value)
+        elif isinstance(value, (bytes, str)):
+            return ScoreScope(int(value))
+        elif not isinstance(value, ScoreScope):
+            raise TypeError(
+                "expected ScoreScope, int, str or unicd, got %s" % repr(value)
+            )
+
+    def _to_base_type(self, sx: ScoreScope):
+        # convert AccountType to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return ScoreScope(value)

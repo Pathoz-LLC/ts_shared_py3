@@ -1,7 +1,7 @@
 from enum import IntEnum, unique
 import random
 
-# import google.cloud.ndb
+from google.cloud.ndb import model
 
 
 @unique
@@ -70,3 +70,25 @@ class AccountType(IntEnum):
     @staticmethod
     def random():
         return AccountType(random.randint(0, 2))
+
+
+# from google.cloud.ndb import model
+class NdbAcctTypeProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return AccountType(value)
+        elif isinstance(value, (bytes, str)):
+            return AccountType(int(value))
+        elif not isinstance(value, AccountType):
+            raise TypeError(
+                "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
+            )
+
+    def _to_base_type(self, sx: AccountType):
+        # convert AccountType to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return AccountType(value)

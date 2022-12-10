@@ -1,4 +1,4 @@
-from string import string, basestring, unicode
+import string  # import string, basestring, unicode
 from enum import Enum, unique
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
@@ -50,9 +50,9 @@ class PersonKeys(BaseNdbModel):
             Use:  PersonKeys.storeNewMobilePhone(phone, person)
     """
 
-    keyType = msgprop.EnumProperty(
-        KeyTypeEnum, required=True, default=KeyTypeEnum.MBPHONE
-    )
+    # keyType = msgprop.EnumProperty(
+    #     KeyTypeEnum, required=True, default=KeyTypeEnum.MBPHONE
+    # )
     value = ndb.StringProperty(required=True, indexed=True)
     # from .person_model import Person     # get Person class
 

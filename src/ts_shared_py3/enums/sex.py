@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import IntEnum, unique
 import random
 
-# import google.cloud.ndb
+from google.cloud.ndb import model
 
 
 @unique
@@ -46,3 +46,23 @@ class Sex(IntEnum):
     def random() -> Sex:
         # only returns MALE or FEMALE for testing
         return Sex(random.randint(2, 3))
+
+
+#
+class NdbSexProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return Sex(value)
+        elif isinstance(value, (bytes, str)):
+            return Sex(int(value))
+        elif not isinstance(value, Sex):
+            raise TypeError("expected Sex, int, str or unicd, got %s" % repr(value))
+
+    def _to_base_type(self, sx: Sex):
+        # convert Sex to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return Sex(value)

@@ -19,17 +19,17 @@ from ..enums.accountType import AccountType  # , NdbAcctTypeProp
 # from webapp2_extras.appengine.auth.models import User as BaseUserExpando
 # from webapp2_extras.appengine.auth.models import UserToken as BaseUserToken
 
-from api_data_classes.user import UserProfileMsg
+from ..api_data_classes.user import UserProfileMsg
 
 
-class UserToken(BaseUserToken):
+class UserToken(object):  # BaseUserToken
     """tracks multi tokens for each user
     they can be logged in with several devices?
     """
 
     SUBJECT_BEARER = "bearer"
 
-    unique_model = Unique
+    # unique_model = Unique
     bearer_token_timedelta = timedelta(days=365)
 
     refresh_token = ndb.model.StringProperty()
@@ -132,7 +132,7 @@ FIRAUTH_FIELDNAMES_TO_STORE = {
 }
 
 
-class User(BaseUserExpando, BaseNdbModel):
+class User(BaseNdbModel):  # BaseUserExpando
     """
     user rec; includes data from social profile
         as an expando table, it will store whatever fields you attach
@@ -143,23 +143,24 @@ class User(BaseUserExpando, BaseNdbModel):
     # Firebase fields:  should be same as user.id_ property
     # the Firebase user ID; must be indexed
     # bio fields
-    handle = ndb.StringProperty(indexed=False, default="")
+    handle = ndb.StringProperty(default="")
     name = ndb.StringProperty(indexed=True, default="")
-    first = ndb.StringProperty(indexed=False, default="")
+    first = ndb.TextProperty(indexed=False, default="")
     last = ndb.StringProperty(indexed=True, default="")
     email = ndb.StringProperty(indexed=True, default="")
     phone = ndb.StringProperty(indexed=True)
     dob = ndb.DateProperty(indexed=False)
     #
-    sex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
-    preferredSex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
-    photoUrl = ndb.StringProperty(indexed=False)
-    #  account info & security;  Free; Pro; Premium
-    accountLevel = NdbAcctTypeProp(indexed=True, default=AccountType.FREE)
+    #  FIXME props below
+    # sex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
+    # preferredSex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
+    # photoUrl = ndb.StringProperty(indexed=False)
+    # #  account info & security;  Free; Pro; Premium
+    # accountLevel = NdbAcctTypeProp(indexed=True, default=AccountType.FREE)
     # next field only applies to premium users
     premiumExpireDt = ndb.DateProperty(indexed=False, default=date.today())
     #  who they logged in with; eg facebook.com; fieldname governed by gitkit
-    provider_id = ndb.StringProperty(indexed=False, default="Facebook")
+    provider_id = ndb.TextProperty(indexed=False, default="Facebook")
 
     # # I dont think we need next 3 fields on this model
     # authToken = ndb.StringProperty(indexed=False)
@@ -168,15 +169,15 @@ class User(BaseUserExpando, BaseNdbModel):
 
     signUpDtTm = ndb.DateTimeProperty(auto_now=True, indexed=False)
     lastLogin = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-    promoCode = ndb.StringProperty(indexed=False, default="")
-    city = ndb.StringProperty(indexed=False, default="")
-    state = ndb.StringProperty(indexed=False, default="")
-    zip = ndb.StringProperty(indexed=False, default="")
+    promoCode = ndb.TextProperty(indexed=False, default="")
+    city = ndb.TextProperty(indexed=False, default="")
+    state = ndb.TextProperty(indexed=False, default="")
+    zip = ndb.TextProperty(indexed=False, default="")
 
     #  setup for push notify
     # only most recent token is stored here; older in ndb.ApnsToken
     # this field is only used to detect token change on the client
-    pushNotifyRegToken = ndb.StringProperty(indexed=False, default="")
+    pushNotifyRegToken = ndb.TextProperty(indexed=False, default="")
     pushNotifyAuthorized = ndb.BooleanProperty(default=False, indexed=False)
     # 0==IOS;  1==Android, 2==Web
     pushNotifyDeviceType = ndb.IntegerProperty(indexed=False, default=0)

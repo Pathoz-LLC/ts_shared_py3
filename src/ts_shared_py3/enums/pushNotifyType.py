@@ -1,4 +1,5 @@
-from enum import Enum, unique
+from enum import IntEnum, unique
+from google.cloud.ndb import model
 
 """
 
@@ -6,7 +7,7 @@ from enum import Enum, unique
 
 
 @unique
-class NotifyType(Enum):
+class NotifyType(IntEnum):
     """type of push notification
 
     NOTE:  keep all() up to date
@@ -177,3 +178,24 @@ class NotifyType(Enum):
                 return "commitmentLevel"
 
         return None
+
+
+class NdbNotifyTypeProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return NotifyType(value)
+        elif isinstance(value, (bytes, str)):
+            return NotifyType(int(value))
+        elif not isinstance(value, NotifyType):
+            raise TypeError(
+                "expected NotifyType, int, str or unicd, got %s" % repr(value)
+            )
+
+    def _to_base_type(self, sx: NotifyType):
+        # convert NotifyType to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return NotifyType(value)

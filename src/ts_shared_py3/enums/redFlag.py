@@ -1,8 +1,9 @@
-from enum import Enum, unique
+from enum import IntEnum, unique
+from google.cloud.ndb import model
 
 
 @unique
-class RedFlagType(Enum):
+class RedFlagType(IntEnum):
     """ """
 
     NEVERSET = 0
@@ -20,20 +21,22 @@ class RedFlagType(Enum):
         return count >= self.convictionVoteCount
 
 
-# class NdbRedFlagProp(ndb.IntegerProperty):
-#     def _validate(self, value):
-#         if isinstance(value, (int, long)):
-#             return RedFlagType(value)
-#         elif isinstance(value, (str, unicode)):
-#             return RedFlagType(int(value))
-#         elif not isinstance(value, RedFlagType):
-#             raise TypeError('expected RedFlagType, int, str or unicd, got %s' % repr(value))
+class NdbRedFlagProp(model.IntegerProperty):
+    def _validate(self, value: RedFlagType):
+        if isinstance(value, int):
+            return RedFlagType(value)
+        elif isinstance(value, str):
+            return RedFlagType(int(value))
+        elif not isinstance(value, RedFlagType):
+            raise TypeError(
+                "expected RedFlagType, int, str or unicd, got %s" % repr(value)
+            )
 
-#     def _to_base_type(self, sx):
-#         # convert to int
-#         if isinstance(sx, int):
-#             return sx
-#         return int(sx.value)
+    def _to_base_type(self, sx: RedFlagType):
+        # convert to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
 
-#     def _from_base_type(self, value):
-#         return RedFlagType(value)  # return RedFlagType
+    def _from_base_type(self, value: int):
+        return RedFlagType(value)  # return RedFlagType

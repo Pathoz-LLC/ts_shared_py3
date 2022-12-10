@@ -4,6 +4,7 @@ from datetime import date
 from enum import IntEnum, unique
 from collections import namedtuple
 from random import randint
+from google.cloud.ndb import model
 
 #
 from ..enums.alloc import AllocType  # , AllocLookup
@@ -573,30 +574,26 @@ VAL_ASSESS_TYPES = [
 ]
 
 
-# class NdbScoringRuleProp(ndb.Property):
-#     # class NdbScoringRuleProp():
-#     #
-#     #     def __init__(self, indexed, default):
-#     #         pass    # remove me when you re-activate ndb
+class NdbScoringRuleProp(model.IntegerProperty):
+    #
+    def _validate(self, value):
+        if isinstance(value, int):
+            return ScoreRuleType(value)
+        elif isinstance(value, str):
+            return ScoreRuleType(int(value))
+        elif not isinstance(value, ScoreRuleType):
+            raise TypeError(
+                "expected ScoreRuleType, int, str or unicd, got %s" % repr(value)
+            )
 
-#     def _validate(self, value):
-#         if isinstance(value, (int)):
-#             return ScoreRuleType(value)
-#         elif isinstance(value, (str)):
-#             return ScoreRuleType(int(value))
-#         elif not isinstance(value, ScoreRuleType):
-#             raise TypeError(
-#                 "expected ScoreRuleType, int, str or unicd, got %s" % repr(value)
-#             )
+    def _to_base_type(self, sx: ScoreRuleType):
+        # convert sex to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
 
-#     def _to_base_type(self, sx):
-#         # convert sex to int
-#         if isinstance(sx, int):
-#             return sx
-#         return int(sx.value)
-
-#     def _from_base_type(self, value):
-#         return ScoreRuleType(value)  # return ScoreRuleType
+    def _from_base_type(self, value: int):
+        return ScoreRuleType(value)  # return ScoreRuleType
 
 
 # from datetime import date
