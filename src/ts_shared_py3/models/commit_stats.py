@@ -1,6 +1,8 @@
 from random import randint
+from typing import Union, TypeVar
+
 import google.cloud.ndb as ndb
-from common.enums.commitLevel import DisplayCommitLvl  # , NdbCommitLvlProp
+from ..enums.commitLevel import DisplayCommitLvl, NdbCommitLvlProp
 import logging
 
 # usage
@@ -18,7 +20,7 @@ class CommitRollup(ndb.Model):
     """
 
     # FIXME
-    # commitLevel = NdbCommitLvlProp(required=True)
+    commitLevel = NdbCommitLvlProp(required=True)
     count = ndb.IntegerProperty(default=0)
 
     def __str__(self):

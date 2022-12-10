@@ -1,4 +1,5 @@
 from datetime import date, timedelta, datetime
+from typing import Union, TypeVar
 
 import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel

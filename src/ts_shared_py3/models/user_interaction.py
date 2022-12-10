@@ -24,8 +24,8 @@ class UserInteractions(ndb.Model):
     comments = ndb.StringProperty(indexed=False, default="")
     commonProspects = ndb.IntegerProperty(repeated=True, indexed=False)
 
-    def updateFromMsg(self, msg):
-        assert isinstance(msg, UserCommunicationDetailsMsg), ""
+    def updateFromMsg(self, msg: UserCommunicationDetailsMsg):
+        assert isinstance(msg, UserCommunicationDetailsMsg), "wrong type"
         if msg.saveBlockedValChanges:
             self.isBlocked = msg.isBlocked
         if msg.saveSpamValChanges:
@@ -106,12 +106,12 @@ class UserInteractions(ndb.Model):
         return rec
 
     @staticmethod
-    def loadAllForUser(myUserID):
+    def loadAllForUser(myUserID: str):
         userKey = ndb.Key("User", myUserID)
         qry = UserInteractions.query(ancestor=userKey)
         return qry.fetch(40)
 
     @staticmethod
-    def _makeKey(myUserID, otherUserID):
+    def _makeKey(myUserID: str, otherUserID: str):
         userKey = ndb.Key("User", myUserID)
         return ndb.Key("UserInteractions", otherUserID, parent=userKey)

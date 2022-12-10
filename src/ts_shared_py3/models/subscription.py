@@ -1,6 +1,6 @@
 from datetime import date
 import google.cloud.ndb as ndb
-from ..enums.accountType import AccountType  # , NdbAcctTypeProp
+from ..enums.accountType import AccountType, NdbAcctTypeProp
 
 # from common.utils.date_conv import lastDayOfMonth
 

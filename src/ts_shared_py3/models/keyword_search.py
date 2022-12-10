@@ -1,4 +1,4 @@
-# from common.models.baseNdb_model import BaseNdbModel
+# from .baseNdb_model import BaseNdbModel
 import google.cloud.ndb as ndb
 
 

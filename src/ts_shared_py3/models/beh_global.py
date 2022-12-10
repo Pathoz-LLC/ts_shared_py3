@@ -1,20 +1,19 @@
+from __future__ import annotations
 import sys
 import random
 import json
+from typing import Union, TypeVar
 from datetime import date, datetime, timedelta
 import copy
 from collections import namedtuple
 
-# import dateutil.parser
-
-# from google.appengine.api import memcache
 import google.cloud.ndb as ndb
 
 # FIXME
 # from ..async_tasks.stats import StatsTasks
 
-from ..enums.sex import Sex  # , NdbSexProp
-from ..enums.voteType import VoteType  # , NdbVoteTypeProp
+from ..enums.sex import Sex, NdbSexProp
+from ..enums.voteType import VoteType, NdbVoteTypeProp
 from ..schemas.behavior import BehVoteStatsMsg, VoteTypeMsg, BehStatMsg
 from ..schemas.behavior import (
     BehVoteStatAdapter,
@@ -23,7 +22,6 @@ from ..schemas.behavior import (
 )
 from ..config.behavior.load_yaml import BehaviorSourceSingleton
 
-# from common.firebase.readWrite import firebase_put
 
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 
@@ -102,7 +100,7 @@ class CountTotals:
         returns a BehVoteStatsMsg msg
     """
 
-    def __init__(self, bru):
+    def __init__(self, bru: BehaviorRollup):
         """construct obj with one bru
         then use self.append() to add stats from other bru shards
         """
@@ -235,13 +233,13 @@ class CountTotals:
         bru = BehaviorRollup._newBehaviorRollup(vi)
         return CountTotals(bru)
 
-    def toMsg(self):
+    def toMsg(self) -> BehVoteStatsMsg:
         # BehVoteStatsMsg for returning to client
         return self.msg
 
 
 class CountTotalsEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Union[CountTotals, object]):
         if isinstance(obj, CountTotals):
             return obj.toDict
         else:
@@ -324,7 +322,7 @@ class VoteTypeRollup(ndb.Model):
         return vtr
 
     @staticmethod
-    def vtrListAllTypes(sex):
+    def vtrListAllTypes(sex: Sex):
         # used for init empty recs when first encountered
         # returns list but would be safer to convert to named-tuple
         feel = VoteTypeRollup.newEmpty(sex, VoteType.FEELING)
@@ -537,7 +535,7 @@ class BehaviorRollup(ndb.Model):
             if vtr.voteType == voteType:
                 totalsVtr.append(vtr)
 
-    def msgFor(self, sex):
+    def msgFor(self, sex: Sex):
         """return a VoteTypeMsg"""
         if Sex.FEMALE == sex:
             theLst = self.femaleCounts
@@ -564,7 +562,7 @@ class BehaviorRollup(ndb.Model):
         return VoteTypeMsg(feeling=feeling, concern=concern, frequency=frequency)
 
     @staticmethod
-    def getStatsForBehavior(behCode):
+    def getStatsForBehavior(behCode: str):
         """API to Retrieve the value for a given sharded counter.
         Args:
             behCode: behavior code name of the counter.

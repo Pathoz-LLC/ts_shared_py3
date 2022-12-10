@@ -4,6 +4,12 @@ from datetime import date, timedelta  # , datetime
 import google.cloud.ndb as ndb
 
 #
+from ..api_data_classes.values import (
+    ValueRateMsg,
+    ValuesCollectionMsg,
+    ValueOrStatsReqMsg,
+)
+
 # from common.utils.date_conv import message_to_date
 
 
@@ -41,7 +47,7 @@ class BehSummary(ndb.Model):
     # date when user changes their concern level
     changeDt = ndb.DateProperty(required=True, auto_now=True)
 
-    def _updateVals(self, valRateMsg):
+    def _updateVals(self, valRateMsg: ValueRateMsg):
         """
         Args:
             svap: SaveValueAssessPayload
@@ -123,7 +129,7 @@ class UserValsByBehCat(ndb.Model):
             self.lastBehCode, len(self.allBehaviors), str(self.userCountStats)
         )
 
-    def updateUserAnswer(self, valRateMsg):
+    def updateUserAnswer(self, valRateMsg: ValueRateMsg):
         # valRateMsg is instance of ValuesClient()
         # update nested struc from ValueRateMsg
         if len(valRateMsg.frequencies) > 0:
@@ -148,7 +154,7 @@ class UserValsByBehCat(ndb.Model):
                 return bs
         return None
 
-    def _appendOrUpdateVoteVals(self, valRateMsg) -> None:
+    def _appendOrUpdateVoteVals(self, valRateMsg: ValueRateMsg) -> None:
         """update both self & UserAnswerStats from SaveValueAssessPayload
         valRateMsg is instance of ValuesClient()
         """
@@ -180,7 +186,7 @@ class UserValsByBehCat(ndb.Model):
         self.put()
 
     @staticmethod
-    def loadAllPriorForUser(userID) -> list[UserValsByBehCat]:
+    def loadAllPriorForUser(userID: str) -> list[UserValsByBehCat]:
         """returns list of all UserValsByBehCat (across categories) prior answers
         for provided userID
         """
@@ -192,7 +198,7 @@ class UserValsByBehCat(ndb.Model):
         return mergedlist
 
     @staticmethod
-    def loadOrCreate(userID, category: str) -> UserValsByBehCat:
+    def loadOrCreate(userID: str, category: str) -> UserValsByBehCat:
         # global userCountCache
         key = UserValsByBehCat._makeKey(userID, category)
         rec = key.get()
@@ -207,13 +213,13 @@ class UserValsByBehCat(ndb.Model):
         return rec
 
     @staticmethod
-    def loadAllByUser(userID) -> list[UserValsByBehCat]:
+    def loadAllByUser(userID: str) -> list[UserValsByBehCat]:
         userKey = ndb.Key("User", userID, parent=None)
         q = UserValsByBehCat.query(ancestor=userKey)
         return q.fetch(500)
 
     @staticmethod
-    def deleteAllByUser(userID, persID=0) -> None:
+    def deleteAllByUser(userID: str, persID: int = 0) -> None:
         # can delete all prior entries or just by personID
         allRecs = UserValsByBehCat.loadAllByUser(userID)
         if persID == 0:

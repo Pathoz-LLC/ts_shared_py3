@@ -1,11 +1,18 @@
 import time
 from datetime import date, datetime, timedelta
 import logging
+
+#
 import google.cloud.ndb as ndb
 
+#
+# from firebase_admin import auth
+# from google.auth.credentials import Credentials, CredentialsWithTokenUri
+
+
 from .baseNdb_model import BaseNdbModel
-from ..enums.sex import Sex  # , NdbSexProp
-from ..enums.accountType import AccountType  # , NdbAcctTypeProp
+from ..enums.sex import Sex, NdbSexProp
+from ..enums.accountType import AccountType, NdbAcctTypeProp
 
 # from ..utils.date_conv import message_to_date, date_to_message
 
@@ -32,7 +39,7 @@ class UserToken(object):  # BaseUserToken
     # unique_model = Unique
     bearer_token_timedelta = timedelta(days=365)
 
-    refresh_token = ndb.model.StringProperty()
+    refresh_token = ndb.StringProperty()
 
     @classmethod
     def create(cls, user, subject, token=None):
@@ -152,11 +159,11 @@ class User(BaseNdbModel):  # BaseUserExpando
     dob = ndb.DateProperty(indexed=False)
     #
     #  FIXME props below
-    # sex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
-    # preferredSex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
+    sex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
+    preferredSex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
     # photoUrl = ndb.StringProperty(indexed=False)
     # #  account info & security;  Free; Pro; Premium
-    # accountLevel = NdbAcctTypeProp(indexed=True, default=AccountType.FREE)
+    accountLevel = NdbAcctTypeProp(indexed=True, default=AccountType.FREE)
     # next field only applies to premium users
     premiumExpireDt = ndb.DateProperty(indexed=False, default=date.today())
     #  who they logged in with; eg facebook.com; fieldname governed by gitkit
@@ -320,7 +327,7 @@ class User(BaseNdbModel):  # BaseUserExpando
 
     @property
     def appPrefs(self):
-        from common.models.userAppSettings_model import UserAppSettings
+        from ..models.user_app_settings import UserAppSettings
 
         return UserAppSettings.get_or_create_by_user_id(self.user_id)
 

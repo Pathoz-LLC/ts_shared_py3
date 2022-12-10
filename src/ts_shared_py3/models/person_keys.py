@@ -1,27 +1,9 @@
-import string  # import string, basestring, unicode
-from enum import Enum, unique
-from datetime import datetime, timedelta
+import string
 import google.cloud.ndb as ndb
 
+#
+from ..enums.keyType import KeyTypeEnum, NdbKeyTypeProp
 from .baseNdb_model import BaseNdbModel
-
-
-@unique
-class KeyTypeEnum(Enum):
-    MBPHONE = 1  # mobile phone
-    HMPHONE = 2  # home ph
-    WKPHONE = 3
-    SKYPE = 4
-    # EMAIL/CHAT
-    HMEMAIL = 10
-    WKEMAIL = 11
-    JABBER = 12
-    # SOCIAL
-    FACEBOOK = 20
-    TWITTER = 21
-    SNAPCHAT = 22
-    PINTEREST = 23
-    # SOMENEWSITE = 24
 
 
 # DELETE_CHARS is for regular string
@@ -36,9 +18,9 @@ NON_DIGITS_MAP = dict(
 def stripNonDigits(value):
     # remove non-digits
     # print('searching Person by phone on %s  (%s)' % (value, type(value)) )
-    if isinstance(value, unicode):  # unicode string
+    if isinstance(value, str):  # unicode string
         return value.translate(NON_DIGITS_MAP)
-    elif isinstance(value, basestring):  # regular string
+    elif isinstance(value, str):  # regular string
         return value.translate(None, DELETE_CHARS)
     else:  # unknown type
         return str(value).translate(None, DELETE_CHARS)
@@ -50,9 +32,7 @@ class PersonKeys(BaseNdbModel):
             Use:  PersonKeys.storeNewMobilePhone(phone, person)
     """
 
-    # keyType = msgprop.EnumProperty(
-    #     KeyTypeEnum, required=True, default=KeyTypeEnum.MBPHONE
-    # )
+    keyType = NdbKeyTypeProp(required=True, default=KeyTypeEnum.MBPHONE)
     value = ndb.StringProperty(required=True, indexed=True)
     # from .person_model import Person     # get Person class
 

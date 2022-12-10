@@ -1,6 +1,10 @@
 from datetime import datetime, date, timedelta
-from enum import Enum, unique
+
 import google.cloud.ndb as ndb
+
+#
+from ..enums.createAndMonitor import CreateReason, MonitorStatus
+from ..enums.sex import Sex, NdbSexProp
 from .baseNdb_model import BaseNdbModel
 from .values_beh_cat import UserAnswerStats
 
@@ -26,30 +30,6 @@ from .user import User
 # previous_namespace = namespace_manager.get_namespace()
 # namespace_manager.set_namespace('default')
 
-# move to models.enums ??
-class CreateReason(Enum):
-    RELATIONSHIP = 1  # with app user
-    STALKING = 2  # crush or ex
-    FRIEND = 3  # for a friend
-    # TEST = 4
-
-
-class MonitorStatus(Enum):
-    """
-    keep this Enum in sync w MON_STATUS_DICT below
-        still tracking if < 4
-        for Person.loadFollowed(), 'active' gets all except archive
-        enums have MonitorStatus.lookup_by_name() & lookup_by_number
-
-        TODO: move & restructure this to common/enums
-    """
-
-    ACTIVE = 1
-    DOGHOUSE = 2
-    SEPARATED = 3
-    TRUSTMODE = 4
-    ARCHIVE = 5
-
 
 # MON_STATUS_DICT = MonitorStatus.to_dict()
 
@@ -73,9 +53,7 @@ class Person(BaseNdbModel):
     alias = ndb.TextProperty(indexed=False)  # anon handle for chatting
     email = ndb.StringProperty(indexed=True)
     dob = ndb.DateProperty(indexed=False)
-    # replace isFemale with this value to match client
-    # FIXME
-    # sex = NdbSexProp(indexed=False, default=Sex.UNKNOWN)
+    sex = NdbSexProp(indexed=False, default=Sex.UNKNOWN)
     # 0 means no RedFlags; bits 1,2,4,8 mean convicted of:
     # REVENGE, CATFISH, CHEATED, DATERAPE
     redFlagBits = ndb.IntegerProperty(default=0, indexed=False)
@@ -201,13 +179,10 @@ class PersonLocal(BaseNdbModel):
     # redFlagBits = ndb.IntegerProperty( default=0, indexed=False )
 
     # housekeeping vals
-    monitorStatus = ndb.msgprop.EnumProperty(
-        MonitorStatus, default=MonitorStatus.ACTIVE
-    )
+    monitorStatus = MonitorStatus(default=MonitorStatus.ACTIVE)
     reminderFrequency = ndb.TextProperty(indexed=False, default="never")
-
-    createReason = ndb.msgprop.EnumProperty(
-        CreateReason, required=True, default=CreateReason.RELATIONSHIP, indexed=False
+    createReason = CreateReason(
+        required=True, default=CreateReason.RELATIONSHIP, indexed=False
     )
     addDateTime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     modDateTime = ndb.DateTimeProperty(

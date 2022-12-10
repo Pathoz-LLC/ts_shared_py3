@@ -1,13 +1,12 @@
 from datetime import datetime, date, time, timedelta
-
-from enum import Enum, unique
+from typing import Union
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
 
-from ..enums.redFlag import RedFlagType  # , NdbRedFlagProp
+from ..enums.redFlag import RedFlagType, NdbRedFlagProp
 from .baseNdb_model import BaseNdbModel
 from .person import Person
-from .user_model import User
+from .user import User
 
 
 class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
@@ -39,7 +38,7 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
         return persKey.integer_id()
 
     def toMsg(self):
-        from common.messages.person import RedFlagReportMsg
+        from api_data_classes.person import RedFlagReportMsg
 
         return RedFlagReportMsg(
             userId=self.userKey.id(),
@@ -74,9 +73,9 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
         return ndb.Key(RedFlagReport, userID, parent=flagTypeKey)
 
     @staticmethod
-    def getAncestorKey(personID, flagType):
+    def getAncestorKey(personID: int, flagType: Union[RedFlagType, int]):
         # this structure prevents duplicates & makes deletion/recindtion a simple operation
-        personID = long(personID)  # convert to 64bit
+        # personID = long(personID)  # convert to 64bit
         if isinstance(flagType, RedFlagType):
             flagType = flagType.value
         persKey = ndb.Key(Person, personID)  # top ancestor; makes loading all easy

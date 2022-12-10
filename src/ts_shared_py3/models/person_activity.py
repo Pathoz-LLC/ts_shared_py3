@@ -1,4 +1,4 @@
-from enum import Enum, unique
+from enum import IntEnum, unique
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
 
@@ -9,7 +9,7 @@ from .baseNdb_model import BaseNdbModel
 
 
 @unique
-class ActivityLogType(Enum):
+class ActivityLogType(IntEnum):
     """what was logged about this person/prospect"""
 
     POS_FEEL = 0
