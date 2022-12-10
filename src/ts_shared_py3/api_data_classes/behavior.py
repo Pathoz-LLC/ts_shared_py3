@@ -8,7 +8,7 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema  # , make_schema_for_dc
-from ..schemas.tracking import TrackingPayloadMessage
+from ..api_data_classes.tracking import TrackingPayloadMsgDc
 
 # example of validation
 @dataclass(base_schema=DataClassBaseSchema)
@@ -158,7 +158,7 @@ class BehaviorLogSummaryMessage(BaseApiData):
     lastEntryDttm: float = field(default=0.0, metadata=dict(required=True))
     count: int = field(default=0, metadata=dict(required=True))
     entries: list[BehEntryWrapperMessage] = field(default_factory=lambda x: [])
-    phaseHistory: list[TrackingPayloadMessage] = field(default_factory=lambda x: [])
+    phaseHistory: list[TrackingPayloadMsgDc] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

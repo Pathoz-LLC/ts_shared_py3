@@ -1,7 +1,7 @@
 from datetime import date
 
 from typing import ClassVar, Type
-from dataclasses import field  # , fields, make_dataclass
+from dataclasses import field
 from marshmallow_dataclass import dataclass
 
 from marshmallow import Schema  # , validate
@@ -53,7 +53,7 @@ class IntervalMessage(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class TrackingPayloadMessage(BaseApiData):
+class TrackingPayloadMsgDc(BaseApiData):
     # the std msg to update a tracking record
     persId: int = field(default=0, metadata=dict(required=True))
     enabled: bool = field(default=True)
@@ -130,7 +130,7 @@ CommitLvlUpdateMsg.Schema.__model__ = CommitLvlUpdateMsg
 
 IntervalMessage.Schema.__model__ = IntervalMessage
 
-TrackingPayloadMessage.Schema.__model__ = TrackingPayloadMessage
+TrackingPayloadMsgDc.Schema.__model__ = TrackingPayloadMsgDc
 
 IncidentRowMessage.Schema.__model__ = IncidentRowMessage
 

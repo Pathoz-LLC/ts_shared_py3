@@ -54,12 +54,12 @@ class IntervalMessage(DataClassBaseSchema):
 #     pass
 
 
-class TrackingPayloadMessage(DataClassBaseSchema):
-    # the std msg to update a tracking record
-    persId = fields.Integer()
-    enabled = fields.Boolean(default=True)
-    # repeating intervals:
-    phases = fields.Nested(IntervalMessage(many=True))
+# class TrackingPayloadMessageSchema(DataClassBaseSchema):
+#     # the std msg to update a tracking record
+#     persId = fields.Integer()
+#     enabled = fields.Boolean(default=True)
+#     # repeating intervals:
+#     phases = fields.Nested(IntervalMessage(many=True))
 
 
 class IncidentRowMessage(DataClassBaseSchema):
