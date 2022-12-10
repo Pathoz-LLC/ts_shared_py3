@@ -39,7 +39,10 @@ class BehaviorStatsFilterMessage(BaseApiData):
 
 BehaviorStatsRequestMessage = make_dataclass(
     "BehaviorStatsRequestMessage",
-    fields(BehaviorKeysMessage) + fields(BehaviorStatsFilterMessage),
+    fields=[
+        ("BehaviorKeysMessage", BehaviorKeysMessage),
+        ("BehaviorStatsFilterMessage", BehaviorStatsFilterMessage),
+    ],
 )
 
 # BehaviorRowMsg = model_message(Entry, exclude=('addDateTime', 'modifyDateTime') )
@@ -89,7 +92,7 @@ class BehaviorHistoryMessage(BaseApiData):
     endedDatingDate: date = field()
     firstLogDtTm: float = field(default=0.0)  # as epoch
     lastLogDtTm: float = field(default=0.0)
-    items = list[BehaviorRowMsg] = []
+    items: list[BehaviorRowMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -124,7 +127,7 @@ class BehEntryWrapperMessage(BaseApiData):
     addDateTime: float = field(default=0.0)
     modifyDateTime: float = field(default=0.0)
     behaviorText: str = field(default="")
-    isPositive: bool = field(default=False)(10, default=True)
+    isPositive: bool = field(default=False)
     keywords: str = field(default="")
     oppBehaviorCode: str = field(default="")
     oppBehaviorText: str = field(default="")
@@ -154,8 +157,8 @@ class BehaviorLogSummaryMessage(BaseApiData):
     firstEntryDttm: float = field(default=0.0, metadata=dict(required=True))  # as epoch
     lastEntryDttm: float = field(default=0.0, metadata=dict(required=True))
     count: int = field(default=0, metadata=dict(required=True))
-    entries: list[BehEntryWrapperMessage] = []
-    phaseHistory: list[TrackingPayloadMessage] = []
+    entries: list[BehEntryWrapperMessage] = field(default_factory=lambda x: [])
+    phaseHistory: list[TrackingPayloadMessage] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -191,7 +194,7 @@ class BehOrCatMsg(BaseApiData):
 class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
-    children: str = field(default="", repeated=True)
+    children: list[str] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -199,9 +202,9 @@ class NodeListMsg(BaseApiData):
 @dataclass(base_schema=DataClassBaseSchema)
 class FullBehaviorListMsg(BaseApiData):
     # top level msg returned to client
-    topCategoryCodes: str = field(default="", repeated=True)
-    masterList: list[BehOrCatMsg] = []
-    graph: list[NodeListMsg] = []
+    topCategoryCodes: list[str] = field(default_factory=lambda x: [])
+    masterList: list[BehOrCatMsg] = field(default_factory=lambda x: [])
+    graph: list[NodeListMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -217,7 +220,7 @@ class CatCodeTextMsg(BaseApiData):
     availCount: int = field(default=10, metadata=dict(required=True))
     # perhaps we should reset availCount each time they add a prospect??
     iconName: str = field(default="", metadata=dict(required=True))
-    pos: bool = field(default=False)(6, metadata=dict(required=True), default=False)
+    pos: bool = field(default=False, metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -225,7 +228,7 @@ class CatCodeTextMsg(BaseApiData):
 @dataclass(base_schema=DataClassBaseSchema)
 class TopCategoriesMsg(BaseApiData):
     # list for client
-    items: list[CatCodeTextMsg] = []
+    items: list[CatCodeTextMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -235,7 +238,7 @@ class TopCategoriesMsg(BaseApiData):
 class BehStatMsg(BaseApiData):
     # embedded in VoteTypeMsg
     totCount: int = field(default=0, metadata=dict(required=True))
-    slotCounts: int = field(default=0, repeated=True)
+    slotCounts: list[int] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -257,9 +260,9 @@ class BehStatMsgAdapter:
 @dataclass(base_schema=DataClassBaseSchema)
 class VoteTypeMsg(BaseApiData):
     # embedded in BehVoteStatsMsg
-    feeling: list[BehStatMsg] = []
-    concern: list[BehStatMsg] = []
-    frequency: list[BehStatMsg] = []
+    feeling: list[BehStatMsg] = field(default_factory=lambda x: [])
+    concern: list[BehStatMsg] = field(default_factory=lambda x: [])
+    frequency: list[BehStatMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -292,9 +295,9 @@ class VoteTypeMsgAdapter:
 class BehVoteStatsMsg(BaseApiData):
     behaviorCode: str = field(default="", metadata=dict(required=True))
     categoryName: str = field(default="", metadata=dict(required=True))
-    female: list[VoteTypeMsg] = []
-    male: list[VoteTypeMsg] = []
-    unknown: list[VoteTypeMsg] = []
+    female: list[VoteTypeMsg] = field(default_factory=lambda x: [])
+    male: list[VoteTypeMsg] = field(default_factory=lambda x: [])
+    unknown: list[VoteTypeMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

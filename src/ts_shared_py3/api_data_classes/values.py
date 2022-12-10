@@ -68,7 +68,7 @@ class ValueRateMsg(BaseApiData):
     concernVote: int = field(default=2, metadata=dict(required=True))
     # send old answer so stats can be adjusted upon change (not yet implemented)
     origConcernVote: int = field(default=-1, metadata=dict(required=True))
-    frequencies: list[PersonFrequencyMsg] = []
+    frequencies: list[PersonFrequencyMsg] = field(default_factory=lambda x: [])
     changeDt: date = None
     # decrementQuota=False tells server that this is a catch-up frequency answer
     # not to count against daily quota
@@ -86,16 +86,16 @@ class BehaviorAssessMsg(BaseApiData):
 
     """
 
-    priorAnswer: ValueRateMsg = None
-
     behCode: str = field(metadata=dict(required=True))
+    filterKeywords: str = field(metadata=dict(required=False))
+
+    priorAnswer: ValueRateMsg = None
     catCode: str = field(default="", metadata=dict(required=True))
     subCat: str = field(default="", metadata=dict(required=True))
     text: str = field(default="")
     # prior answer
     hasPriorAnswer: bool = field(default=False)
     categoryName: str = field(default="", metadata=dict(required=True))
-    filterKeywords: str = field(required=False)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -107,7 +107,7 @@ class ValuesCollectionMsg(BaseApiData):
 
     availQuestCount: int = field(default=5, metadata=dict(required=True))
     # should be an entry in items for each behCode
-    items: list[BehaviorAssessMsg] = []
+    items: list[BehaviorAssessMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

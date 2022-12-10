@@ -2,9 +2,9 @@ import logging
 from random import randint
 from datetime import datetime, timedelta
 
-from google.appengine.api import taskqueue
+# from google.appengine.api import taskqueue
 
-from common.models.entry_adapter import InputEntryAdapter
+from ..models.input_entry_adapter import InputEntryAdapter
 
 # FIX BELOW
 # from ...constants import GAEQ_FOR_SCORING, SCORING_SERVICE_NAME
@@ -12,7 +12,7 @@ GAEQ_FOR_SCORING = "scoring-queue"
 SCORING_SERVICE_NAME = "ts-scoring"
 
 
-scoringRetryConfig = taskqueue.TaskRetryOptions(task_retry_limit=6)
+# scoringRetryConfig = taskqueue.TaskRetryOptions(task_retry_limit=6)
 
 
 class ScoreDispatchHelper(object):

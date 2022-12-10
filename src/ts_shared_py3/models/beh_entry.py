@@ -28,7 +28,6 @@ class Entry(BaseNdbModel):  # ndb.model.Expando
         indexed=False, default=1
     )  # feeling strength re beh (1-3) 3vals
 
-    # GeoField(name='place', value=GeoPoint(latitude=-33.84, longitude=151.26))
     coords = ndb.GeoPtProperty()
 
     comments = ndb.TextProperty(indexed=False, default="")  # any notes or comments

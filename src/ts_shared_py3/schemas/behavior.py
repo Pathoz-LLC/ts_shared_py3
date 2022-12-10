@@ -6,7 +6,7 @@ from marshmallow_dataclass import add_schema
 # #
 # from .base import NdbBaseSchema
 # from .tracking import TrackingPayloadMessage
-from api_data_classes.behavior import *
+from ..api_data_classes.behavior import *
 
 """
     from common.schemas.behavior import *
@@ -31,7 +31,7 @@ BehaviorStatsFilterMessageSchema = BehaviorStatsFilterMessage.Schema()
 #     lon = fields.Float(default=0.0)
 
 
-BehaviorStatsRequestMessage = compose(BehaviorKeysMessage, BehaviorStatsFilterMessage)
+# BehaviorStatsRequestMessage = BehaviorStatsRequestMessage.Schema()
 
 # BehaviorRowMsg = model_message(Entry, exclude=('addDateTime', 'modifyDateTime') )
 

@@ -143,7 +143,7 @@ class RedFlagSummaryMsg(BaseApiData):
     catfishCount: int = field(default=0, metadata=dict(required=True))
     cheatedCount: int = field(default=0, metadata=dict(required=True))
     daterapeCount: int = field(default=0, metadata=dict(required=True))
-    reports: list[RedFlagReportMsg] = []
+    reports: list[RedFlagReportMsg] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

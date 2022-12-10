@@ -1,5 +1,7 @@
 from enum import IntEnum, unique
 
+from google.cloud.ndb import model
+
 
 class CreateReason(IntEnum):
     RELATIONSHIP = 1  # with app user
@@ -23,3 +25,45 @@ class MonitorStatus(IntEnum):
     SEPARATED = 3
     TRUSTMODE = 4
     ARCHIVE = 5
+
+
+class NdbCreateReasonProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return CreateReason(value)
+        elif isinstance(value, (bytes, str)):
+            return CreateReason(int(value))
+        elif not isinstance(value, CreateReason):
+            raise TypeError(
+                "expected CreateReason, int, str or unicd, got %s" % repr(value)
+            )
+
+    def _to_base_type(self, sx: CreateReason):
+        # convert AccountType to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return CreateReason(value)
+
+
+class NdbMonitorStatusProp(model.IntegerProperty):
+    def _validate(self, value: int):
+        if isinstance(value, (int)):
+            return MonitorStatus(value)
+        elif isinstance(value, (bytes, str)):
+            return MonitorStatus(int(value))
+        elif not isinstance(value, MonitorStatus):
+            raise TypeError(
+                "expected MonitorStatus, int, str or unicd, got %s" % repr(value)
+            )
+
+    def _to_base_type(self, sx: MonitorStatus):
+        # convert AccountType to int
+        if isinstance(sx, int):
+            return sx
+        return int(sx.value)
+
+    def _from_base_type(self, value: int):
+        return MonitorStatus(value)

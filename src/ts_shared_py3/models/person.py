@@ -3,7 +3,12 @@ from datetime import datetime, date, timedelta
 import google.cloud.ndb as ndb
 
 #
-from ..enums.createAndMonitor import CreateReason, MonitorStatus
+from ..enums.createAndMonitor import (
+    CreateReason,
+    MonitorStatus,
+    NdbCreateReasonProp,
+    NdbMonitorStatusProp,
+)
 from ..enums.sex import Sex, NdbSexProp
 from .baseNdb_model import BaseNdbModel
 from .values_beh_cat import UserAnswerStats
@@ -179,9 +184,9 @@ class PersonLocal(BaseNdbModel):
     # redFlagBits = ndb.IntegerProperty( default=0, indexed=False )
 
     # housekeeping vals
-    monitorStatus = MonitorStatus(default=MonitorStatus.ACTIVE)
+    monitorStatus = NdbMonitorStatusProp(default=MonitorStatus.ACTIVE)
     reminderFrequency = ndb.TextProperty(indexed=False, default="never")
-    createReason = CreateReason(
+    createReason = NdbCreateReasonProp(
         required=True, default=CreateReason.RELATIONSHIP, indexed=False
     )
     addDateTime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
