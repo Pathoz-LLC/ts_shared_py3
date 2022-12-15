@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from datetime import date, datetime, timedelta, time
-from typing import Union, TypeVar
+from typing import cast, Union, TypeVar
 
 import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
@@ -26,47 +28,51 @@ class PersonBehavior(BaseNdbModel):
     _earliestEntryDate = None  # the date
 
     @property
-    def unscoredEntries(self):
-        return [e for e in self.entries if e.modifyDateTime > self.scoredUpTo]
+    def entryList(self) -> list[Entry]:
+        return cast(list[Entry], self.entries)
 
     @property
-    def yearMonthKeyStr(self):
-        return PersonBehavior.keyStrFromDate(self.monthStartDt)
+    def unscoredEntries(self: PersonBehavior):
+        return [e for e in self.entryList if e.modifyDateTime > self.scoredUpTo]
 
     @property
-    def earliestEntryDate(self):
+    def yearMonthKeyStr(self: PersonBehavior):
+        return PersonBehavior.keyStrFromDate(self.monthStartDt)  # type: ignore
+
+    @property
+    def earliestEntryDate(self: PersonBehavior):
         # print("there are {0} behavior entries".format( len(self.entries) ))
         # print("date list is:")
         # print( [ e.occurDateTime for e in self.entries] )
-        if len(self.entries) < 1:
+        if len(self.entryList) < 1:
             return date.today()
         elif self._earliestEntryDate != None:
             return self._earliestEntryDate
 
-        self._earliestEntryDate = min([e.occurDateTime for e in self.entries]).date()
+        self._earliestEntryDate = min([e.occurDateTime for e in self.entryList]).date()  # type: ignore
         return self._earliestEntryDate
 
     @property
-    def latestEntryDate(self):
-        if len(self.entries) < 1:
+    def latestEntryDate(self: PersonBehavior):
+        if len(self.entryList) < 1:
             return date.today()
         elif self._latestEntry == None:
-            self._latestEntry = self.entries[0]
-        return self._latestEntry.occurDateTime.date()
+            self._latestEntry = self.entryList[0]
+        return self._latestEntry.occurDateTime.date()  # type: ignore
 
     @property
-    def earliestEntryDtTm(self):
+    def earliestEntryDtTm(self: PersonBehavior):
         return datetime.combine(self.earliestEntryDate, time.min) + timedelta(
             milliseconds=1
         )
 
     @property
-    def latestEntryDtTm(self):
+    def latestEntryDtTm(self: PersonBehavior):
         return datetime.combine(self.latestEntryDate, time.min) + timedelta(
             milliseconds=1
         )
 
-    def addNewEntry(self, entry):
+    def addNewEntry(self: PersonBehavior, entry):
         """ """
         # cat, subCat = behaviorDataShared.catAndSubForCode(entry.behaviorCode)
         bcn = behaviorDataShared.masterDict.get(entry.behaviorCode)
@@ -81,14 +87,14 @@ class PersonBehavior(BaseNdbModel):
         # print("2) BehCount in {0} is {1}".format(self.monthStartDt, len(self.entries)))
         self.clearCache()
 
-    def updateEntry(self, rowNum, entry):
+    def updateEntry(self: PersonBehavior, rowNum: int, entry: Entry):
         """"""
         # for i, e in enumerate(self.entries):
         #     if e.occurDateTime == origOccurDateTime and e.behaviorCode == entry.behaviorCode:
         #         self.entries[rowNum] = entry
         #         break
         # modifyDateTime is set in _pre_put_hook
-        if len(self.entries) < rowNum + 1:
+        if len(self.entryList) < rowNum + 1:
             rowNum = 0
         entry.modifyDateTime = datetime.now()
         self.entries[rowNum] = entry
@@ -135,15 +141,18 @@ class PersonBehavior(BaseNdbModel):
         qry = cls.query(ancestor=ancestorKey).order(-cls.monthStartDt)
         return qry.fetch()
 
-    # @staticmethod
-    # def loadBehaviorsWithDimensions(user, personId):
-    #     # returns raw data 4 behaviors/dimensions
-    #     from common.scoring.models import BehaviorDimensionScores     # avoid circular import
-    #     allBehavior = PersonBehavior.loadOrInitByCoreIds(user, personId)
-    #     # print("found %s entries in behavior dict" % (len(allBehavior.entries)) )
-    #     bds = BehaviorDimensionScores(user, personId, allBehavior)
-    #     bds.calc()
-    #     return bds
+    @staticmethod
+    def loadBehaviorsWithDimensions(user, personId):
+        # returns raw data 4 behaviors/dimensions
+        from ts_shared_py3.models.behavior import (
+            BehaviorDimensionScores,
+        )  # avoid circular import
+
+        allBehavior = PersonBehavior.loadOrInitByCoreIds(user, personId)
+        # print("found %s entries in behavior dict" % (len(allBehavior.entries)) )
+        bds = BehaviorDimensionScores(user, personId, allBehavior)
+        bds.calc()
+        return bds
 
     # @staticmethod
     # def keyStrFromDate(dt):
@@ -167,7 +176,7 @@ class PersonBehavior(BaseNdbModel):
         e = Entry()
         e.behaviorCode = MOCK_BEH_CODES[randIntInRange(0, len(MOCK_BEH_CODES) - 1)]
         e.feelingStrength = randIntInRange(0, 4)
-        e.significanceStrength = randIntInRange(0, 4)
+        # e.significanceStrength = randIntInRange(0, 4)
         now = date.today()
         daysBetween = (now - startDate).days
         backupDays = randIntInRange(0, daysBetween)

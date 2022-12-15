@@ -5,7 +5,7 @@
 # from google.appengine.ext.ndb import Query
 import random
 import constants
-from ..models.user import User, UserToken
+from ..models.user import DbUser, UserToken
 from ..api_data_classes.user import UserLoginMsg
 
 
@@ -14,7 +14,7 @@ class UserIO(object):
 
     @staticmethod
     def loadUserByUniqueVal(searchMsg):
-        # type: (UserLoginMsg) -> User
+        # type: (UserLoginMsg) -> DbUser
         """
         can search by email, phone, ID or token (in jwt field)
         but we don't have phone # for users
@@ -25,21 +25,21 @@ class UserIO(object):
 
         """
         if len(searchMsg.userId) > 0 or len(searchMsg.email) > 0:
-            return User.loadByEmailOrId(
+            return DbUser.loadByEmailOrId(
                 email=searchMsg.email, firAuthUserId=searchMsg.userId
             )
         elif len(searchMsg.jwt) > 0:
-            user, tokTimestmp = User.get_by_bearer_token(token=searchMsg.jwt)
+            user, tokTimestmp = DbUser.get_by_bearer_token(token=searchMsg.jwt)
             return user
 
         if len(searchMsg.phone) > 0:
-            qry = User.query().filter(User.phone, "=", searchMsg.phone)
+            qry = DbUser.query().filter(DbUser.phone, "=", searchMsg.phone)
 
         return qry.get()  ## type: User
 
     @staticmethod
     def loadUserByID(userID):
-        return User.loadByEmailOrId(firAuthUserId=userID)
+        return DbUser.loadByEmailOrId(firAuthUserId=userID)
 
     @staticmethod
     def getXRandUsers(count):
@@ -47,5 +47,5 @@ class UserIO(object):
             offst = 0
         else:
             offst = random.randint(0, 300)
-        qry = User.query()
+        qry = DbUser.query()
         return qry.fetch(count, offset=offst)

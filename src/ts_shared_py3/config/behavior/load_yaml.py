@@ -14,11 +14,12 @@ Behavior level:
     shareEvent()
 """
 from __future__ import annotations
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Dict, Any, List
 import logging
 import random
 import yaml
 import json  # dumps( {} ) turns dict into string
+from dataclasses import dataclass
 from marshmallow.fields import Number
 
 #
@@ -62,9 +63,27 @@ def forRowInYaml(relFilePath: str, funcToRun: Callable) -> list[BehCatNode]:
     return results
 
 
+@dataclass
 class BehCatNode(object):
+
+    code: str
+    parentCode: str
+    text: str
+    keywords: str
+    sort: int
+    positive: bool
+    childrenSearchable: bool
+    isCategory: bool
+    impact: float
+    aliases: str
+    altCategories: str
+    oppositeCode: str
+
+    def __init__(self: BehCatNode) -> None:
+        pass
+
     @staticmethod
-    def yamlToBcn(isCategory: bool, row) -> BehCatNode:
+    def yamlToBcn(isCategory: bool, row: Dict[str, Any]) -> BehCatNode:
         """BIG WARNING HERE
             our YAML files deliver Bool true or false
 
@@ -142,7 +161,7 @@ class BehCatNode(object):
         # keywords must be string when we exit this function
         return bcn
 
-    def inheritParentVals(self: BehCatNode, masterDict: map[str, any]):
+    def inheritParentVals(self: BehCatNode, masterDict: Dict[str, Any]):
         # only call this for leaf nodes (non categories)
         dirParentAkaSubcat = masterDict.get(self.parentCode)
         if dirParentAkaSubcat is None:
@@ -196,7 +215,7 @@ class BehCatNode(object):
         return int(val)
 
     @property
-    def asDict(self: BehCatNode) -> map[str, any]:
+    def asDict(self: BehCatNode) -> Dict[str, Any]:
         return dict(
             code=self.code,
             parentCode=self.parentCode,
@@ -275,7 +294,7 @@ def finalKeywordsList(
 
 
 def inheritCategoryDescripToBehKeywords(
-    behaviorsDict: map[str, any], categoriesDict: map[str, any]
+    behaviorsDict: Dict[str, Any], categoriesDict: Dict[str, Any]
 ) -> None:
     """combine keywords, dedup, lowercase & remove punctuation from search words"""
     # print("categoriesDict:")
@@ -307,9 +326,9 @@ def inheritCategoryDescripToBehKeywords(
         # print("KWs for {0} are: {1}".format(beh.code, beh.keywords))
 
 
-def makePerRowFunc(isCategory: bool, categoryDict: map[str, any]) -> Callable:
+def makePerRowFunc(isCategory: bool, categoryDict: Dict[str, Any]) -> Callable:
     # lineNumLst = [1]
-    def makeNewRow(rec: map[str, any]):
+    def makeNewRow(rec: Dict[str, Any]):
         # rec comes in as a yaml object (basically a dict)
         categoryDict[rec.get("code")] = BehCatNode.yamlToBcn(isCategory, rec)
 
@@ -324,7 +343,7 @@ def sortTupleList(tupList: list[Tuple[str, int]]) -> list[str]:
 
 
 def getCategoryListSorted(
-    catDict: map[str, BehCatNode], filterFunc: Callable
+    catDict: Dict[str, BehCatNode], filterFunc: Callable
 ) -> list[str]:
     tupList: list[Tuple[str, int]] = [
         (cd, cat.sort) for cd, cat in catDict.items() if filterFunc(cat)
@@ -368,7 +387,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
         NOTE: hidden behaviors may be a problem for showing parent category on Behavior stats
         """
-        categoriesDict: map[str, BehCatNode] = dict()
+        categoriesDict: dict[str, BehCatNode] = dict()
 
         # import os
 
@@ -380,7 +399,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             projRoot + "config/behavior/category.yaml",  # common/config/behavior/
             makePerRowFunc(True, categoriesDict),
         )
-        behaviorsDict: map[str, BehCatNode] = dict()  # behavior
+        behaviorsDict: dict[str, BehCatNode] = dict()  # behavior
         forRowInYaml(
             projRoot + "config/behavior/behaviors.yaml",
             makePerRowFunc(False, behaviorsDict),
@@ -420,7 +439,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         self._posCatCodesWithNames = None
         self._countsByCategory = None  # of beh/questions per category
 
-    def getBehAsDict(self: BehaviorSourceSingleton, code: str) -> map[str, any]:
+    def getBehAsDict(self: BehaviorSourceSingleton, code: str) -> Dict[str, Any]:
         """return a dict to describe behavior atts
         for community news meta
         """
@@ -459,13 +478,13 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         return codes
 
     def buildSortedGraph(
-        self: BehaviorSourceSingleton, categoriesDict: map[str, str]
+        self: BehaviorSourceSingleton, categoriesDict: dict[str, BehCatNode]
     ) -> list[Tuple[str, list[str]]]:
         # every behavior or subCat has a parent
         # we need a sorted list of every parent's child  codes
         # tempGraphDict first contains tuples & then converted to strings after sorting
         tempGraphDict = dict()
-        beh: BehCatNode = None
+        beh: BehCatNode = ""
         for cd, beh in self.masterDict.items():
             # only need to process subCats & behaviors (parentCode filters out topLevelCats)
             if beh.parentCode not in ("", "root"):
@@ -507,7 +526,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         return graph
 
     def removeDupChildCodesThenSort(
-        self: BehaviorSourceSingleton, lstOfCodeSortTup: list[str, int]
+        self: BehaviorSourceSingleton, lstOfCodeSortTup: List[str]
     ) -> list[str]:
         newList: list[Tuple[str, int]] = []
         seenList: list[str] = []
@@ -565,13 +584,13 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         return "_notFnd_{0}".format(code)
 
     @property
-    def countsByCategory(self: BehaviorSourceSingleton) -> map[str, int]:
+    def countsByCategory(self: BehaviorSourceSingleton) -> Dict[str, int]:
         if self._countsByCategory is None:
             self._countsByCategory = self._makeCategoryCountDict()
         return self._countsByCategory
 
-    def _makeCategoryCountDict(self: BehaviorSourceSingleton) -> map[str, int]:
-        d: map[str, int] = dict()
+    def _makeCategoryCountDict(self: BehaviorSourceSingleton) -> Dict[str, int]:
+        d: Dict[str, int] = dict()
         for bcn in self.masterDict.values():
             if bcn.isCategory or bcn.positive:
                 continue  # only count negative questions
@@ -579,30 +598,30 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             d[bcn.topCategoryCode] = cnt + 1
         return d
 
-    # @property
-    # def behaviorListMsg(self:BehaviorSourceSingleton) -> any:
-    #     # NIU??
-    #     if self._behaviorListMsg is None:
-    #         self._behaviorListMsg = self._toMsg()
-    #     return self._behaviorListMsg
+    @property
+    def behaviorListMsg(self: BehaviorSourceSingleton) -> Any:
+        # NIU??
+        if self._behaviorListMsg is None:
+            self._behaviorListMsg = self._toMsg()
+        return self._behaviorListMsg
 
-    # def _toMsg(self):
-    #     # remember to remove feelings from list
-    #     # from common.messages.behavior import FullBehaviorListMsg, NodeListMsg
-    #     raise Exception
+    def _toMsg(self):
+        # remember to remove feelings from list
+        # from common.messages.behavior import FullBehaviorListMsg, NodeListMsg
+        raise Exception
 
-    #     mastLst = [
-    #         b._toMsg()
-    #         for b in self.masterDict.values()
-    #         if not b.code.startswith("feelingReport")
-    #     ]
-    #     nodeList = [NodeListMsg(code=tup[0], children=tup[1]) for tup in self.graph]
-    #     fbl = FullBehaviorListMsg(
-    #         topCategoryCodes=self.topLevelCategoryCodes,
-    #         graph=nodeList,
-    #         masterList=mastLst,
-    #     )
-    #     return fbl
+        mastLst = [
+            b._toMsg()
+            for b in self.masterDict.values()
+            if not b.code.startswith("feelingReport")
+        ]
+        nodeList = [NodeListMsg(code=tup[0], children=tup[1]) for tup in self.graph]
+        fbl = FullBehaviorListMsg(
+            topCategoryCodes=self.topLevelCategoryCodes,
+            graph=nodeList,
+            masterList=mastLst,
+        )
+        return fbl
 
     def findTopCategory(
         self: BehaviorSourceSingleton, behaviorCode: str, isPositive: bool
@@ -624,13 +643,13 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
     def countByFeeling(
         self: BehaviorSourceSingleton,
-        personBehavior: object,  # PersonBehavior causes circular import
+        personBehavior: "PersonBehavior",  # PersonBehavior causes circular import
         countPositive: bool = True,
         feelingsOnly: bool = False,
     ) -> int:
         # return counts by pos/neg & whether behavior is attached or generic feeling
 
-        filteredBehaviors = personBehavior.entries
+        filteredBehaviors = personBehavior.entryList
         if feelingsOnly:
             # we can match on exact code without calling isPositiveByCode()
             code = FEELING_ONLY_CODE_POS if countPositive else FEELING_ONLY_CODE_NEG
@@ -660,7 +679,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         self: BehaviorSourceSingleton,
         count: int,
         categoryCode: str,
-        startingAfter: str = None,
+        startingAfter: str = "",
     ) -> list[BehCatNode]:
         """
         count = int (how many bcn to return
@@ -741,7 +760,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         consumedPositions = set()  # confirms all beh recs are unique
         allBehCodes = [
             cd
-            for cd, v in self.masterDict.iteritems()
+            for cd, v in self.masterDict.items()
             if not v.isCategory and v.positive == pos
         ]
         for i in range(count):
@@ -767,7 +786,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
 class BcnEncoder(json.JSONEncoder):
     #
-    def default(self: BcnEncoder, obj) -> map[str, any]:
+    def default(self: BcnEncoder, obj) -> dict[str, Any]:
         if isinstance(obj, BehCatNode):
             return obj.toDict()
         return json.JSONEncoder.default(self, obj)

@@ -139,7 +139,7 @@ FIRAUTH_FIELDNAMES_TO_STORE = {
 }
 
 
-class User(BaseNdbModel):  # BaseUserExpando
+class DbUser(BaseNdbModel):  # BaseUserExpando
     """
     user rec; includes data from social profile
         as an expando table, it will store whatever fields you attach
@@ -161,11 +161,11 @@ class User(BaseNdbModel):  # BaseUserExpando
     #  FIXME props below
     sex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
     preferredSex = NdbSexProp(required=True, default=Sex.NEVERSET, indexed=False)
-    # photoUrl = ndb.StringProperty(indexed=False)
+    photoUrl = ndb.TextProperty(indexed=False)
     # #  account info & security;  Free; Pro; Premium
     accountLevel = NdbAcctTypeProp(indexed=True, default=AccountType.FREE)
     # next field only applies to premium users
-    premiumExpireDt = ndb.DateProperty(indexed=False, default=date.today())
+    premiumExpireDt = ndb.DateProperty(indexed=False, default=datetime.now())
     #  who they logged in with; eg facebook.com; fieldname governed by gitkit
     provider_id = ndb.TextProperty(indexed=False, default="Facebook")
 
@@ -228,7 +228,7 @@ class User(BaseNdbModel):  # BaseUserExpando
                 user.last = parts[1] if len(parts) == 2 else parts[len(parts) - 1]
 
         user.photoUrl = msg.photoUrl
-        user.dob = message_to_date(msg.dob)
+        user.dob = msg.dob
         user.sex = msg.sex
         user.city = msg.city
         user.state = msg.state
@@ -259,9 +259,9 @@ class User(BaseNdbModel):  # BaseUserExpando
     @staticmethod
     def updateFromProfileMsg(msg):
         # user edited profile
-        user = User.loadByEmailOrId(firAuthUserId=msg.userId)
+        user = DbUser.loadByEmailOrId(firAuthUserId=msg.userId)
         if user is None:
-            return User()
+            return DbUser()
 
         user.email = msg.email
         user.handle = msg.fullNameOrHandle
@@ -270,7 +270,7 @@ class User(BaseNdbModel):  # BaseUserExpando
         user.last = msg.last
 
         user.photoUrl = msg.photoUrl
-        user.dob = message_to_date(msg.dob)
+        user.dob = msg.dob
         user.sex = msg.sex
         user.city = msg.city
         # user.state = msg.state
@@ -288,12 +288,12 @@ class User(BaseNdbModel):  # BaseUserExpando
     def updateLastLogin(userId, jwt):
         # refresh token & store login date
 
-        authToken = User.token_model.create(userId, "auth", jwt)
-        user = ndb.Key(User, userId).get()
+        authToken = DbUser.token_model.create(userId, "auth", jwt)
+        user = ndb.Key(DbUser, userId).get()
         if user is None:
             print("This user does not exist!!")
             return None, None
-        bearerToken = User.create_bearer_token(userId)
+        bearerToken = DbUser.create_bearer_token(userId)
         user.lastLogin = datetime.now()
         user.put()
         return user, bearerToken
@@ -304,7 +304,7 @@ class User(BaseNdbModel):  # BaseUserExpando
         msg.email = self.email
         msg.fullNameOrHandle = self.name
         msg.photoUrl = self.photoUrl
-        msg.dob = date_to_message(self.dob)
+        msg.dob = self.dob
         msg.sex = "{0}".format(self.sex.value)
         msg.city = self.city
         msg.state = self.state
@@ -495,19 +495,19 @@ class User(BaseNdbModel):  # BaseUserExpando
     @staticmethod
     def loadByEmailOrId(email="", firAuthUserId=""):
         if len(firAuthUserId) > 2:
-            user = ndb.Key(User, firAuthUserId).get()
+            user = ndb.Key(DbUser, firAuthUserId).get()
         else:
-            userQuery = User.query(User.email == email)
+            userQuery = DbUser.query(DbUser.email == email)
             user = userQuery.get()
         return user
 
     @classmethod
     def makeNewAuthorizedUser(cls, uid, email, token):
-        uKey = ndb.Key(User, uid)
+        uKey = ndb.Key(DbUser, uid)
         u = uKey.get()
         # print("user:{0}".format(u))
         if u == None:
-            u = User()
+            u = DbUser()
             u.key = uKey
             u.email = email
             u.authToken = token

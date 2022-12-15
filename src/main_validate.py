@@ -8,6 +8,7 @@ from ts_shared_py3.scoring import commBehImpactConsenus
 # from ts_shared_py3.scoring import *
 from ts_shared_py3.scoring import *
 from ts_shared_py3.services import *
+from ts_shared_py3.config.behavior.load_yaml import BehaviorSourceSingleton
 
 # from ts_shared_py3.common import enums
 # from ts_shared_py3.common import config

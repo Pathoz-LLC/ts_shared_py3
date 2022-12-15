@@ -57,14 +57,14 @@ class Entry(BaseNdbModel):  # ndb.model.Expando
     @property
     def longitude(self):
         if self.coords is not None:
-            return self.coords.lon
+            return self.coords.lon  # type: ignore
         else:
             return 0
 
     @property
     def latitude(self):
         if self.coords is not None:
-            self.coords.lat
+            self.coords.lat  # type: ignore
         else:
             return 0
 

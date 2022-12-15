@@ -19,7 +19,7 @@ from .values_beh_cat import UserAnswerStats
 from ..enums.sex import Sex
 from ..enums.commitLevel import DisplayCommitLvl, NdbCommitLvlProp
 from .person_keys import PersonKeys, KeyTypeEnum
-from .user import User
+from .user import DbUser
 
 # advanced filter building and usage
 # field = "city"
@@ -234,7 +234,7 @@ class PersonLocal(BaseNdbModel):
 
     @staticmethod
     def _makeKey(userIdStr, personIdInt):
-        return ndb.Key(User, userIdStr, PersonLocal, personIdInt)
+        return ndb.Key(DbUser, userIdStr, PersonLocal, personIdInt)
 
     @staticmethod
     def fromMsg(msg):

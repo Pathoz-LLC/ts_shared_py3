@@ -6,7 +6,7 @@ import google.cloud.ndb as ndb
 from ..enums.redFlag import RedFlagType, NdbRedFlagProp
 from .baseNdb_model import BaseNdbModel
 from .person import Person
-from .user import User
+from .user import DbUser
 
 
 class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
@@ -20,7 +20,7 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
     status vals are:  ( 0=submitted, 1=proven, 2=rescinded, 3=overriden)
     """
 
-    userKey = ndb.KeyProperty(User, required=True, indexed=True)
+    userKey = ndb.KeyProperty(DbUser, required=True, indexed=True)
     flagType = NdbRedFlagProp(
         required=True, default=RedFlagType.NEVERSET, indexed=False
     )
@@ -55,7 +55,7 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
         beganDt = msg.beganDateTime if msg.beganDateTime else now
         beganDt = beganDt.replace(tzinfo=None)
         rfr = RedFlagReport(
-            userKey=ndb.Key(User, userId),
+            userKey=ndb.Key(DbUser, userId),
             flagType=msg.flagType,
             comment=msg.comment,
             addDateTime=now,
