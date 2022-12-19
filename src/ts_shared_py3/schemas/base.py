@@ -1,4 +1,6 @@
+from __future__ import annotations
 import marshmallow as ma
+from typing import Any, AnyStr
 
 #
 from .ndbkey_jwt import NdbKeyField
@@ -15,6 +17,9 @@ class DataClassBaseSchema(ma.Schema):
     in all subclasses
 
     __model__ is a class variable
+
+    _makeModelObj causes schema deserialization to return
+    an instance of the model class
     """
 
     __model__ = _ReplaceWithRealDataClass
@@ -24,7 +29,9 @@ class DataClassBaseSchema(ma.Schema):
         dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%dT%H:%M:%S%z"
 
     @ma.post_load
-    def _makeModelObj(self, loadedDataAsDict, **kwargs):
+    def _makeModelObj(
+        self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
+    ):
         return self.__model__(**loadedDataAsDict)
 
 

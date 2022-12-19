@@ -11,7 +11,7 @@ from ..enums.sex import Sex
 # FIXME
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class PersonRowMsg(BaseApiData):
     dob: date = field()
     addDateTime: date = field()
@@ -34,7 +34,7 @@ class PersonRowMsg(BaseApiData):
 # PersonLocalRowMsg = model_message(PersonLocal, exclude=('userKey', 'personKey', 'createReason') )
 # PersonLocalRowMsg.field_by_name('nickname').required=False
 # PersonLocalRowMsg.field_by_name('createReason').required=False
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class PersonLocalRowMsg(BaseApiData):
     modDateTime: datetime = field()
     addDateTime: datetime = field()
@@ -54,7 +54,7 @@ class PersonLocalRowMsg(BaseApiData):
 
 
 # Message types below are primary public classes
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class PersonIdMessage(BaseApiData):
     # returned for create
     perId: int = field(default=0, metadata=dict(required=True))
@@ -63,7 +63,7 @@ class PersonIdMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class PersonPhoneMessage(BaseApiData):
     phone: str = field(default="")
     # auth_token: str = field(default="")
@@ -71,7 +71,7 @@ class PersonPhoneMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class PersonIdentifierMessage(BaseApiData):
     perId: int = field(default=0, metadata=dict(required=True))
     idValue: str = field(default="")
@@ -80,7 +80,7 @@ class PersonIdentifierMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class PersonMockDataMsg(BaseApiData):
     perId: int = field(default=0, metadata=dict(required=True))
     fileName: str = field(default="better")
@@ -102,7 +102,7 @@ PersonIdMessageCollection: list[PersonIdMessage]
 PersonPhoneMessageCollection: list[PersonPhoneMessage]
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class IncidentUpdateOpinionMessage(BaseApiData):
     pass
     #
@@ -120,7 +120,7 @@ class IncidentUpdateOpinionMessage(BaseApiData):
 #     # tellStrength: int = field(default=0, metadata=dict(required=True))
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class RedFlagReportMsg(BaseApiData):
     """ """
 
@@ -136,7 +136,7 @@ class RedFlagReportMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class RedFlagSummaryMsg(BaseApiData):
     personId: int = field(default=0, metadata=dict(required=True))
     revengeCount: int = field(default=0, metadata=dict(required=True))

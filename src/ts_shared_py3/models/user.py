@@ -1,3 +1,4 @@
+from __future__ import annotations
 import time
 from datetime import date, datetime, timedelta
 import logging
@@ -5,6 +6,7 @@ import logging
 #
 import google.cloud.ndb as ndb
 
+# from google.cloud.ndb.utils import logging_debug
 #
 # from firebase_admin import auth
 # from google.auth.credentials import Credentials, CredentialsWithTokenUri
@@ -502,7 +504,7 @@ class DbUser(BaseNdbModel):  # BaseUserExpando
         return user
 
     @classmethod
-    def makeNewAuthorizedUser(cls, uid, email, token):
+    def makeNewAuthorizedUser(cls: DbUser, uid: str, email: str, token: str) -> DbUser:
         uKey = ndb.Key(DbUser, uid)
         u = uKey.get()
         # print("user:{0}".format(u))
@@ -518,4 +520,5 @@ class DbUser(BaseNdbModel):  # BaseUserExpando
             u.expiresOn = datetime.now() + timedelta(weeks=4)
             u.pushNotifyAuthorized = True
             u.put()
-        cls.token_model.create(uid, "bearer", token)
+        # cls.token_model.create(uid, "bearer", token)
+        return u

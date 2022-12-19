@@ -1,27 +1,34 @@
 from __future__ import annotations
+from typing import Any
 
-# from datetime import datetime, date, time
+from marshmallow_dataclass import dataclass, NewType
 
-from dataclasses import dataclass, Field  # , field, fields, make_dataclass
+from marshmallow import validate
 
-# from marshmallow_dataclass import NewType, field_for_schema
+# from dataclasses import dataclass, Field  # , field, fields, make_dataclass
 # from dataclass_wizard import JSONWizard
+from ..schemas.base import DataClassBaseSchema
+
+# IPv4 = NewType('IPv4', str, validate=validate.Regexp(r'^([0-9]{1,3}\.){3}[0-9]{1,3}$'))
 
 
-# IPv4 = NewType('IPv4', str, validate=marshmallow.validate.Regexp(r'^([0-9]{1,3}\.){3}[0-9]{1,3}$'))
-
-
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class BaseApiData:
     """simple dict of data-types from JSON payload"""
 
-    def __init__(self, /, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
+        # print("blah:")
+        # print(type(kwargs))
         if len(kwargs) > 0:
-            self.updateAttsFromDict(kwargs)
+            self._updateAttsFromDict(kwargs)
 
-    def updateAttsFromDict(self: BaseApiData, kwArgsDict: dict[str, str]) -> None:
-        for key, value in kwArgsDict.items():
+    def _updateAttsFromDict(self: BaseApiData, kwargs: dict[str, Any]) -> None:  #
+        for key, value in kwargs.items():
             setattr(self, key, value)
+
+    # def __post_init__(self):
+    #     # std way of validating required fields
+    #     pass
 
     # def updateViaDictOrSchema(self, dictOrSchema):
     #     if isinstance(dictOrSchema, Schema):
@@ -31,7 +38,3 @@ class BaseApiData:
     #         self._updateAtts(dictOrSchema)
     #     else:
     #         raise Exception("invalid argument")
-
-    # def blah(self: BaseApiData) -> None:
-    #     # demo
-    #     fld: Field = field_for_schema(date, metadata=dict(blah=123))

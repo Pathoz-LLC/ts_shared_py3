@@ -10,8 +10,15 @@ from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema  # , make_schema_for_dc
 from ..api_data_classes.tracking import TrackingPayloadMsgDc
 
+"""Important Note:
+    it is vital that you set the Schema.__model__
+    equal to the Classname
+    this will allow creation & return of actual Model instances
+    inside our endpoints
+"""
+
 # example of validation
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehaviorKeysMessage(BaseApiData):
     surveyId: int = field(default=2)
     personId: int = field(default=0, metadata=dict(required=True))
@@ -26,7 +33,7 @@ class BehaviorKeysMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehaviorStatsFilterMessage(BaseApiData):
     behaviorCode: str = field(metadata=dict(required=True))
     state: str = field(default="")
@@ -46,7 +53,7 @@ BehaviorStatsRequestMessage = make_dataclass(
 )
 
 # BehaviorRowMsg = model_message(Entry, exclude=('addDateTime', 'modifyDateTime') )
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehaviorRowMsg(BaseApiData):
     behaviorCode: str = field(metadata=dict(required=True))
     feelingStrength: int = field(default=0)  # 0-4
@@ -86,7 +93,7 @@ class BehaviorRowMsg(BaseApiData):
 # }
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehaviorHistoryMessage(BaseApiData):
     beganDatingDate: date = field()
     endedDatingDate: date = field()
@@ -99,7 +106,7 @@ class BehaviorHistoryMessage(BaseApiData):
 
 # new behavior entries summary logic below
 # 11/20/17
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class StatsAndMetricsMsg(BaseApiData):
     influenceSummary: str = field(default="")
     communicationScore: float = field(default=0.0)
@@ -114,7 +121,7 @@ class StatsAndMetricsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehEntryWrapperMessage(BaseApiData):
     """also used to include phases/intervals in the list of beh-entries"""
 
@@ -146,7 +153,7 @@ class BehEntryWrapperMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehaviorLogSummaryMessage(BaseApiData):
     endedDatingDt: date = field()
     beganDatingDt: date = field(metadata=dict(required=True))
@@ -163,7 +170,7 @@ class BehaviorLogSummaryMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehaviorSearchTermMsg(BaseApiData):
     userId: str = field(default="", metadata=dict(required=True))
     searchPhrase: str = field(default="", metadata=dict(required=True))
@@ -173,7 +180,7 @@ class BehaviorSearchTermMsg(BaseApiData):
 
 
 # full behavior list
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehOrCatMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
@@ -190,7 +197,7 @@ class BehOrCatMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
@@ -199,7 +206,7 @@ class NodeListMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class FullBehaviorListMsg(BaseApiData):
     # top level msg returned to client
     topCategoryCodes: list[str] = field(default_factory=lambda x: [])
@@ -210,7 +217,7 @@ class FullBehaviorListMsg(BaseApiData):
 
 
 # return list of NEGATIVE top level category codes
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class CatCodeTextMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
@@ -225,7 +232,7 @@ class CatCodeTextMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class TopCategoriesMsg(BaseApiData):
     # list for client
     items: list[CatCodeTextMsg] = field(default_factory=lambda x: [])
@@ -234,7 +241,7 @@ class TopCategoriesMsg(BaseApiData):
 
 
 # global stats about behavior
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehStatMsg(BaseApiData):
     # embedded in VoteTypeMsg
     totCount: int = field(default=0, metadata=dict(required=True))
@@ -243,7 +250,7 @@ class BehStatMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehStatMsgAdapter:
     @staticmethod
     def toDict(behStatMsg):
@@ -257,7 +264,7 @@ class BehStatMsgAdapter:
         return BehStatMsg(totCount=tc, slotCounts=sc)
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class VoteTypeMsg(BaseApiData):
     # embedded in BehVoteStatsMsg
     feeling: list[BehStatMsg] = field(default_factory=lambda x: [])
@@ -267,7 +274,7 @@ class VoteTypeMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class VoteTypeMsgAdapter:
     @staticmethod
     def toDict(voteTypeMsg):
@@ -291,7 +298,7 @@ class VoteTypeMsgAdapter:
         return VoteTypeMsg(feeling=feel, concern=con, frequency=freq)
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehVoteStatsMsg(BaseApiData):
     behaviorCode: str = field(default="", metadata=dict(required=True))
     categoryName: str = field(default="", metadata=dict(required=True))
@@ -302,7 +309,7 @@ class BehVoteStatsMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehVoteStatAdapter:
 
     #
@@ -336,7 +343,7 @@ class BehVoteStatAdapter:
         )
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass()
 class BehSrchLogMsg(BaseApiData):
     searchStr: str = field(default="", metadata=dict(required=True))
     foundCount: int = field(default=0, metadata=dict(required=True))

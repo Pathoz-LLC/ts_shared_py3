@@ -29,7 +29,7 @@ from ...constants import (
     FEELING_CD_PREFIX,
 )
 
-# from common.models.behavior_model import PersonBehavior
+from ts_shared_py3.api_data_classes.behavior import FullBehaviorListMsg, NodeListMsg
 from ...utils.singleton import Singleton
 from .beh_constants import (
     SHOWALL_CAT_LABEL,
@@ -226,22 +226,22 @@ class BehCatNode(object):
             impact=self.impact,
         )
 
-    # def _toMsg(self):
-    #     # convert rec to a client msg
-    #     from common.messages.behavior import BehOrCatMsg
+    def toMsg(self):
+        # convert rec to a client msg
+        from ...api_data_classes.behavior import BehOrCatMsg
 
-    #     return BehOrCatMsg(
-    #         code=self.code,
-    #         parentCode=self.parentCode,
-    #         catCode=self.topCategoryCode,
-    #         oppositeCode=self.oppositeCode,
-    #         text=self.text,
-    #         catDescription=self.parentDescription,
-    #         isCategory=self.isCategory,
-    #         isPositive=self.positive,
-    #         sort=self.sort,
-    #         keywords=self.keywords,
-    #     )
+        return BehOrCatMsg(
+            code=self.code,
+            parentCode=self.parentCode,
+            catCode=self.topCategoryCode,
+            oppositeCode=self.oppositeCode,
+            text=self.text,
+            catDescription=self.parentDescription,
+            isCategory=self.isCategory,
+            isPositive=self.positive,
+            sort=self.sort,
+            keywords=self.keywords,
+        )
 
     # def toDict(self):
     #     # do NOT change this:  client expects these in exact order
@@ -599,19 +599,19 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         return d
 
     @property
-    def behaviorListMsg(self: BehaviorSourceSingleton) -> Any:
-        # NIU??
+    def behaviorListMsg(self: BehaviorSourceSingleton) -> FullBehaviorListMsg:
+        # serves all
         if self._behaviorListMsg is None:
             self._behaviorListMsg = self._toMsg()
         return self._behaviorListMsg
 
-    def _toMsg(self):
+    def _toMsg(self) -> FullBehaviorListMsg:
         # remember to remove feelings from list
         # from common.messages.behavior import FullBehaviorListMsg, NodeListMsg
-        raise Exception
+        # raise Exception
 
         mastLst = [
-            b._toMsg()
+            b.toMsg()
             for b in self.masterDict.values()
             if not b.code.startswith("feelingReport")
         ]
