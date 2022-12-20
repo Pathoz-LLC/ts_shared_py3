@@ -314,7 +314,7 @@ class VoteTypeRollup(ndb.Model):
         return dict(count=self.count, votes=self.slotsAsList)
 
     @staticmethod
-    def newEmpty(sex, voteType):
+    def newEmpty(sex: Sex, voteType: VoteType):
         """new type rollup"""
         vtr = VoteTypeRollup(
             voterSex=sex, voteType=voteType, count=0, s1=0, s2=0, s3=0, s4=0
@@ -337,7 +337,7 @@ class VoteTypeRollup(ndb.Model):
             self.voterSex, self.voteType, self.count, self.s1, self.s2, self.s3, self.s4
         )
 
-    def update(self, slot):
+    def update(self, slot: int):
         """add to count"""
         # slot = max(1, min(4, slot))
         assert 1 <= slot <= 4, "oops? slot: {0}".format(slot)
@@ -358,7 +358,7 @@ class VoteTypeRollup(ndb.Model):
         self.s3 += otherVtr.s3
         self.s4 += otherVtr.s4
 
-    def matchesVoteType(self, voteType):
+    def matchesVoteType(self, voteType: VoteType):
         if isinstance(voteType, VoteType):
             voteType = voteType.value
         assert isinstance(voteType, int), "invalid type"
@@ -385,11 +385,11 @@ class BehaviorRollup(ndb.Model):
     maleCounts = ndb.LocalStructuredProperty(VoteTypeRollup, repeated=True)
     unknownCounts = ndb.LocalStructuredProperty(VoteTypeRollup, repeated=True)
 
-    def _update(self, voteInfo):
+    def _update(self: BehaviorRollup, voteInfo: VoteInfo):
         """
         take latest vote info & apply it to the right user-sex & stat-type
         """
-        vtrListForThisSex = self._statsListBySex(voteInfo.sex)
+        vtrListForThisSex: list[VoteTypeRollup] = self._statsListBySex(voteInfo.sex)
         # print("vtrListForThisSex: {0}".format(len(vtrListForThisSex)))
         # print(vtrListForThisSex)
 
@@ -425,22 +425,23 @@ class BehaviorRollup(ndb.Model):
         # else:
         #     self.unknownCounts = perSexList
 
-    def save(self):
+    def save(self: BehaviorRollup):
         # store to ndb
         self.put()
 
-    def _statsListBySex(self, sex):
+    def _statsListBySex(self: BehaviorRollup, sex: Sex) -> list[VoteTypeRollup]:
         # handles receiving Sex obj or int
         # returns copy of list but objects inside list should have only 1 identity
         if isinstance(sex, int):
             sex = Sex(sex)
         assert isinstance(sex, Sex), "{0} is unexpected arg type".format(type(sex))
+        assert sex != Sex.NEVERSET, "error"
 
         sexName = sex.name.lower() + "Counts"
-        return getattr(self, sexName, [0, 0, 0, 0])  #  default=
+        return getattr(self, sexName, None)  #  default= []
 
     @staticmethod
-    def loadAllStats(voteType, pos=False):
+    def loadAllStats(voteType: VoteType, pos: bool = False):
         """
         roll up all stats (across all behaviors) by vote type
         combine all totals (across many shards) into one VoteTypeRollup (ignoring its sex)
@@ -468,7 +469,7 @@ class BehaviorRollup(ndb.Model):
         return aggregateCounts
 
     @staticmethod
-    def updateStats(listVoteInfo):
+    def updateStats(listVoteInfo: list[VoteInfo]):
         """public api to store updated stats
         several votes can come from one endpoint so arg is a list
         but all most pertain to same behCode for sharding purposes
@@ -491,7 +492,7 @@ class BehaviorRollup(ndb.Model):
         rec.save()
 
     @staticmethod
-    def _loadOrCreateRec(voteInfo):
+    def _loadOrCreateRec(voteInfo: VoteInfo):
         """pick one shard rec to distribute concurrent write load
         either load or create it
         do not update stats here
@@ -506,7 +507,7 @@ class BehaviorRollup(ndb.Model):
         return rec
 
     @staticmethod
-    def _newBehaviorRollup(voteInfo):
+    def _newBehaviorRollup(voteInfo: VoteInfo):
         """create new empty rec; only for internal use"""
         new = BehaviorRollup()
         new.category = voteInfo.categoryCode
@@ -519,7 +520,7 @@ class BehaviorRollup(ndb.Model):
         new.unknownCounts = VoteTypeRollup.vtrListAllTypes(Sex.UNKNOWN)
         return new
 
-    def _unifyStats(self, voteType, aggDict):
+    def _unifyStats(self: BehaviorRollup, voteType: VoteType, aggDict):
         """roll stats into one VoteTypeRollup rec
         sex is irrelevant in this case
 
@@ -535,7 +536,7 @@ class BehaviorRollup(ndb.Model):
             if vtr.voteType == voteType:
                 totalsVtr.append(vtr)
 
-    def msgFor(self, sex: Sex):
+    def msgFor(self: BehaviorRollup, sex: Sex):
         """return a VoteTypeMsg"""
         if Sex.FEMALE == sex:
             theLst = self.femaleCounts
@@ -592,7 +593,7 @@ class BehaviorRollup(ndb.Model):
         return totalRec.toMsg()
 
     @staticmethod
-    def all_keys(behCode):
+    def all_keys(behCode: str):
         """Returns all possible keys for the counter name given the config.
         Args:
             name: The name of the counter.
@@ -606,7 +607,7 @@ class BehaviorRollup(ndb.Model):
         ]
 
     @property
-    def categoryName(self):
+    def categoryName(self: BehaviorRollup):
         catRec = behaviorDataShared.masterDict.get(self.category)
         if catRec is not None:
             return catRec.text
@@ -615,7 +616,7 @@ class BehaviorRollup(ndb.Model):
 
     # properties added for rollup by percentages
     @property
-    def concernCountsBySex(self):
+    def concernCountsBySex(self: BehaviorRollup):
         femCount = sum(
             [vtr.count for vtr in self.femaleCounts if vtr.voteType == VoteType.CONCERN]
         )
@@ -633,7 +634,7 @@ class BehaviorRollup(ndb.Model):
         return PerSexVoteTotals(female=femCount, male=maleCount, unknown=unkCount)
 
     @property
-    def frequencyCountsBySex(self):
+    def frequencyCountsBySex(self: BehaviorRollup):
         femCount = sum(
             [
                 vtr.count
@@ -655,7 +656,7 @@ class BehaviorRollup(ndb.Model):
         return PerSexVoteTotals(female=femCount, male=maleCount, unknown=unkCount)
 
     @property
-    def feelingCountsBySex(self):
+    def feelingCountsBySex(self: BehaviorRollup):
         femCount = sum(
             [vtr.count for vtr in self.femaleCounts if vtr.voteType == VoteType.FEELING]
         )
@@ -673,7 +674,7 @@ class BehaviorRollup(ndb.Model):
         return PerSexVoteTotals(female=femCount, male=maleCount, unknown=unkCount)
 
 
-def _makeBehStatsShardKey(code, instanceID):
+def _makeBehStatsShardKey(code: str, instanceID: int):
     # assert instanceID > 0, "invalid ID"
     strID = "{0}_{1:d}".format(code, instanceID)
     return ndb.Key(BehaviorRollup, strID)
@@ -699,7 +700,11 @@ class RollingStatWindow:
     """
 
     def __init__(
-        self, globalCount=0, lastUpdateTime=[], positiveTotals={}, negativeTotals={}
+        self: RollingStatWindow,
+        globalCount: int = 0,
+        lastUpdateTime=[],
+        positiveTotals={},
+        negativeTotals={},
     ):
         # initialize basic structure
         self.GlobalCount = globalCount
@@ -738,7 +743,7 @@ class RollingStatWindow:
                 for _ in range(24):
                     self.NegativeTotals[cat[0]]["subTot"].append(0)
 
-    def copy(self):
+    def copy(self: RollingStatWindow):
         return RollingStatWindow(
             self.GlobalCount,
             copy.deepcopy(self.LastUpdateTime),
@@ -749,7 +754,7 @@ class RollingStatWindow:
     # calculate the total sum of a list of category window
     # return a list of dicts containing catName, iconName, isPositive,
     # and the actual summed count
-    def _sumWindowedTotals(self, isPositive):
+    def _sumWindowedTotals(self: RollingStatWindow, isPositive: bool):
         summedStatsList = []
 
         # BDM TODO: factor out - this is used in multiple places
@@ -783,7 +788,7 @@ class RollingStatWindow:
 
         return summedStatsList
 
-    def loadFromMemcache(self):
+    def loadFromMemcache(self: RollingStatWindow):
         # read memcache! (stored as json)
         data = None  # memcache.get(key="RollingStatsWindow")
 
@@ -803,7 +808,7 @@ class RollingStatWindow:
         # DEBUGGING
         # print("rolling stats window - memcache miss!")
 
-    def saveToMemcache(self):
+    def saveToMemcache(self: RollingStatWindow):
         data = RollingStatWindow.toJson(self)
         # print("saving %s to memecache!" % data)
 
@@ -816,7 +821,7 @@ class RollingStatWindow:
         # memcache.set(key="RollingStatsWindow", value=data, time=expiration_secs)
         return
 
-    def percentIncreased(self, rate, oldStats):
+    def percentIncreased(self: RollingStatWindow, rate: float, oldStats):
         # DEBUGGING
         # print("rate = %d oldStats = %s" %(rate, oldStats))
 
@@ -841,7 +846,7 @@ class RollingStatWindow:
 
         return False
 
-    def isReordered(self, oldStats):
+    def isReordered(self: RollingStatWindow, oldStats):
         # get summed total lists
         PosList_prev = oldStats._sumWindowedTotals(True)
         PosList = self._sumWindowedTotals(True)
@@ -884,7 +889,7 @@ class RollingStatWindow:
 
         return False
 
-    def updateFirebase(self):
+    def updateFirebase(self: RollingStatWindow):
         # extract relevant data for firebase
         dailyStatsPos = {}
         dailyStatsNeg = {}

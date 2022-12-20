@@ -36,19 +36,19 @@ class PersonRowMsg(BaseApiData):
 # PersonLocalRowMsg.field_by_name('createReason').required=False
 @dataclass()
 class PersonLocalRowMsg(BaseApiData):
-    modDateTime: datetime = field()
-    addDateTime: datetime = field()
+    modDateTime: datetime = field(default_factory=lambda: datetime.now())
+    addDateTime: datetime = field(default_factory=lambda: datetime.now())
 
     nickname: str = field(default="")
     devotionLevel: int = field(default=0, metadata=dict(required=True))
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
-    monitorStatus: str = field(default="ACTIVE")
+    monitorStatus: int = field(default=1)
     # redFlagBits: int = field(default=0, metadata=dict(required=True))
     xtra: str = field(default="")
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)
-    reminderFrequency: str = field(default="never")
-    tsConfidenceScore: float = field(default=0.0)
+    reminderFrequency: int = field(default=0)
+    tsConfidenceScore: float = field(default=50.0)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

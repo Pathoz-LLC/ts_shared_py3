@@ -72,7 +72,7 @@ class PersonBehavior(BaseNdbModel):
             milliseconds=1
         )
 
-    def addNewEntry(self: PersonBehavior, entry):
+    def addNewEntry(self: PersonBehavior, entry: Entry):
         """ """
         # cat, subCat = behaviorDataShared.catAndSubForCode(entry.behaviorCode)
         bcn = behaviorDataShared.masterDict.get(entry.behaviorCode)

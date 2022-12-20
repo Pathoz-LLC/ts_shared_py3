@@ -20,11 +20,12 @@ class MonitorStatus(IntEnum):
         TODO: move & restructure this to common/enums
     """
 
+    ARCHIVE = 0
     ACTIVE = 1
     DOGHOUSE = 2
     SEPARATED = 3
     TRUSTMODE = 4
-    ARCHIVE = 5
+    DELETED = 5
 
 
 class NdbCreateReasonProp(model.IntegerProperty):

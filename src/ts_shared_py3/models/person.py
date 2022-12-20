@@ -9,6 +9,7 @@ from ..enums.createAndMonitor import (
     NdbCreateReasonProp,
     NdbMonitorStatusProp,
 )
+from ..enums.remind_freq import RemindFreq
 from ..enums.sex import Sex, NdbSexProp
 from .baseNdb_model import BaseNdbModel
 from .values_beh_cat import UserAnswerStats
@@ -18,6 +19,7 @@ from .values_beh_cat import UserAnswerStats
 # parent/ancestor to group similar vals and keep ACID within that space
 from ..enums.sex import Sex
 from ..enums.commitLevel import DisplayCommitLvl, NdbCommitLvlProp
+from ..api_data_classes.person import PersonLocalRowMsg
 from .person_keys import PersonKeys, KeyTypeEnum
 from .user import DbUser
 
@@ -185,7 +187,9 @@ class PersonLocal(BaseNdbModel):
 
     # housekeeping vals
     monitorStatus = NdbMonitorStatusProp(default=MonitorStatus.ACTIVE)
-    reminderFrequency = ndb.TextProperty(indexed=False, default="never")
+    reminderFrequency = NdbMonitorStatusProp(
+        indexed=False, default=MonitorStatus.ACTIVE
+    )
     createReason = NdbCreateReasonProp(
         required=True, default=CreateReason.RELATIONSHIP, indexed=False
     )
@@ -193,11 +197,6 @@ class PersonLocal(BaseNdbModel):
     modDateTime = ndb.DateTimeProperty(
         indexed=True
     )  # most recent Prospect/SO at top of all lists
-
-    # _use_cache = True   # thread/ctx cache
-    # _use_memcache = True
-    # _use_datastore = True
-    # _memcache_timeout = 60 # secs of life
 
     @property
     def userId(self):
@@ -224,16 +223,16 @@ class PersonLocal(BaseNdbModel):
 
         return Tracking.loadByKeys(self.userKey, self.personKey)
 
-    def _updateFromMsg(self, msg):
+    def _updateFromMsg(self, msg: PersonLocalRowMsg):
         self.nickname = msg.nickname
         self.devotionLevel = DisplayCommitLvl.fromStr(msg.devotionLevel)
         self.imagePath = msg.imagePath
-        self.monitorStatus = MonitorStatus.lookup_by_name(msg.monitorStatus.upper())
-        self.reminderFrequency = msg.reminderFrequency
+        self.monitorStatus = MonitorStatus(msg.monitorStatus)
+        self.reminderFrequency = RemindFreq(msg.reminderFrequency)
         self.recentTsConfidenceScore = 50.0  # default val
 
     @staticmethod
-    def _makeKey(userIdStr, personIdInt):
+    def _makeKey(userIdStr: str, personIdInt: int):
         return ndb.Key(DbUser, userIdStr, PersonLocal, personIdInt)
 
     @staticmethod
@@ -245,7 +244,9 @@ class PersonLocal(BaseNdbModel):
         return pl
 
     @staticmethod
-    def createAndStore(userKey, personKey, personLocalMsg):
+    def createAndStore(
+        userKey: ndb.Key, personKey: ndb.Key, personLocalMsg: PersonLocalRowMsg
+    ) -> ndb.Key:
         """app user could delete Prospect, then add them again later..
         check if he exists and update monitor status if he does
         """

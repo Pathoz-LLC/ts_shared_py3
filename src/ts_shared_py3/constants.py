@@ -65,7 +65,9 @@ NO_PERSIST_REC_ID = -1
 
 DERIVE_FINAL_FROM_GROUP = False
 
-ISO_8601_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
+ISO_8601_DATE_FORMAT = "%Y-%m-%d"  # 2022-08-12
+ISO_8601_DATETIME_FORMAT = "%Y-%m-%dT%H:%M"  # 2022-08-12T09:15     "%Y-%m-%dT%H:%M:%z"
+ISO_8601_TIME_FORMAT = "%H:%M"
 
 FIREBASE_CREDS_PATH = "ts_shared_py3/auth/{0}".format(FIR_CREDS_FILENAME)
 # # User Score section;  must add to 1

@@ -4,28 +4,32 @@ import random
 
 from google.cloud.ndb import model
 
+_DISPL_VALS = [
+    "Never",
+    "Monthly",
+    "Weekly",
+    "Bi-weekly",
+    "Daily",
+    "Twice Daily",
+    "Hourly",
+]
+
 
 @unique
 class RemindFreq(IntEnum):
-    """sex of user prospect or inner circle member"""
+    """"""
 
     NEVER = 0
-    UNKNOWN = 1
-    FEMALE = 2
-    MALE = 3
+    MONTHLY = 1
+    WEEKLY = 2
+    TWICE_WEEKLY = 3
+    DAILY = 4
+    TWICE_DAILY = 5
+    HOURLY = 6
 
     @property
     def toDisplayVal(self) -> str:
-        if self == 0:
-            return "Won't say"
-        elif self == 1:
-            return "Won't say"
-        elif self == 2:
-            return "Female"
-        elif self == 3:
-            return "Male"
-        else:
-            return "Won't say"
+        return _DISPL_VALS[self.value]
 
     @staticmethod
     def random() -> RemindFreq:
@@ -44,7 +48,7 @@ class NdbRemindProp(model.IntegerProperty):
             raise TypeError("expected Sex, int, str or unicd, got %s" % repr(value))
 
     def _to_base_type(self, sx: RemindFreq):
-        # convert Sex to int
+        # convert RemindFreq to int
         if isinstance(sx, int):
             return sx
         return int(sx.value)
