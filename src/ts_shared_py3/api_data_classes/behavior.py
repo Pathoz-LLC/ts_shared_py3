@@ -7,8 +7,7 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import DataClassBaseSchema  # , make_schema_for_dc
-from ..api_data_classes.tracking import TrackingPayloadMsgDc
+from .tracking import TrackingPayloadMsgDc
 
 """Important Note:
     it is vital that you set the Schema.__model__

@@ -5,7 +5,6 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..schemas.base import DataClassBaseSchema
 from ..enums.sex import Sex
 
 # FIXME
