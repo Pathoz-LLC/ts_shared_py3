@@ -519,6 +519,7 @@ class DbUser(BaseNdbModel):  # BaseUserExpando
             u.handle = "testUserOnly"
             u.expiresOn = datetime.now() + timedelta(weeks=4)
             u.pushNotifyAuthorized = True
+            u.sex = Sex.UNKNOWN
             u.put()
         # cls.token_model.create(uid, "bearer", token)
         return u

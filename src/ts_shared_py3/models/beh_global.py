@@ -435,7 +435,8 @@ class BehaviorRollup(ndb.Model):
         if isinstance(sex, int):
             sex = Sex(sex)
         assert isinstance(sex, Sex), "{0} is unexpected arg type".format(type(sex))
-        assert sex != Sex.NEVERSET, "error"
+        if sex == Sex.NEVERSET:
+            sex = Sex.UNKNOWN
 
         sexName = sex.name.lower() + "Counts"
         return getattr(self, sexName, None)  #  default= []

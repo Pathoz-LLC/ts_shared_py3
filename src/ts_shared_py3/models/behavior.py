@@ -87,17 +87,21 @@ class PersonBehavior(BaseNdbModel):
         # print("2) BehCount in {0} is {1}".format(self.monthStartDt, len(self.entries)))
         self.clearCache()
 
-    def updateEntry(self: PersonBehavior, rowNum: int, entry: Entry):
+    def updateEntry(self: PersonBehavior, secsFromOrigDtTm: int, entry: Entry):
         """"""
-        # for i, e in enumerate(self.entries):
-        #     if e.occurDateTime == origOccurDateTime and e.behaviorCode == entry.behaviorCode:
-        #         self.entries[rowNum] = entry
-        #         break
+        originalDtTm: datetime = entry.occurDateTime + timedelta(seconds=secsFromOrigDtTm)
+        originalDtTm = originalDtTm.combine(originalDtTm.date, time=time(0,0,0,0))
+
+        for i: int, e: Entry in enumerate(self.entries):
+            if e.occurDateTime == origOccurDateTime and e.behaviorCode == entry.behaviorCode:
+                self.entries[rowNum] = entry
+                break
         # modifyDateTime is set in _pre_put_hook
-        if len(self.entryList) < rowNum + 1:
-            rowNum = 0
-        entry.modifyDateTime = datetime.now()
-        self.entries[rowNum] = entry
+        # if len(self.entryList) < secsFromOrigDtTm + 1:
+        #     secsFromOrigDtTm = 0
+        # entry.modifyDateTime = datetime.now()
+
+        self.entries[secsFromOrigDtTm] = entry
         self._latestEntry = entry
         self.put()
         self.clearCache()
