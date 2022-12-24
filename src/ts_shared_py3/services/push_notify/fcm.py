@@ -2,8 +2,8 @@ from random import randint
 from collections import namedtuple
 import google.cloud.ndb as ndb
 
-from ..models.user import User
-from ..models.person import PersonLocal
+from ...models.user import DbUser
+from ...models.person import PersonLocal
 from .pn_exceptions import UserNotFoundErr, MissingReqFieldErr
 
 # FIXME
@@ -15,7 +15,7 @@ from firebase_admin.messaging import ApsAlert, Aps, APNSConfig, APNSPayload
 from firebase_admin.messaging import AndroidConfig, AndroidNotification
 from firebase_admin.exceptions import FirebaseError, NotFoundError
 
-from common.enums.niu_pushNotifyType import NotifyType
+from ...enums.pushNotifyType import NotifyType
 
 import logging
 
