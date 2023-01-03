@@ -34,6 +34,8 @@ class PersonRowMsg(BaseApiData):
 class PersonListMsg(BaseApiData):
     items: list[PersonRowMsg] = field(default_factory=lambda: [])
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 # PersonLocalRowMsg = model_message(PersonLocal, exclude=('userKey', 'personKey', 'createReason') )
 # PersonLocalRowMsg.field_by_name('nickname').required=False
@@ -158,6 +160,7 @@ PersonIdMessage.Schema.__model__ = PersonIdMessage
 PersonPhoneMessage.Schema.__model__ = PersonPhoneMessage
 PersonPhoneMessage.Schema.__model__ = PersonPhoneMessage
 PersonIdentifierMessage.Schema.__model__ = PersonIdentifierMessage
+PersonListMsg.Schema.__model__ = PersonListMsg
 
 PersonMockDataMsg.Schema.__model__ = PersonMockDataMsg
 IncidentUpdateOpinionMessage.Schema.__model__ = IncidentUpdateOpinionMessage

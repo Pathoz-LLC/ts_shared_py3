@@ -1,5 +1,8 @@
+from pathlib import Path
 from firebase_admin import initialize_app, credentials
-from ...constants import FIREBASE_CREDS_PATH, PROJ_ID
+
+#
+from ...constants import FIR_CREDS_FILENAME, PROJ_ID
 
 
 # usage
@@ -15,7 +18,8 @@ from ...constants import FIREBASE_CREDS_PATH, PROJ_ID
 
 
 # Use the credentials object to authenticate app instance
-serviceCreds = credentials.Certificate(FIREBASE_CREDS_PATH)
+creds_path = Path(__file__).with_name(FIR_CREDS_FILENAME)
+serviceCreds = credentials.Certificate(creds_path)
 config = {
     "databaseURL": "https://{0}.firebaseio.com/".format(PROJ_ID),
     "projectId": PROJ_ID,
