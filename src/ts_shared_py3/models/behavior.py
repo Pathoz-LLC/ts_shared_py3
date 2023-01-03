@@ -4,12 +4,15 @@ from datetime import date, datetime, timedelta, time
 from typing import cast, Union, TypeVar
 
 import google.cloud.ndb as ndb
+
+#
 from .baseNdb_model import BaseNdbModel
 
 from ..config.behavior.beh_constants import FEELING_ONLY_CODE_NEG, FEELING_ONLY_CODE_POS
 from ..config.behavior.load_yaml import BehaviorSourceSingleton
 from ..utils.data_gen import randIntInRange
 from .beh_entry import Entry
+from .user import DbUser
 
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 
@@ -88,12 +91,14 @@ class PersonBehavior(BaseNdbModel):
         self.clearCache()
 
     def updateEntry(self: PersonBehavior, secsFromOrigDtTm: int, entry: Entry):
-        """"""
-        originalDtTm: datetime = entry.occurDateTime + timedelta(seconds=secsFromOrigDtTm)
-        originalDtTm = originalDtTm.combine(originalDtTm.date, time=time(0,0,0,0))
+        """use time delta and beh_code to find rec to replace"""
+        originalDtTm: datetime = entry.occurDateTime + timedelta(
+            seconds=secsFromOrigDtTm
+        )
+        originalDtTm = originalDtTm.combine(originalDtTm.date, time=time(0, 0, 0, 0))
 
-        for i: int, e: Entry in enumerate(self.entries):
-            if e.occurDateTime == origOccurDateTime and e.behaviorCode == entry.behaviorCode:
+        for rowNum, e in enumerate(self.entries):
+            if e.occurDateTime == originalDtTm and e.behaviorCode == entry.behaviorCode:
                 self.entries[rowNum] = entry
                 break
         # modifyDateTime is set in _pre_put_hook
@@ -119,7 +124,7 @@ class PersonBehavior(BaseNdbModel):
             self._latestEntry.modifyDateTime = datetime.now(tz=None)
 
     @staticmethod
-    def loadOrInitByCoreIds(user, personID, occurDate):
+    def loadOrInitByCoreIds(user: DbUser, personID: int, occurDate: date):
         # load one PersonBehavior (user/person/month) combo rec from the DB
         if isinstance(occurDate, datetime):
             occurDate = occurDate.date()
@@ -138,37 +143,41 @@ class PersonBehavior(BaseNdbModel):
         return res
 
     @classmethod
-    def loadAllFromCoreIds(cls, user, personID):
+    def loadAllFromCoreIds(cls, user: DbUser, personID: int) -> list[PersonBehavior]:
         # return list of PersonBehavior recs for every month since started dating
         ancestorKey = cls.makeAncestor(user.id_, personID)
         # below requires custom datastore index
         qry = cls.query(ancestor=ancestorKey).order(-cls.monthStartDt)
         return qry.fetch()
 
-    @staticmethod
-    def loadBehaviorsWithDimensions(user, personId):
-        # returns raw data 4 behaviors/dimensions
-        from ts_shared_py3.models.behavior import (
-            BehaviorDimensionScores,
-        )  # avoid circular import
+    # @staticmethod
+    # def loadBehaviorsWithDimensions(user, personId):
+    #     """
+    #         niu -- missing BehaviorDimensionScores class below
+    #     """
+    #     # returns raw data 4 behaviors/dimensions
+    #     from ts_shared_py3.models.behavior import
+    #     (
+    #         BehaviorDimensionScores,
+    #     )  # avoid circular import
 
-        allBehavior = PersonBehavior.loadOrInitByCoreIds(user, personId)
-        # print("found %s entries in behavior dict" % (len(allBehavior.entries)) )
-        bds = BehaviorDimensionScores(user, personId, allBehavior)
-        bds.calc()
-        return bds
+    #     allBehavior = PersonBehavior.loadOrInitByCoreIds(user, personId)
+    #     # print("found %s entries in behavior dict" % (len(allBehavior.entries)) )
+    #     bds = BehaviorDimensionScores(user, personId, allBehavior)
+    #     bds.calc()
+    #     return bds
 
     # @staticmethod
     # def keyStrFromDate(dt):
     #     return dt.strftime(MONTH_START_FMT_STR)
-    #
+    # #
     # @staticmethod
     # def makeKey(userID, personID, dateObj):
     #     assert isinstance(dateObj, date) and dateObj.day == 1, "Err: %s %s" % (dateObj, dateObj.day)
     #     personKey = PersonBehavior.makeAncestor(userID, personID)
     #     monthStartStr = PersonBehavior.keyStrFromDate(dateObj)
     #     return ndb.Key(PersonBehavior, monthStartStr, parent=personKey)
-    #
+
     # @staticmethod
     # def makeAncestor(userID, personID):
     #     userKey = ndb.Key("User", userID)

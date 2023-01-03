@@ -68,22 +68,21 @@ class Entry(BaseNdbModel):  # ndb.model.Expando
         else:
             return 0
 
-    # def toMsg(self, personId=0, rowNum=-1):
-    #     from common.messages.behavior import BehaviorRowMsg
+    def to_msg(self, personId: int = 0):
+        from ..api_data_classes.behavior import BehaviorRowMsg
 
-    #     brm = BehaviorRowMsg(
-    #         behaviorCode=self.behaviorCode,
-    #         feelingStrength=self.feelingStrength,
-    #         comments=self.comments,
-    #     )
-    #     brm.behaviorId = rowNum
-    #     brm.positive = self.positive
-    #     brm.shareDetails = self.shareDetails
-    #     brm.lon = self.longitude
-    #     brm.lat = self.latitude
-    #     brm.personId = personId
-    #     brm.occurDateTime = (
-    #         self.occurDateTime - datetime.datetime(1970, 1, 1)
-    #     ).total_seconds()
-    #     brm.categoryCode = self.categoryCode
-    #     return brm
+        brm = BehaviorRowMsg(
+            behaviorCode=self.behaviorCode,
+            feelingStrength=self.feelingStrength,
+            comments=self.comments,
+        )
+        #
+        brm.secsToOrigDtTm = 0
+        brm.positive = self.positive
+        brm.shareDetails = self.shareDetails
+        brm.lon = self.longitude
+        brm.lat = self.latitude
+        brm.personId = personId
+        brm.occurDateTime = self.occurDateTime
+        brm.categoryCode = self.categoryCode
+        return brm

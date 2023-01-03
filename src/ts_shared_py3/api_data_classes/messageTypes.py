@@ -8,7 +8,7 @@ from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
 
 
-def buildStatusMsg(code, msg, detail):
+def buildStatusMsg(code: str, msg: str, detail: str):
     dtl = detail or ""
     return StatusMessage(code=code, msg=msg, detail=dtl)
 
@@ -41,9 +41,14 @@ class FilterMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-FilterMessageCollection: list[FilterMessage] = []
+@dataclass(base_schema=DataClassBaseSchema)
+class FilterMessageCollectionMsg(BaseApiData):
+    items: list[FilterMessage] = field(default_factory=lambda: [])
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 StatusMessage.Schema.__model__ = StatusMessage
 JsonMessage.Schema.__model__ = JsonMessage
 FilterMessage.Schema.__model__ = FilterMessage
+FilterMessageCollectionMsg.Schema.__model__ = FilterMessageCollectionMsg

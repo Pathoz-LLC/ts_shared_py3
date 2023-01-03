@@ -162,35 +162,35 @@ class Interval(BaseNdbModel):
         series[0].endDate = DISTANT_FUTURE_DATE
         return series
 
-    # def toMsg(self, persId=0):
-    #     """
-    #     Args:
-    #         interval:
+    def toMsg(self, persId=0):
+        """
+        Args:
+            interval:
 
-    #     Returns:
-    #         IntervalMessage
-    #     """
-    #     im = IntervalMessage()
-    #     im.persId = persId
-    #     im.startDate = date_to_message(self.startDate)
-    #     im.endDate = date_to_message(self.endDate)
-    #     im.oldStartDate = im.startDate  # date_to_message(datetime.now())
-    #     im.commitLvl = self.commitLevel.asApiMsg
-    #     return im
+        Returns:
+            IntervalMessage
+        """
+        im = IntervalMessage()
+        im.persId = persId
+        im.startDate = self.startDate
+        im.endDate = self.endDate
+        im.oldStartDate = im.startDate  # date_to_message(datetime.now())
+        im.commitLvl = self.commitLevel.name
+        return im
 
-    # @staticmethod
-    # def newFromMsg(im):
-    #     """
-    #     Args:
-    #         im(IntervalMessage):
+    @staticmethod
+    def newFromMsg(im: IntervalMessage):
+        """
+        Args:
+            im(IntervalMessage):
 
-    #     Returns:
-    #         Interval
-    #     """
-    #     # print(im.commitLvl)
-    #     # print("cmtLvl: {0}".format(im.commitLvl.displayCode))
-    #     interval = Interval()
-    #     interval.commitLevel = DisplayCommitLvl.fromStr(im.commitLvl.displayCode)
-    #     interval.startDate = message_to_date(im.startDate)
-    #     interval.endDate = message_to_date(im.endDate)
-    #     return interval
+        Returns:
+            Interval
+        """
+        # print(im.commitLvl)
+        # print("cmtLvl: {0}".format(im.commitLvl.displayCode))
+        interval = Interval()
+        interval.commitLevel = DisplayCommitLvl.fromStr(im.commitLvl.displayCode)
+        interval.startDate = im.startDate
+        interval.endDate = im.endDate
+        return interval

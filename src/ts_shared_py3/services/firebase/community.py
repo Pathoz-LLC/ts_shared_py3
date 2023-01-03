@@ -8,9 +8,9 @@ from ts_shared_py3.utils.date_conv import (
     date_to_epoch,
     date_from_epoch,
 )
-from ts_shared_py3.models.behavior import BehaviorSourceSingleton
-from ts_shared_py3.enums.activityType import ActivityType
-from ts_shared_py3.enums.sex import Sex
+from ...config.behavior.load_yaml import BehaviorSourceSingleton
+from ...enums.activityType import ActivityType
+from ...enums.sex import Sex
 
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 

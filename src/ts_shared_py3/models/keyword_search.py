@@ -1,5 +1,8 @@
-# from .baseNdb_model import BaseNdbModel
+from __future__ import annotations
 import google.cloud.ndb as ndb
+
+#
+from ts_shared_py3.api_data_classes.behavior import BehaviorSearchTermMsg
 
 
 class KeywordSearch(ndb.Model):
@@ -15,7 +18,7 @@ class KeywordSearch(ndb.Model):
         return key.get()
 
     @staticmethod
-    def loadOrCreateFromMsg(msg):
+    def loadOrCreateFromMsg(msg: BehaviorSearchTermMsg) -> KeywordSearch:
         key = ndb.Key(KeywordSearch, msg.searchPhrase)
         rec = KeywordSearch.load(key)
         if rec == None:
@@ -31,6 +34,6 @@ class KeywordSearch(ndb.Model):
         rec.useIDs.append(msg.userID)
         return rec
 
-    def save(self):
+    def save(self: KeywordSearch):
         #
         self.key.put()

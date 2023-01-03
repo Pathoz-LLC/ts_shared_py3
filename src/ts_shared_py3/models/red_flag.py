@@ -26,8 +26,8 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
     )
     status = ndb.IntegerProperty(indexed=True, default=0)
 
-    comment = ndb.StringProperty(indexed=False)  # any notes or comments
-    url = ndb.StringProperty(indexed=False)  # evidence location
+    comment = ndb.TextProperty(indexed=False)  # any notes or comments
+    url = ndb.TextProperty(indexed=False)  # evidence location
     beganDateTime = ndb.DateTimeProperty(indexed=False)  # first time they did this
     addDateTime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     modifyDateTime = ndb.DateTimeProperty(indexed=False)

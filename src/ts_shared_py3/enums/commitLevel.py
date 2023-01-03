@@ -6,16 +6,20 @@ from google.cloud.ndb import model
 import random
 
 #
-# from google.cloud.ndb import msgprop
-
-# from protorpc import messages
 from .activityType import ActivityType
 
-# from common.schemas.tracking import CommitLvlApiMsg, DevotionLevelListMessage
+from ..api_data_classes.tracking import (
+    CommitLvlApiMsg,
+    DevotionLevelListMessage,
+)
 
 # even tho biz logic is driven from LogicCommitLvl, since client uses
 # display vals, the public api to this module is via DisplayCommitLvl
-# from common.enums.commitLevel import DisplayCommitLvl, LogicCommitLvl, NdbCommitLvlProp
+# from ts_shared_py3.enums.commitLevel import (
+#     DisplayCommitLvl,
+#     LogicCommitLvl,
+#     NdbCommitLvlProp,
+# )
 
 
 _CommitLevelMasterDict = None  # key'd by code
@@ -33,7 +37,7 @@ class LogicCommitLvl(IntEnum):
     NONEXCLUSIVE = 2
     EXCLUSIVE = 3
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self: LogicCommitLvl, other: LogicCommitLvl) -> bool:
         # handle both int and object cases
         if isinstance(other, LogicCommitLvl):
             return self.value == other.value
@@ -43,15 +47,15 @@ class LogicCommitLvl(IntEnum):
             return False
 
     @property
-    def code(self) -> str:
+    def code(self: LogicCommitLvl) -> str:
         return self.name
 
     @property
-    def isSeparated(self) -> bool:
+    def isSeparated(self: LogicCommitLvl) -> bool:
         return self.value < 2
 
     @property
-    def isExclusive(self) -> bool:
+    def isExclusive(self: LogicCommitLvl) -> bool:
         return self.value == 3
 
 
@@ -68,7 +72,7 @@ class DisplayCommitLvl(IntEnum):
     EXCLUSIVE_AS = 3  # assumed
     EXCLUSIVE_MA = 4  # mutually agreed
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self: DisplayCommitLvl, other: DisplayCommitLvl) -> bool:
         # handle both int and object cases
         if isinstance(other, DisplayCommitLvl):
             return self.value == other.value
@@ -77,7 +81,7 @@ class DisplayCommitLvl(IntEnum):
         else:
             return False
 
-    def pointsFromDeltaToCurrent(self, currentPhase) -> int:
+    def pointsFromDeltaToCurrent(self: DisplayCommitLvl, currentPhase) -> int:
         # gap width between CL indicates how big the change
         if self == currentPhase:
             return 0  # no change
@@ -103,11 +107,11 @@ class DisplayCommitLvl(IntEnum):
     # )
 
     @property
-    def code(self) -> str:
+    def code(self: DisplayCommitLvl) -> str:
         return self.name
 
     @property
-    def displayVal(self) -> str:
+    def displayVal(self: DisplayCommitLvl) -> str:
         val = self.value
         if val == 0:
             return "BrokenUp; On a Break"
@@ -123,7 +127,7 @@ class DisplayCommitLvl(IntEnum):
             return "?Non-Monogamous"
 
     @property
-    def iconName(self) -> str:
+    def iconName(self: DisplayCommitLvl) -> str:
         if self == 0:
             return "cl_brokenUp"
         elif self == 1:
@@ -138,7 +142,7 @@ class DisplayCommitLvl(IntEnum):
             return "cl_nonExclusive"
 
     @property
-    def logic(self) -> LogicCommitLvl:
+    def logic(self: DisplayCommitLvl) -> LogicCommitLvl:
         val = self.value
         if val == 0:
             return LogicCommitLvl.SEPARATED
@@ -154,25 +158,25 @@ class DisplayCommitLvl(IntEnum):
             return LogicCommitLvl.EXCLUSIVE
 
     @property
-    def isExclusive(self) -> bool:
+    def isExclusive(self: DisplayCommitLvl) -> bool:
         return self.logic.isExclusive
 
     @property
-    def isSeparated(self) -> bool:
+    def isSeparated(self: DisplayCommitLvl) -> bool:
         return self.logic.isSeparated
 
-    # @property
-    # def asApiMsg(self):
-    #     raise Exception("missing schema CommitLvlApiMsg", "??")
-    #     return CommitLvlApiMsg(
-    #         displayCode=self.code,
-    #         logicCode=self.logic.code,
-    #         iconName=self.iconName,
-    #         displayValue=self.displayVal,
-    # )
+    @property
+    def asApiMsg(self: DisplayCommitLvl):
+        raise Exception("missing schema CommitLvlApiMsg", "??")
+        return CommitLvlApiMsg(
+            displayCode=self.code,
+            logicCode=self.logic.code,
+            iconName=self.iconName,
+            displayValue=self.displayVal,
+        )
 
     @property
-    def asDict(self) -> map[str, str]:
+    def asDict(self: DisplayCommitLvl) -> map[str, str]:
         return dict(
             code=self.code,
             displayVal=self.displayVal,
@@ -182,11 +186,13 @@ class DisplayCommitLvl(IntEnum):
 
     # methods
 
-    def isIncreaseFrom(self, prior) -> bool:
+    def isIncreaseFrom(self: DisplayCommitLvl, prior: DisplayCommitLvl) -> bool:
         # assert isinstance(prior, DisplayCommitLvl), "invalid arg"
         return self.value >= prior.value
 
-    def newsTypeFromCommitLvlDelta(self, priorCl) -> Optional[ActivityType]:
+    def newsTypeFromCommitLvlDelta(
+        self: DisplayCommitLvl, priorCl
+    ) -> Optional[ActivityType]:
         """self == latest/newest
         priorCL is one right before this latest cl
         return None

@@ -381,7 +381,7 @@ class CommunicationEvent(BaseNdbModel):
     fromUser = ndb.BooleanProperty(indexed=False, default=False)
     sentDttm = ndb.DateTimeProperty(indexed=True)
     wordCount = ndb.IntegerProperty(indexed=False, default=0)
-    text = ndb.StringProperty(indexed=False)  # , default=''
+    text = ndb.TextProperty(indexed=False)  # , default=''
 
     @staticmethod
     def fromMsg(msg, parentKey):
@@ -460,8 +460,8 @@ class CommunicationPrefs(BaseNdbModel):
     allowTextAnalyss = ndb.BooleanProperty(indexed=False, default=False)
     makeTextAnnon = ndb.BooleanProperty(indexed=False, default=False)
 
-    pathToMsgDb = ndb.StringProperty(indexed=False)
-    dataHarvestSchedule = ndb.StringProperty(indexed=False)
+    pathToMsgDb = ndb.TextProperty(indexed=False)
+    dataHarvestSchedule = ndb.TextProperty(indexed=False)
     modifyDtTm = ndb.DateTimeProperty(indexed=False)
     lastSubmitDataDtTm = ndb.DateTimeProperty(indexed=False)
 

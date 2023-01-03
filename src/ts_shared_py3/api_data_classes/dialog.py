@@ -6,17 +6,17 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..schemas.tracking import TrackingPayloadMessage
+from ..api_data_classes.tracking import TrackingPayloadMsgDc
 
 
 @dataclass(base_schema=DataClassBaseSchema)
 class RelationshipPhaseSetupMessage(BaseApiData):
     # to set up a dialog object
+    startTrackingDate: date = field(metadata=dict(required=True))
     use_id: str = field(default="", metadata=dict(required=True))
     per_id: int = field(default=0, metadata=dict(required=True))
     personName: str = field(default="", metadata=dict(required=True))
     curCommitLevel: str = field(default="", metadata=dict(required=True))
-    startTrackingDate: date = field(metadata=dict(required=True))
     breakupCount: int = field(default=0, metadata=dict(required=True))
 
 
@@ -44,7 +44,7 @@ class QuestionAsMessage(BaseApiData):
     # each question to ask user;  client receives list of these (usually only 1)
     question: str = field(default="")
     responseType: str = field(default="")
-    responseChoices: list[ResponseChoiceMessage] = []
+    responseChoices: list[ResponseChoiceMessage] = field(default_factory=lambda: [])
     que_id: str = field(default="")  # to use if you need to revise a prior answer
 
 
@@ -53,7 +53,7 @@ class PendingRelPhaseQuestions(BaseApiData):
     # allows returning multiple questions at once
     # but typically sends one at a time
     noMoreQuestions: bool = field(default=False)
-    questions: list[QuestionAsMessage] = []
+    questions: list[QuestionAsMessage] = field(default_factory=lambda: [])
     # when items.count == 0, then use phases as the final result
     # now the server builds the phases / intervals & so next value is not needed
     # phases = BaseApiDataField(IntervalMessage, 3, repeated=True)

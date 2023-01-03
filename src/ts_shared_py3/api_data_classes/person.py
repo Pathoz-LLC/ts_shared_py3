@@ -30,6 +30,11 @@ class PersonRowMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
+@dataclass()
+class PersonListMsg(BaseApiData):
+    items: list[PersonRowMsg] = field(default_factory=lambda: [])
+
+
 # PersonLocalRowMsg = model_message(PersonLocal, exclude=('userKey', 'personKey', 'createReason') )
 # PersonLocalRowMsg.field_by_name('nickname').required=False
 # PersonLocalRowMsg.field_by_name('createReason').required=False

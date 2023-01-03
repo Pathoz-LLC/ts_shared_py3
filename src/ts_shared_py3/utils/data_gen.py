@@ -10,7 +10,7 @@ def forRowInYaml(relFilePath, funcToRun):
     yamlRows = []
     with open(relFilePath) as f:  # service_backend/dialog/
         try:
-            yamlRows = yaml.load(f)
+            yamlRows = yaml.safe_load(f)
             # yamlRows = fileAsDict.get('questions')
         except yaml.YAMLError as exc:
             print(exc)

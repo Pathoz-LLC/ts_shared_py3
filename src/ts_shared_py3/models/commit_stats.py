@@ -46,7 +46,7 @@ class CommitStats(ndb.Model):
     eventually grouped by region
     """
 
-    region = ndb.StringProperty(indexed=False, required=True, default=GLOBAL_REGION)
+    region = ndb.TextProperty(indexed=False, required=True, default=GLOBAL_REGION)
     updateDtTm = ndb.DateTimeProperty(indexed=False, required=True, auto_now=True)
     # per CL counts
     # its vital that this list order never changes

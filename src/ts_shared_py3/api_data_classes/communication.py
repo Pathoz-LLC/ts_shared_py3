@@ -21,10 +21,10 @@ class CommStatsMsg(BaseApiData):
     theirAvgWpmCount: int = field(default=0, metadata=dict(required=True))
     # LTR = avg length time to respond in minutes
     myAvgLtr: int = field(default=0, metadata=dict(required=True))
-    theirAvgLtr: int = field(default=0, required=False)
+    theirAvgLtr: int = field(default=0, metadata=dict(required=False))
     # initiate = starting convo after x (eg 12) hours
     myInitiateCount: int = field(default=0, metadata=dict(required=True))
-    theirInitiateCount: int = field(default=0, required=False)
+    theirInitiateCount: int = field(default=0, metadata=dict(required=False))
     # ended = # of times person stopped responding for x (eg 12) hrs
     myEndedCount: int = field(default=0, metadata=dict(required=True))
     theirEndedCount: int = field(default=0, metadata=dict(required=True))
@@ -40,7 +40,7 @@ class CommStatsMsg(BaseApiData):
 
 @dataclass(base_schema=DataClassBaseSchema)
 class CommStatsListMsg(BaseApiData):
-    periodStats: list[CommStatsMsg] = []
+    periodStats: list[CommStatsMsg] = field(default_factory=lambda: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -61,7 +61,7 @@ class CommunicationRawTranscriptMsg(BaseApiData):
     startDtTm: date = field()
     endDtTm: date = field()
     persId: int = field(default=0, metadata=dict(required=True))
-    messages: list[CommunicationEventMsg] = []
+    messages: list[CommunicationEventMsg] = field(default_factory=lambda: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -90,7 +90,7 @@ class PhoneNumMsg(BaseApiData):
 @dataclass(base_schema=DataClassBaseSchema)
 class FollowedPhoneNums(BaseApiData):
     #
-    items: list[PhoneNumMsg] = []
+    items: list[PhoneNumMsg] = field(default_factory=lambda: [])
 
     #
     Schema: ClassVar[Type[Schema]] = Schema
