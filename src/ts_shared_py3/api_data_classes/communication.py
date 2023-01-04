@@ -96,6 +96,7 @@ class FollowedPhoneNums(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
+CommStatsMsg.Schema.__model__ = CommStatsMsg
 CommStatsListMsg.Schema.__model__ = CommStatsListMsg
 CommunicationEventMsg.Schema.__model__ = CommunicationEventMsg
 CommunicationRawTranscriptMsg.Schema.__model__ = CommunicationRawTranscriptMsg
