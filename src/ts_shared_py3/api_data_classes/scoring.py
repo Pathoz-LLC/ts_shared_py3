@@ -1,5 +1,8 @@
 from datetime import date
-from dataclasses import dataclass, field
+from dataclasses import field
+from typing import ClassVar, Type, Optional
+from marshmallow import Schema
+from marshmallow_dataclass import dataclass
 
 #
 from .base import BaseApiData
@@ -20,9 +23,11 @@ class RequRelationshipOverviewData(BaseApiData):
     persName: str = field(default="")
     # Deprecated
     # monthsBackFromNow & prior flds are deprecated (use queryStart and queryEnd above)
-    monthsBackFromNow: int = field(default=3, metadata=dict(validate=123))
+    monthsBackFromNow: int = field(default=3, metadata=dict(validate=lambda: 123))
     priorUserScore: float = field(default=0.5)
     priorCommunityScore: int = field(default=0.5)
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
 
 @dataclass
@@ -47,6 +52,8 @@ class OneWindowScoreData(BaseApiData):
     # copy of a prior days scores because user made no entries
     # it's a filler row to keep the line flat; area is NOT tapable on graph UI
     isEmptyPeriod: bool = field(default=False)
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
     # # fields below are NIU
     # hasCommunicationStats = field(default=False)
@@ -75,6 +82,8 @@ class CurPhaseRelStateData(BaseApiData):
     communityScoreDescrip: str = field(default="Derived from the TS Algorithm")
     # communicationScoreDescrip = ma.fields.String(6, default='')
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 @dataclass
 class ScoreMetadataData(BaseApiData):
@@ -89,6 +98,8 @@ class ScoreMetadataData(BaseApiData):
     queryStartDt: date = field()
     queryEndDt: date = field()
 
+    Schema: ClassVar[Type[Schema]] = Schema
+
 
 @dataclass
 class ProspectScoreData(BaseApiData):
@@ -101,6 +112,8 @@ class ProspectScoreData(BaseApiData):
     # priorPeriodScores are the buckets/windows of consolidated scores (ie a point on graph)
     incidentCount: int = field(default=0)
     redFlagBits: int = field(default=0)
+
+    Schema: ClassVar[Type[Schema]] = Schema
 
     # bucketWidthDays: int = field(default=0)
 

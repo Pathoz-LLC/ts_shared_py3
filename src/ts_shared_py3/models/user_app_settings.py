@@ -1,6 +1,6 @@
 import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
-from api_data_classes.user import AppSettingsMsg
+from ts_shared_py3.api_data_classes.user import AppSettingsMsg
 
 
 class UserAppSettings(BaseNdbModel):

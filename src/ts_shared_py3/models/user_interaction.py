@@ -21,7 +21,7 @@ class UserInteractions(ndb.Model):
     lastChatNotifyDtTm = ndb.DateTimeProperty(indexed=False)
     canContinueChat = ndb.BooleanProperty(indexed=False, default=False)
 
-    comments = ndb.StringProperty(indexed=False, default="")
+    comments = ndb.TextProperty(indexed=False, default="")
     commonProspects = ndb.IntegerProperty(repeated=True, indexed=False)
 
     def updateFromMsg(self, msg: UserCommunicationDetailsMsg):

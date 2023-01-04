@@ -3,7 +3,7 @@ from firebase_admin import initialize_app, credentials
 
 #
 from ...constants import FIR_CREDS_FILENAME, PROJ_ID
-
+from ...config.auth.load_path import ThirdPtSvcType
 
 # usage
 # from common.firebase.admin import tsFirebaseApp
@@ -18,7 +18,8 @@ from ...constants import FIR_CREDS_FILENAME, PROJ_ID
 
 
 # Use the credentials object to authenticate app instance
-creds_path = Path(__file__).with_name(FIR_CREDS_FILENAME)
+creds_path = ThirdPtSvcType.FB_ADMIN.get_credential_path(FIR_CREDS_FILENAME)
+# print("creds_path: {0}".format(creds_path))
 serviceCreds = credentials.Certificate(creds_path)
 config = {
     "databaseURL": "https://{0}.firebaseio.com/".format(PROJ_ID),
