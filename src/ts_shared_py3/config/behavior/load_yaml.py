@@ -354,7 +354,7 @@ def getCategoryListSorted(
     return sortTupleList(tupList)
 
 
-class BehaviorSourceSingleton(metaclass=Singleton):
+class BehaviorSourceSingleton(Singleton):
     """
     takes raw Category & Behavior data from yaml files
         and generates a JSON file to be sent to app-clients via rest or rpc

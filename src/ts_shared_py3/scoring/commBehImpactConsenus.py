@@ -174,7 +174,7 @@ if COMMIT_CHNG_FAKE_CCIW is None:
     )
 
 
-class CommImpactConsensus(object, metaclass=Singleton):
+class CommImpactConsensus(Singleton):
     """singleton object with all cummulative community
     consensus status rolled into a vote
 
