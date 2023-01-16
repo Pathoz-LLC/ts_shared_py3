@@ -3,7 +3,7 @@ from firebase_admin import initialize_app, credentials
 
 #
 from ...constants import FIR_CREDS_FILENAME, PROJ_ID
-from ...config.env.env_vars import OsPathInfo, ThirdPtSvcType
+from ...config.env_vars import OsPathInfo, ThirdPtSvcType
 
 # usage
 # from common.firebase.admin import tsFirebaseApp

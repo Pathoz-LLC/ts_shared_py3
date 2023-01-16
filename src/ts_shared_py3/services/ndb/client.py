@@ -4,15 +4,14 @@ import logging
 import google.cloud.ndb as ndb
 from google.oauth2 import service_account
 
-from ...config.env.cfg_defaults import GcpSvcsCfg
-from ...config.env.load import EnvConfigTypEnum
+from ...config.all import GcpSvcsCfg
 
 # from ...config.env.env import EnvVarVals
 
 
 def get_ndb_client() -> ndb.Client:
 
-    gcp_config: GcpSvcsCfg = EnvConfigTypEnum.GCP_SVCS.config_obj
+    gcp_config = GcpSvcsCfg()
     logging.info(
         "loading NDB from:  {0}".format(gcp_config.GOOGLE_APPLICATION_CREDENTIALS)
     )

@@ -138,7 +138,7 @@ class Alloc(object):
         return Alloc(groupBitSum)
 
 
-class AllocLookup(object, metaclass=Singleton):
+class AllocLookup(Singleton):
     """
     singleton class to figure out weight distribution for multiple entries
     in a day or bucket
