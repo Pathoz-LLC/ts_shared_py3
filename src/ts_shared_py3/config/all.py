@@ -95,31 +95,35 @@ class OpenApiCfg(Singleton, CfgBaseIfc):
     title: str = "TS Core API"
     version: str = "1.0.2"
     openapi_version: str = "3.0.2"
-    openapi_url_prefix: str = "api/"
+    # openapi_url_prefix: str = "api/"
 
-    openapi_redoc_path: str = "/redoc"
-    openapi_redoc_url: str = (
-        "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
-    )
-    openapi_json_path: str = "api-spec.json"
-    openapi_swagger_ui_path: str = "/"
-    openapi_swagger_ui_url: str = (
-        "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/"
+    # openapi_redoc_path: str = "/redoc"
+    # openapi_redoc_url: str = (
+    #     "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
+    # )
+    # openapi_json_path: str = "api-spec.json"
+    # openapi_swagger_ui_path: str = "/"
+    # openapi_swagger_ui_url: str = (
+    #     "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/"
+    # )
+    servers: Dict[str, Any] = field(
+        default_factory=lambda: [
+            {
+                "url": "http://127.0.0.1",
+            },
+        ]
     )
 
-    api_spec_options: Dict[str, Any] = field(
+    info: Dict[str, Any] = field(
         default_factory=lambda: {
-            "host": "http://http://127.0.0.1",
-            "info": {
-                # "title": "required",
-                # "version": "required",
-                "description": "Touchstone API server",
-                "termsOfService": "http://pathoz.com/terms/",
-                "contact": {"email": "dewey@pathoz.com"},
-                "license": {
-                    "name": "MIT License",
-                    "url": "https://fr.wikipedia.org/wiki/Licence_MIT",
-                },
+            # "title": "required",
+            # "version": "required",
+            "description": "Touchstone API server",
+            "termsOfService": "http://pathoz.com/terms/",
+            "contact": {"email": "dewey@pathoz.com"},
+            "license": {
+                "name": "MIT License",
+                "url": "https://fr.wikipedia.org/wiki/Licence_MIT",
             },
         }
     )

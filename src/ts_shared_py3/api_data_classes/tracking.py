@@ -71,6 +71,9 @@ class IncidentRowMessage(BaseApiData):
     addDateTime: date = field()
     modDateTime: date = field()
 
+    userInterval: IntervalMessage = field()
+    reportingUserInterval: IntervalMessage = field()
+
     incidentId: int = field(default=0, metadata=dict(required=True))
     userTruthOpinion: int = field(default=0, metadata=dict(required=True))
     evidenceStatus: int = field(default=0, metadata=dict(required=True))
@@ -80,8 +83,6 @@ class IncidentRowMessage(BaseApiData):
 
     overlapDays: int = field(default=0, metadata=dict(required=True))
     userIntervalRowNum: int = field(default=0, metadata=dict(required=True))
-    userInterval: IntervalMessage = None
-    reportingUserInterval: IntervalMessage = None
 
     # housekeeping
     # if reporting user changes their dates, store old vals here

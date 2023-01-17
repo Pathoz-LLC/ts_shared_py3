@@ -86,10 +86,10 @@ class BehaviorAssessMsg(BaseApiData):
 
     """
 
+    priorAnswer: ValueRateMsg = field()
+
     behCode: str = field(metadata=dict(required=True))
     filterKeywords: str = field(metadata=dict(required=False))
-
-    priorAnswer: ValueRateMsg = None
     catCode: str = field(default="", metadata=dict(required=True))
     subCat: str = field(default="", metadata=dict(required=True))
     text: str = field(default="")

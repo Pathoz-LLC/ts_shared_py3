@@ -74,7 +74,7 @@ class CurPhaseRelStateData(BaseApiData):
     accompanying score descriptions
     """
 
-    scores: OneWindowScoreData = None
+    scores: OneWindowScoreData = field()
     # score descriptions
     userAppScoreDescrip: str = field(default="Derived from your entries")
     # flockScoreDescrip = ma.fields.String(3, default='')
@@ -104,9 +104,9 @@ class ScoreMetadataData(BaseApiData):
 @dataclass
 class ProspectScoreData(BaseApiData):
     # ProspectScoreMsg; rolls together current score with prior-period scores
-    curPeriodDetails: CurPhaseRelStateData = None
-    priorPeriodScores: list[OneWindowScoreData] = None
-    metadata: ScoreMetadataData = None  # field()
+    curPeriodDetails: CurPhaseRelStateData = field()
+    priorPeriodScores: list[OneWindowScoreData] = field()
+    metadata: ScoreMetadataData = field()  # field()
 
     persId: int = field(default=0)
     # priorPeriodScores are the buckets/windows of consolidated scores (ie a point on graph)
