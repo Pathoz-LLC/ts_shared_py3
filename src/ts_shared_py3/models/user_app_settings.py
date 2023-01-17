@@ -1,6 +1,8 @@
+from __future__ import annotations
 import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
-from ts_shared_py3.api_data_classes.user import AppSettingsMsg
+
+from ..api_data_classes.user import AppSettingsMsg
 
 
 class UserAppSettings(BaseNdbModel):
@@ -18,7 +20,7 @@ class UserAppSettings(BaseNdbModel):
     blockedUserList = ndb.StringProperty(repeated=True)
     autoLockAfterMinutes = ndb.IntegerProperty(default=0)
 
-    def asMsg(self):
+    def asMsg(self: UserAppSettings):
         msg = AppSettingsMsg()
         msg.allowIncidentTracking = self.allowIncidentTracking
         msg.allowPushNotifications = True
@@ -27,7 +29,7 @@ class UserAppSettings(BaseNdbModel):
         return msg
 
     @staticmethod
-    def get_or_create_by_user_id(userId):
+    def get_or_create_by_user_id(userId: int):
         #
         q = UserAppSettings.get_by_id(userId)
         if not q:
@@ -35,7 +37,7 @@ class UserAppSettings(BaseNdbModel):
             q.put()
         return q  # found or none
 
-    def updateFromAppSettingsMsg(self, msg):
+    def updateFromAppSettingsMsg(self: UserAppSettings, msg: AppSettingsMsg):
         self.allowIncidentTracking = msg.allowIncidentTracking
         self.autoLockAfterMinutes = msg.autoLockAfterMinutes
         if msg.unblockAllUsers:

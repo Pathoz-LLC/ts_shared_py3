@@ -76,6 +76,8 @@ class FlaskWebAppCfg(Singleton, CfgBaseIfc):
 class OpenApiCfg(Singleton, CfgBaseIfc):
     """
     https://swagger.io/specification/
+    https://flask-smorest.readthedocs.io/en/latest/openapi.html
+
     API_TITLE & API_VERSION both
     get auto-copied into the info dict  (both required here)
 
