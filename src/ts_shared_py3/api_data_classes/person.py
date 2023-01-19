@@ -7,14 +7,12 @@ from marshmallow import Schema, validate
 from .base import BaseApiData
 from ..enums.sex import Sex
 
-# FIXME
-
 
 @dataclass()
 class PersonRowMsg(BaseApiData):
+    id: int = field()
     dob: date = field()
     addDateTime: date = field()
-    id: str = field()
 
     mobile: str = field(default="")
     first: str = field(default="")
@@ -37,11 +35,9 @@ class PersonListMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-# PersonLocalRowMsg = model_message(PersonLocal, exclude=('userKey', 'personKey', 'createReason') )
-# PersonLocalRowMsg.field_by_name('nickname').required=False
-# PersonLocalRowMsg.field_by_name('createReason').required=False
 @dataclass()
 class PersonLocalRowMsg(BaseApiData):
+    id: int = field()
     modDateTime: datetime = field(default_factory=lambda: datetime.now())
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
 
@@ -55,6 +51,38 @@ class PersonLocalRowMsg(BaseApiData):
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)
     reminderFrequency: int = field(default=0)
     tsConfidenceScore: float = field(default=50.0)
+    #
+    Schema: ClassVar[Type[Schema]] = Schema
+
+
+@dataclass()
+class PersonFullWithLocal(BaseApiData):
+    """combines atts from PersonRowMsg & PersonLocalRowMsg
+    into one payload
+    """
+
+    id: int = field()
+    dob: date = field()
+    addDateTime: date = field()
+
+    mobile: str = field(default="")
+    first: str = field(default="")
+    last: str = field(default="")
+    email: str = field(default="")
+    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
+    redFlagBits: int = field(default=0)
+    city: str = field(default="")
+    state: str = field(default="")
+    zip: str = field(default="")
+
+    modDateTime: datetime = field(default_factory=lambda: datetime.now())
+    addDateTime: datetime = field(default_factory=lambda: datetime.now())
+
+    nickname: str = field(default="")
+    devotionLevel: int = field(default=0, metadata=dict(required=True))
+    imagePath: str = field(default="")
+    # overallScore: int = field(default=0, metadata=dict(required=True))
+    monitorStatus: int = field(default=1)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -155,12 +183,14 @@ class RedFlagSummaryMsg(BaseApiData):
 
 
 PersonRowMsg.Schema.__model__ = PersonRowMsg
+PersonListMsg.Schema.__model__ = PersonListMsg
 PersonLocalRowMsg.Schema.__model__ = PersonLocalRowMsg
+PersonFullWithLocal.Schema.__model__ = PersonFullWithLocal
+
 PersonIdMessage.Schema.__model__ = PersonIdMessage
 PersonPhoneMessage.Schema.__model__ = PersonPhoneMessage
 PersonPhoneMessage.Schema.__model__ = PersonPhoneMessage
 PersonIdentifierMessage.Schema.__model__ = PersonIdentifierMessage
-PersonListMsg.Schema.__model__ = PersonListMsg
 
 PersonMockDataMsg.Schema.__model__ = PersonMockDataMsg
 IncidentUpdateOpinionMessage.Schema.__model__ = IncidentUpdateOpinionMessage
