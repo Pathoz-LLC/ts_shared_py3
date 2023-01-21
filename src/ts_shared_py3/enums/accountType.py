@@ -98,12 +98,16 @@ class NdbAcctTypeProp(model.IntegerProperty):
 class AcctTypeSerialized(fields.Field):
     """serialization"""
 
-    def _serialize(self: AcctTypeSerialized, value: AccountType, attr, obj, **kwargs):
+    def _serialize(
+        self: AcctTypeSerialized, value: AccountType, attr, obj, **kwargs
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: AcctTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: AcctTypeSerialized, value: str, attr, data, **kwargs
+    ) -> AccountType:
         try:
             return AccountType[value]
         except ValueError as error:

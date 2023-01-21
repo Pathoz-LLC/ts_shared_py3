@@ -103,20 +103,24 @@ class NdbActivityTypeProp(model.IntegerProperty):
         return ActivityType(value)
 
 
-class AcctTypeSerialized(fields.Field):
+class ActivTypeSerialized(fields.Field):
     """serialization"""
 
-    def _serialize(self: AcctTypeSerialized, value: AccountType, attr, obj, **kwargs):
+    def _serialize(
+        self: ActivTypeSerialized, value: ActivityType, attr, obj, **kwargs
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: AcctTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: ActivTypeSerialized, value: str, attr, data, **kwargs
+    ) -> ActivityType:
         try:
-            return AccountType[value]
+            return ActivityType[value]
         except ValueError as error:
             raise ValidationError("") from error
 
     @property
-    def dump_default(self: AcctTypeSerialized) -> AccountType:
-        return AccountType.FREE
+    def dump_default(self: ActivTypeSerialized) -> ActivityType:
+        return ActivityType.BEHAVIOR_REPORTED

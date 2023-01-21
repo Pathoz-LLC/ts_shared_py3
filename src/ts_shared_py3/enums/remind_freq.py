@@ -65,12 +65,14 @@ class ReminderFreqSerialized(fields.Field):
 
     def _serialize(
         self: ReminderFreqSerialized, value: RemindFreq, attr, obj, **kwargs
-    ):
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: ReminderFreqSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: ReminderFreqSerialized, value: str, attr, data, **kwargs
+    ) -> RemindFreq:
         try:
             return RemindFreq[value]
         except ValueError as error:

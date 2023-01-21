@@ -65,12 +65,16 @@ from marshmallow import fields, ValidationError
 class VoteTypeSerialized(fields.Field):
     """Field that serializes to a string of sex name"""
 
-    def _serialize(self: VoteTypeSerialized, value: VoteType, attr, obj, **kwargs):
+    def _serialize(
+        self: VoteTypeSerialized, value: VoteType, attr, obj, **kwargs
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: VoteTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: VoteTypeSerialized, value: str, attr, data, **kwargs
+    ) -> VoteType:
         try:
             return VoteType[value]
         except ValueError as error:

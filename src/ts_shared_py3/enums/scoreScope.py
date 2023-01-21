@@ -60,12 +60,16 @@ from marshmallow import fields, ValidationError
 class ScoreScopeSerialized(fields.Field):
     """"""
 
-    def _serialize(self: ScoreScopeSerialized, value: ScoreScope, attr, obj, **kwargs):
+    def _serialize(
+        self: ScoreScopeSerialized, value: ScoreScope, attr, obj, **kwargs
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: ScoreScopeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: ScoreScopeSerialized, value: str, attr, data, **kwargs
+    ) -> ScoreScope:
         try:
             return ScoreScope[value]
         except ValueError as error:

@@ -604,12 +604,14 @@ class ScoreRuleTypeSerialized(fields.Field):
 
     def _serialize(
         self: ScoreRuleTypeSerialized, value: ScoreRuleType, attr, obj, **kwargs
-    ):
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: ScoreRuleTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: ScoreRuleTypeSerialized, value: str, attr, data, **kwargs
+    ) -> ScoreRuleType:
         try:
             return ScoreRuleType[value]
         except ValueError as error:

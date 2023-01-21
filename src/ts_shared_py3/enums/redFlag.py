@@ -51,12 +51,14 @@ class RedFlagTypeSerialized(fields.Field):
 
     def _serialize(
         self: RedFlagTypeSerialized, value: RedFlagType, attr, obj, **kwargs
-    ):
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: RedFlagTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: RedFlagTypeSerialized, value: str, attr, data, **kwargs
+    ) -> RedFlagType:
         try:
             return RedFlagType[value]
         except ValueError as error:

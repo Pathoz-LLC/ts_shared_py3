@@ -87,12 +87,16 @@ class QueuedWorkTyp(AutoName):
 class QwTypeSerialized(fields.Field):
     """serialization"""
 
-    def _serialize(self: QwTypeSerialized, value: QueuedWorkTyp, attr, obj, **kwargs):
+    def _serialize(
+        self: QwTypeSerialized, value: QueuedWorkTyp, attr, obj, **kwargs
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: QwTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: QwTypeSerialized, value: str, attr, data, **kwargs
+    ) -> QueuedWorkTyp:
         try:
             return QueuedWorkTyp[value]
         except ValueError as error:

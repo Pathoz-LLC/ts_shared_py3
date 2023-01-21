@@ -76,12 +76,14 @@ class MonitorStatusSerialized(fields.Field):
 
     def _serialize(
         self: MonitorStatusSerialized, value: MonitorStatus, attr, obj, **kwargs
-    ):
+    ) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: MonitorStatusSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(
+        self: MonitorStatusSerialized, value: str, attr, data, **kwargs
+    ) -> MonitorStatus:
         try:
             return MonitorStatus[value]
         except ValueError as error:

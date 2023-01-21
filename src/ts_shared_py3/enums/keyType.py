@@ -1,4 +1,7 @@
+from __future__ import annotations
 from enum import IntEnum, unique
+from marshmallow import fields, ValidationError
+
 import google.cloud.ndb as ndb
 
 
@@ -40,3 +43,26 @@ class NdbKeyTypeProp(ndb.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return KeyTypeEnum(value)
+
+
+class KeyTypeEnumSerialized(fields.Field):
+    """"""
+
+    def _serialize(
+        self: KeyTypeEnumSerialized, value: KeyTypeEnum, attr, obj, **kwargs
+    ) -> str:
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(
+        self: KeyTypeEnumSerialized, value: str, attr, data, **kwargs
+    ) -> KeyTypeEnum:
+        try:
+            return KeyTypeEnum[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: KeyTypeEnumSerialized) -> KeyTypeEnum:
+        return KeyTypeEnum.MBPHONE

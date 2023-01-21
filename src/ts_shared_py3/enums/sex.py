@@ -73,12 +73,12 @@ class NdbSexProp(model.IntegerProperty):
 class SexSerialized(fields.Field):
     """Field that serializes to a string of sex name"""
 
-    def _serialize(self: SexSerialized, value: Sex, attr, obj, **kwargs):
+    def _serialize(self: SexSerialized, value: Sex, attr, obj, **kwargs) -> str:
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: SexSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(self: SexSerialized, value: str, attr, data, **kwargs) -> Sex:
         try:
             return Sex[value]
         except ValueError as error:
