@@ -55,3 +55,27 @@ class NdbRemindProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return RemindFreq(value)
+
+
+from marshmallow import fields, ValidationError
+
+
+class ReminderFreqSerialized(fields.Field):
+    """"""
+
+    def _serialize(
+        self: ReminderFreqSerialized, value: RemindFreq, attr, obj, **kwargs
+    ):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: ReminderFreqSerialized, value: str, attr, data, **kwargs):
+        try:
+            return RemindFreq[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: ReminderFreqSerialized) -> RemindFreq:
+        return RemindFreq.DAILY

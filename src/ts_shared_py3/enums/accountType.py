@@ -1,6 +1,7 @@
+from __future__ import annotations
 from enum import IntEnum, unique
 import random
-
+from marshmallow import fields, ValidationError
 from google.cloud.ndb import model
 
 
@@ -92,3 +93,22 @@ class NdbAcctTypeProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return AccountType(value)
+
+
+class AcctTypeSerialized(fields.Field):
+    """serialization"""
+
+    def _serialize(self: AcctTypeSerialized, value: AccountType, attr, obj, **kwargs):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: AcctTypeSerialized, value: str, attr, data, **kwargs):
+        try:
+            return AccountType[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: AcctTypeSerialized) -> AccountType:
+        return AccountType.FREE

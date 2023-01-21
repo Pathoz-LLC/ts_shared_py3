@@ -1,6 +1,7 @@
 from __future__ import annotations
 from enum import IntEnum, unique
 import random
+from marshmallow import fields, ValidationError
 
 from google.cloud.ndb import model
 
@@ -66,3 +67,23 @@ class NdbSexProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return Sex(value)
+
+
+# from marshmallow import fields, ValidationError
+class SexSerialized(fields.Field):
+    """Field that serializes to a string of sex name"""
+
+    def _serialize(self: SexSerialized, value: Sex, attr, obj, **kwargs):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: SexSerialized, value: str, attr, data, **kwargs):
+        try:
+            return Sex[value]
+        except ValueError as error:
+            raise ValidationError("Pin codes must contain only digits.") from error
+
+    @property
+    def dump_default(self: SexSerialized) -> Sex:
+        return Sex.UNKNOWN

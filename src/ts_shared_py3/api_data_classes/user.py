@@ -6,7 +6,7 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import Sex
+from ..enums.sex import SexSerialized
 
 # from common.utils.date_conv import date_to_message
 import logging
@@ -32,7 +32,7 @@ class UserProfileMsg(BaseApiData):
     email: str = field(default="", metadata=dict(required=True))
     fullNameOrHandle: str = field(default="", metadata=dict(required=True))
     photoUrl: str = field(default="", metadata=dict(required=True))
-    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
+    sex: SexSerialized = SexSerialized()
     city: str = field(default="", metadata=dict(required=True))
     state: str = field(default="", metadata=dict(required=True))
     zip: str = field(default="", metadata=dict(required=True))
@@ -110,7 +110,7 @@ class UserDemographicsMsg(BaseApiData):
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    sex: str = field(default="", metadata=dict(required=True))
+    sex: SexSerialized = SexSerialized()
     preferredSex: str = field(default="", metadata=dict(required=True))
     imageURL: str = field(default="", metadata=dict(required=True))
     city: str = field(default="", metadata=dict(required=True))
@@ -138,7 +138,7 @@ class UserBioMessage(BaseApiData):
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    sex: int = field(default=0, metadata=dict(required=True))
+    sex: SexSerialized = SexSerialized()
     preferredSex: int = field(default=0, metadata=dict(required=True))
     photoUrl: str = field(default="", metadata=dict(required=True))
     accountLevel: int = field(default=0, metadata=dict(required=True))

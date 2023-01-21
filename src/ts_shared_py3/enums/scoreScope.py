@@ -52,3 +52,25 @@ class NdbScoreScopeProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return ScoreScope(value)
+
+
+from marshmallow import fields, ValidationError
+
+
+class ScoreScopeSerialized(fields.Field):
+    """"""
+
+    def _serialize(self: ScoreScopeSerialized, value: ScoreScope, attr, obj, **kwargs):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: ScoreScopeSerialized, value: str, attr, data, **kwargs):
+        try:
+            return ScoreScope[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: ScoreScopeSerialized) -> ScoreScope:
+        return ScoreScope.APP_AND_USER

@@ -1,3 +1,5 @@
+from __future__ import annotations
+from marshmallow import fields, ValidationError
 from enum import IntEnum, unique
 from google.cloud.ndb import model
 
@@ -199,3 +201,22 @@ class NdbNotifyTypeProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return NotifyType(value)
+
+
+class NotifyTypeSerialized(fields.Field):
+    """"""
+
+    def _serialize(self: NotifyTypeSerialized, value: NotifyType, attr, obj, **kwargs):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: NotifyTypeSerialized, value: str, attr, data, **kwargs):
+        try:
+            return NotifyType[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: NotifyTypeSerialized) -> NotifyType:
+        return NotifyType.CHAT_MSG_RECEIVED

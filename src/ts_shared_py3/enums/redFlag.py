@@ -1,3 +1,4 @@
+from __future__ import annotations
 from enum import IntEnum, unique
 from google.cloud.ndb import model
 
@@ -40,3 +41,27 @@ class NdbRedFlagProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return RedFlagType(value)  # return RedFlagType
+
+
+from marshmallow import fields, ValidationError
+
+
+class RedFlagTypeSerialized(fields.Field):
+    """"""
+
+    def _serialize(
+        self: RedFlagTypeSerialized, value: RedFlagType, attr, obj, **kwargs
+    ):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: RedFlagTypeSerialized, value: str, attr, data, **kwargs):
+        try:
+            return RedFlagType[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: RedFlagTypeSerialized) -> RedFlagType:
+        return RedFlagType.NEVERSET

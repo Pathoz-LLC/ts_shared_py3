@@ -5,7 +5,8 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..enums.sex import Sex
+from ..enums.sex import SexSerialized
+from ..enums.commitLevel import CommitLvlSerialized
 
 
 @dataclass()
@@ -18,20 +19,13 @@ class PersonRowMsg(BaseApiData):
     first: str = field(default="")
     last: str = field(default="")
     email: str = field(default="")
-    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
+    sex: SexSerialized = SexSerialized()
     redFlagBits: int = field(default=0)
     city: str = field(default="")
     state: str = field(default="")
     zip: str = field(default="")
 
     #
-    Schema: ClassVar[Type[Schema]] = Schema
-
-
-@dataclass()
-class PersonListMsg(BaseApiData):
-    items: list[PersonRowMsg] = field(default_factory=lambda: [])
-
     Schema: ClassVar[Type[Schema]] = Schema
 
 
@@ -69,7 +63,7 @@ class PersonFullWithLocal(BaseApiData):
     first: str = field(default="")
     last: str = field(default="")
     email: str = field(default="")
-    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
+    sex: SexSerialized = SexSerialized()
     redFlagBits: int = field(default=0)
     city: str = field(default="")
     state: str = field(default="")
@@ -79,11 +73,18 @@ class PersonFullWithLocal(BaseApiData):
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
 
     nickname: str = field(default="")
-    devotionLevel: int = field(default=0, metadata=dict(required=True))
+    devotionLevel: CommitLvlSerialized = CommitLvlSerialized()
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
     monitorStatus: int = field(default=1)
     #
+    Schema: ClassVar[Type[Schema]] = Schema
+
+
+@dataclass()
+class PersonListMsg(BaseApiData):
+    items: list[PersonFullWithLocal] = field(default_factory=lambda: [])
+
     Schema: ClassVar[Type[Schema]] = Schema
 
 

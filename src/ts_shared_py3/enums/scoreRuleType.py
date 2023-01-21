@@ -596,6 +596,30 @@ class NdbScoringRuleProp(model.IntegerProperty):
         return ScoreRuleType(value)  # return ScoreRuleType
 
 
+from marshmallow import fields, ValidationError
+
+
+class ScoreRuleTypeSerialized(fields.Field):
+    """"""
+
+    def _serialize(
+        self: ScoreRuleTypeSerialized, value: ScoreRuleType, attr, obj, **kwargs
+    ):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: ScoreRuleTypeSerialized, value: str, attr, data, **kwargs):
+        try:
+            return ScoreRuleType[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: ScoreRuleTypeSerialized) -> ScoreRuleType:
+        return ScoreRuleType.BEHAVIOR_NEGATIVE
+
+
 # from datetime import date
 # from enum import Enum, unique
 # from collections import namedtuple

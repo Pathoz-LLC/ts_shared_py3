@@ -1,5 +1,6 @@
+from __future__ import annotations
 from enum import IntEnum, unique
-
+from marshmallow import fields, ValidationError
 from google.cloud.ndb import model
 
 
@@ -68,3 +69,24 @@ class NdbMonitorStatusProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return MonitorStatus(value)
+
+
+class MonitorStatusSerialized(fields.Field):
+    """"""
+
+    def _serialize(
+        self: MonitorStatusSerialized, value: MonitorStatus, attr, obj, **kwargs
+    ):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: MonitorStatusSerialized, value: str, attr, data, **kwargs):
+        try:
+            return MonitorStatus[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: MonitorStatusSerialized) -> MonitorStatus:
+        return MonitorStatus

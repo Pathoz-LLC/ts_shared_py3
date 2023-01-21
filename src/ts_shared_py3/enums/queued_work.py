@@ -1,5 +1,6 @@
 from __future__ import annotations
 from enum import Enum, unique, auto
+from marshmallow import fields, ValidationError
 
 #
 class AutoName(Enum):
@@ -81,3 +82,22 @@ class QueuedWorkTyp(AutoName):
             return "test/stats/fake"
         else:
             return "undefined"
+
+
+class QwTypeSerialized(fields.Field):
+    """serialization"""
+
+    def _serialize(self: QwTypeSerialized, value: QueuedWorkTyp, attr, obj, **kwargs):
+        if value is None:
+            return ""
+        return value.name
+
+    def _deserialize(self: QwTypeSerialized, value: str, attr, data, **kwargs):
+        try:
+            return QueuedWorkTyp[value]
+        except ValueError as error:
+            raise ValidationError("") from error
+
+    @property
+    def dump_default(self: QwTypeSerialized) -> QueuedWorkTyp:
+        return QueuedWorkTyp.COMMUNITY_NEWS
