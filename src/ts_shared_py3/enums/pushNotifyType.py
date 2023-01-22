@@ -217,6 +217,5 @@ class NotifyTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
     def dump_default(self: NotifyTypeSerialized) -> NotifyType:
         return NotifyType.CHAT_MSG_RECEIVED

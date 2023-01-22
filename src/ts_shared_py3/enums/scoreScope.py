@@ -75,6 +75,5 @@ class ScoreScopeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
     def dump_default(self: ScoreScopeSerialized) -> ScoreScope:
         return ScoreScope.APP_AND_USER

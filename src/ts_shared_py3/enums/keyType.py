@@ -63,6 +63,5 @@ class KeyTypeEnumSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
     def dump_default(self: KeyTypeEnumSerialized) -> KeyTypeEnum:
         return KeyTypeEnum.MBPHONE

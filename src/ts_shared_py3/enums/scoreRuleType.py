@@ -617,7 +617,6 @@ class ScoreRuleTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
     def dump_default(self: ScoreRuleTypeSerialized) -> ScoreRuleType:
         return ScoreRuleType.BEHAVIOR_NEGATIVE
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
-from enum import IntEnum, unique
 import random
+from enum import IntEnum, unique
+from marshmallow_dataclass import NewType
+from marshmallow import fields, ValidationError
 
 from google.cloud.ndb import model
 
@@ -57,27 +59,28 @@ class NdbRemindProp(model.IntegerProperty):
         return RemindFreq(value)
 
 
-from marshmallow import fields, ValidationError
-
-
-class ReminderFreqSerialized(fields.Field):
+class _ReminderFreqSerialized(fields.Field):
     """"""
 
     def _serialize(
-        self: ReminderFreqSerialized, value: RemindFreq, attr, obj, **kwargs
+        self: _ReminderFreqSerialized, value: RemindFreq, attr, obj, **kwargs
     ) -> str:
         if value is None:
             return ""
         return value.name
 
     def _deserialize(
-        self: ReminderFreqSerialized, value: str, attr, data, **kwargs
+        self: _ReminderFreqSerialized, value: str, attr, data, **kwargs
     ) -> RemindFreq:
         try:
             return RemindFreq[value]
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
-    def dump_default(self: ReminderFreqSerialized) -> RemindFreq:
+    def dump_default(self: _ReminderFreqSerialized) -> RemindFreq:
         return RemindFreq.DAILY
+
+
+ReminderFreqSerializedMsg = NewType(
+    "ReminderFreqSerialized", str, _ReminderFreqSerialized
+)

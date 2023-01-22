@@ -113,6 +113,5 @@ class AcctTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
     def dump_default(self: AcctTypeSerialized) -> AccountType:
         return AccountType.FREE

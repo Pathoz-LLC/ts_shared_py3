@@ -121,6 +121,5 @@ class ActivTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
     def dump_default(self: ActivTypeSerialized) -> ActivityType:
         return ActivityType.BEHAVIOR_REPORTED

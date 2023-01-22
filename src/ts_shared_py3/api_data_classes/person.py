@@ -1,12 +1,15 @@
 from datetime import date, datetime
 from typing import ClassVar, Type
-from dataclasses import field, fields, make_dataclass
+from dataclasses import field
 from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 from .base import BaseApiData
-from ..enums.sex import SexSerialized
-from ..enums.commitLevel import CommitLvlSerialized
+from ..enums.sex import SexSerializedMsg
+from ..enums.commitLevel import CommitLvlSerializedMsg
+from ..enums.redFlag import RedFlagTypeSerializedMsg
+from ..enums.remind_freq import ReminderFreqSerializedMsg
+from ..enums.createAndMonitor import MonitorStatusSerializedMsg
 
 
 @dataclass()
@@ -14,13 +17,13 @@ class PersonRowMsg(BaseApiData):
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
+    sex: SexSerializedMsg
+    redFlagBits: RedFlagTypeSerializedMsg
 
     mobile: str = field(default="")
     first: str = field(default="")
     last: str = field(default="")
     email: str = field(default="")
-    sex: SexSerialized = SexSerialized()
-    redFlagBits: int = field(default=0)
     city: str = field(default="")
     state: str = field(default="")
     zip: str = field(default="")
@@ -32,18 +35,19 @@ class PersonRowMsg(BaseApiData):
 @dataclass()
 class PersonLocalRowMsg(BaseApiData):
     id: int = field()
+    commitLevel: CommitLvlSerializedMsg
+    reminderFrequency: ReminderFreqSerializedMsg
+
     modDateTime: datetime = field(default_factory=lambda: datetime.now())
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
 
     nickname: str = field(default="")
-    devotionLevel: int = field(default=0, metadata=dict(required=True))
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
     monitorStatus: int = field(default=1)
     # redFlagBits: int = field(default=0, metadata=dict(required=True))
     xtra: str = field(default="")
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)
-    reminderFrequency: int = field(default=0)
     tsConfidenceScore: float = field(default=50.0)
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -55,6 +59,10 @@ class PersonFullWithLocal(BaseApiData):
     into one payload
     """
 
+    sex: SexSerializedMsg
+    redFlagBits: RedFlagTypeSerializedMsg
+    devotionLevel: CommitLvlSerializedMsg
+    monitorStatus: MonitorStatusSerializedMsg
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
@@ -63,8 +71,6 @@ class PersonFullWithLocal(BaseApiData):
     first: str = field(default="")
     last: str = field(default="")
     email: str = field(default="")
-    sex: SexSerialized = SexSerialized()
-    redFlagBits: int = field(default=0)
     city: str = field(default="")
     state: str = field(default="")
     zip: str = field(default="")
@@ -73,10 +79,9 @@ class PersonFullWithLocal(BaseApiData):
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
 
     nickname: str = field(default="")
-    devotionLevel: CommitLvlSerialized = CommitLvlSerialized()
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
-    monitorStatus: int = field(default=1)
+
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -160,10 +165,10 @@ class RedFlagReportMsg(BaseApiData):
     """ """
 
     beganDateTime: datetime = field()
+    flagType: RedFlagTypeSerializedMsg
 
     personId: int = field(default=0, metadata=dict(required=True))
     userId: str = field(default="")
-    flagType: int = field(default=0, metadata=dict(required=True))
     comment: str = field(default="")
     url: str = field(default="")
     rescinded: int = field(default=0, metadata=dict(required=True))

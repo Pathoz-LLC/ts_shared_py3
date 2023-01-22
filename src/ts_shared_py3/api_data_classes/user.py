@@ -6,7 +6,7 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import SexSerialized
+from ..enums.sex import SexSerializedMsg
 
 # from common.utils.date_conv import date_to_message
 import logging
@@ -26,13 +26,13 @@ class UserProfileMsg(BaseApiData):
     updating their profile
     """
 
+    sex: SexSerializedMsg
     dob: date = field(metadata=dict(required=True))
 
     userId: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     fullNameOrHandle: str = field(default="", metadata=dict(required=True))
     photoUrl: str = field(default="", metadata=dict(required=True))
-    sex: SexSerialized = SexSerialized()
     city: str = field(default="", metadata=dict(required=True))
     state: str = field(default="", metadata=dict(required=True))
     zip: str = field(default="", metadata=dict(required=True))
@@ -105,13 +105,14 @@ class UserIdMessage(BaseApiData):
 
 @dataclass(base_schema=DataClassBaseSchema)
 class UserDemographicsMsg(BaseApiData):
+    sex: SexSerializedMsg
+    preferredSex: SexSerializedMsg
+
     dob: date = field(metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    sex: SexSerialized = SexSerialized()
-    preferredSex: str = field(default="", metadata=dict(required=True))
     imageURL: str = field(default="", metadata=dict(required=True))
     city: str = field(default="", metadata=dict(required=True))
     state: str = field(default="", metadata=dict(required=True))
@@ -127,6 +128,7 @@ class UserBioMessage(BaseApiData):
         eg request chat or block user
     """
 
+    sex: SexSerializedMsg
     dob: date = field(metadata=dict(required=True))
     expiresOn: date = field(metadata=dict(required=True))
     lastLogin: date = field(metadata=dict(required=True))
@@ -138,7 +140,6 @@ class UserBioMessage(BaseApiData):
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    sex: SexSerialized = SexSerialized()
     preferredSex: int = field(default=0, metadata=dict(required=True))
     photoUrl: str = field(default="", metadata=dict(required=True))
     accountLevel: int = field(default=0, metadata=dict(required=True))

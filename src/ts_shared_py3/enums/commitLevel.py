@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from enum import IntEnum, unique
 from marshmallow import fields, ValidationError
+from marshmallow_dataclass import NewType
 from google.cloud.ndb import model
 import random
 
@@ -323,24 +324,26 @@ class NdbCommitLvlProp(model.IntegerProperty):
         return DisplayCommitLvl(value)  # return DisplayCommitLvl
 
 
-class CommitLvlSerialized(fields.Field):
+class _CommitLvlSerialized(fields.Field):
     """Field that serializes to a string of sex name"""
 
     def _serialize(
-        self: CommitLvlSerialized, value: DisplayCommitLvl, attr, obj, **kwargs
+        self: _CommitLvlSerialized, value: DisplayCommitLvl, attr, obj, **kwargs
     ) -> str:
         if value is None:
             return ""
         return value.name
 
     def _deserialize(
-        self: CommitLvlSerialized, value: str, attr, data, **kwargs
+        self: _CommitLvlSerialized, value: str, attr, data, **kwargs
     ) -> DisplayCommitLvl:
         try:
             return DisplayCommitLvl[value]
         except ValueError as error:
             raise ValidationError("") from error
 
-    @property
-    def dump_default(self: CommitLvlSerialized) -> DisplayCommitLvl:
+    def dump_default(self: _CommitLvlSerialized) -> DisplayCommitLvl:
         return DisplayCommitLvl.NONEXCLUSIVE
+
+
+CommitLvlSerializedMsg = NewType("CommitLvlSerialized", str, _CommitLvlSerialized)

@@ -80,6 +80,5 @@ class VoteTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("Pin codes must contain only digits.") from error
 
-    @property
     def dump_default(self: VoteTypeSerialized) -> VoteType:
         return VoteType.CONCERN
