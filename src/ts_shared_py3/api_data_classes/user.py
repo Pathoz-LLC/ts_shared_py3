@@ -6,7 +6,7 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import SexSerializedMsg
+from ..enums.sex import Sex, SexSerializedMsg
 
 # from common.utils.date_conv import date_to_message
 import logging
@@ -26,8 +26,8 @@ class UserProfileMsg(BaseApiData):
     updating their profile
     """
 
-    sex: SexSerializedMsg
     dob: date = field(metadata=dict(required=True))
+    sex: Sex = field(default=Sex.UNKNOWN)
 
     userId: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
@@ -105,8 +105,8 @@ class UserIdMessage(BaseApiData):
 
 @dataclass(base_schema=DataClassBaseSchema)
 class UserDemographicsMsg(BaseApiData):
-    sex: SexSerializedMsg
-    preferredSex: SexSerializedMsg
+    sex: Sex = field()
+    preferredSex: Sex = field()
 
     dob: date = field(metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
@@ -128,7 +128,7 @@ class UserBioMessage(BaseApiData):
         eg request chat or block user
     """
 
-    sex: SexSerializedMsg
+    sex: Sex = field()
     dob: date = field(metadata=dict(required=True))
     expiresOn: date = field(metadata=dict(required=True))
     lastLogin: date = field(metadata=dict(required=True))

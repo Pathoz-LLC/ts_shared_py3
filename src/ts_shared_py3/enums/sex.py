@@ -76,6 +76,8 @@ class _SexSerialized(fields.Field):
     def _serialize(self: _SexSerialized, value: Sex, attr, obj, **kwargs) -> str:
         if value is None:
             return ""
+        print("_SexSerialized:")
+        print(type(value))
         return value.name
 
     def _deserialize(self: _SexSerialized, value: str, attr, data, **kwargs) -> Sex:
@@ -88,4 +90,5 @@ class _SexSerialized(fields.Field):
         return Sex.UNKNOWN
 
 
-SexSerializedMsg = NewType("SexSerialized", str, field=_SexSerialized)
+SexSerializedMsg = NewType("SexSerialized", Sex, field=fields.Enum)
+# Email = NewType("Email", str, field=marshmallow.fields.Email)

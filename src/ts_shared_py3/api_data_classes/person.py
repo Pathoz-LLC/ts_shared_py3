@@ -1,24 +1,31 @@
 from datetime import date, datetime
 from typing import ClassVar, Type
 from dataclasses import field
-from marshmallow_dataclass import dataclass
-from marshmallow import Schema, validate
+from marshmallow_dataclass import dataclass, field_for_schema
+from marshmallow import Schema, fields
 
 from .base import BaseApiData
-from ..enums.sex import SexSerializedMsg
-from ..enums.commitLevel import CommitLvlSerializedMsg
-from ..enums.redFlag import RedFlagTypeSerializedMsg
-from ..enums.remind_freq import ReminderFreqSerializedMsg
-from ..enums.createAndMonitor import MonitorStatusSerializedMsg
+from ..enums.sex import SexSerializedMsg, Sex
+from ..enums.commitLevel import CommitLvlSerializedMsg, DisplayCommitLvl
+from ..enums.redFlag import RedFlagTypeSerializedMsg, RedFlagType
+from ..enums.remind_freq import ReminderFreqSerializedMsg, RemindFreq
+from ..enums.createAndMonitor import (
+    MonitorStatusSerializedMsg,
+    MonitorStatus,
+    CreateReason,
+)
 
 
 @dataclass()
 class PersonRowMsg(BaseApiData):
+    #
+    # deweyG: RedFlagTypeSerializedMsg = field()
+    # pierceG: SexSerializedMsg = field()
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
-    sex: SexSerializedMsg
-    redFlagBits: RedFlagTypeSerializedMsg
+    redFlagBits: RedFlagType
+    sex: Sex = field(default=Sex.UNKNOWN)
 
     mobile: str = field(default="")
     first: str = field(default="")
@@ -35,13 +42,15 @@ class PersonRowMsg(BaseApiData):
 @dataclass()
 class PersonLocalRowMsg(BaseApiData):
     id: int = field()
-    commitLevel: CommitLvlSerializedMsg
-    reminderFrequency: ReminderFreqSerializedMsg
+    commitLevel: DisplayCommitLvl = field()
+    reminderFrequency: RemindFreq = field()
 
     modDateTime: datetime = field(default_factory=lambda: datetime.now())
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
 
     nickname: str = field(default="")
+    first: str = field(default="")
+    last: str = field(default="")
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
     monitorStatus: int = field(default=1)
@@ -59,10 +68,10 @@ class PersonFullWithLocal(BaseApiData):
     into one payload
     """
 
-    sex: SexSerializedMsg
-    redFlagBits: RedFlagTypeSerializedMsg
-    devotionLevel: CommitLvlSerializedMsg
-    monitorStatus: MonitorStatusSerializedMsg
+    sex: Sex
+    redFlagBits: RedFlagType = field()
+    commitLevel: DisplayCommitLvl = field()
+    monitorStatus: MonitorStatus = field()
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
@@ -80,6 +89,7 @@ class PersonFullWithLocal(BaseApiData):
 
     nickname: str = field(default="")
     imagePath: str = field(default="")
+    tsConfidenceScore: float = field(default=50.0)
     # overallScore: int = field(default=0, metadata=dict(required=True))
 
     #
