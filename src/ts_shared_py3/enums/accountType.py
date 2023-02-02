@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import IntEnum, unique
 import random
 from marshmallow import fields, ValidationError
+from marshmallow_dataclass import NewType
 from google.cloud.ndb import model
 
 
@@ -113,5 +114,10 @@ class AcctTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: AcctTypeSerialized) -> AccountType:
-        return AccountType.FREE
+    # def dump_default(self: AcctTypeSerialized) -> AccountType:
+    #     return AccountType.FREE
+
+
+AcctTypeSerializedMsg = NewType(
+    "AcctTypeSerialized", AcctTypeSerialized, field=fields.Enum(AccountType)
+)

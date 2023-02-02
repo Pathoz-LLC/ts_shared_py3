@@ -2,13 +2,13 @@ from datetime import date, datetime
 from typing import ClassVar, Type
 from dataclasses import field  # , fields, make_dataclass
 from marshmallow_dataclass import dataclass
-from marshmallow import Schema, validate
+from marshmallow import Schema, fields
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import Sex, SexSerializedMsg
+from ..enums.sex import Sex, SexSerializedMa, SexSerializedDc
+from ..enums.accountType import AccountType, AcctTypeSerialized, AcctTypeSerializedMsg
 
-# from common.utils.date_conv import date_to_message
 import logging
 
 # usage:
@@ -27,7 +27,7 @@ class UserProfileMsg(BaseApiData):
     """
 
     dob: date = field(metadata=dict(required=True))
-    sex: Sex = field(default=Sex.UNKNOWN)
+    sex: Sex = SexSerializedMa(Sex.UNKNOWN)
 
     userId: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
@@ -52,7 +52,9 @@ class UserProfileMsg(BaseApiData):
     jwt: str = field(default="", metadata=dict(required=True))
     latitude: float = field(default=0.0)
     longitude: float = field(default=0.0)
-    accountLevel: int = field(default=0, metadata=dict(required=True))
+    # FIXME
+    # accountLevel: AcctTypeSerialized = AcctTypeSerializedMsg(AccountType.FREE)
+    accountLevel: float = field(default=0.0)
 
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -105,10 +107,11 @@ class UserIdMessage(BaseApiData):
 
 @dataclass(base_schema=DataClassBaseSchema)
 class UserDemographicsMsg(BaseApiData):
-    sex: Sex = field()
-    preferredSex: Sex = field()
-
+    #
     dob: date = field(metadata=dict(required=True))
+    sex: Sex = SexSerializedDc(Sex.UNKNOWN)
+    preferredSex: Sex = SexSerializedDc(Sex.UNKNOWN)
+
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
@@ -128,10 +131,11 @@ class UserBioMessage(BaseApiData):
         eg request chat or block user
     """
 
-    sex: Sex = field()
     dob: date = field(metadata=dict(required=True))
     expiresOn: date = field(metadata=dict(required=True))
     lastLogin: date = field(metadata=dict(required=True))
+    sex: Sex = SexSerializedDc(Sex.UNKNOWN)
+    preferredSex: Sex = SexSerializedDc(Sex.UNKNOWN)
 
     userId: str = field(default="", metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
@@ -140,7 +144,7 @@ class UserBioMessage(BaseApiData):
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    preferredSex: int = field(default=0, metadata=dict(required=True))
+
     photoUrl: str = field(default="", metadata=dict(required=True))
     accountLevel: int = field(default=0, metadata=dict(required=True))
     provider_id: str = field(default="", metadata=dict(required=True))

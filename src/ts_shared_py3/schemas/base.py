@@ -1,7 +1,9 @@
 from __future__ import annotations
-import marshmallow as ma
-
-from marshmallow import SchemaOpts  # validates_schema, ValidationError
+import decimal
+from datetime import datetime, date, time, timedelta
+from marshmallow_dataclass import dataclass
+from marshmallow import Schema, post_load
+import marshmallow.fields as ma_fields
 from typing import Any, AnyStr
 
 #
@@ -11,9 +13,13 @@ from ..constants import (
     ISO_8601_DATETIME_FORMAT,
     ISO_8601_TIME_FORMAT,
 )
+from ..enums.sex import Sex, SexSerializedDc, SexSerializedMa
+from ..enums.accountType import AccountType, AcctTypeSerializedMsg
 
 
+@dataclass
 class _ReplaceWithRealDataClass:
+    # niu = ma_fields.Enum(Sex.UNKNOWN)
     pass
 
 
@@ -29,7 +35,7 @@ class _ReplaceWithRealDataClass:
 #         self.timeformat = getattr(meta, "timeformat", None)
 
 
-class DataClassBaseSchema(ma.Schema):
+class DataClassBaseSchema(Schema):
     """use this superclass for dataclass objects
     make sure you set the __model__ property
     in all subclasses
@@ -40,16 +46,34 @@ class DataClassBaseSchema(ma.Schema):
     an instance of the model class
     """
 
-    # OPTIONS_CLASS = SchemaCfgOpts
-
     __model__ = _ReplaceWithRealDataClass
+    TYPE_MAPPING = {
+        str: ma_fields.String,
+        bytes: ma_fields.String,
+        datetime: ma_fields.DateTime,
+        float: ma_fields.Float,
+        bool: ma_fields.Boolean,
+        tuple: ma_fields.Raw,
+        list: ma_fields.Raw,
+        set: ma_fields.Raw,
+        int: ma_fields.Integer,
+        # uuid.UUID: ma_fields.UUID,
+        time: ma_fields.Time,
+        date: ma_fields.Date,
+        timedelta: ma_fields.TimeDelta,
+        decimal.Decimal: ma_fields.Decimal,
+        # custom below
+        Sex: SexSerializedDc,
+        AccountType: AcctTypeSerializedMsg,
+    }
+    # OPTIONS_CLASS = SchemaCfgOpts
 
     class Meta:
         dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%d"
         datetimeformat = ISO_8601_DATETIME_FORMAT
         timeformat = ISO_8601_TIME_FORMAT
 
-    @ma.post_load
+    @post_load
     def _makeModelObj(
         self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
     ):

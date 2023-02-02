@@ -5,13 +5,13 @@ from marshmallow_dataclass import dataclass, field_for_schema
 from marshmallow import Schema, fields
 
 from .base import BaseApiData
-from ..enums.sex import SexSerializedMsg, Sex
+from ..enums.sex import Sex
 from ..enums.commitLevel import CommitLvlSerializedMsg, DisplayCommitLvl
 from ..enums.redFlag import RedFlagTypeSerializedMsg, RedFlagType
 from ..enums.remind_freq import ReminderFreqSerializedMsg, RemindFreq
 from ..enums.createAndMonitor import (
-    MonitorStatusSerializedMsg,
     MonitorStatus,
+    MonitorStatusSerializedMsg,
     CreateReason,
 )
 
@@ -24,8 +24,8 @@ class PersonRowMsg(BaseApiData):
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
-    redFlagBits: RedFlagType
-    sex: Sex = field(default=Sex.UNKNOWN)
+    redFlagBits: RedFlagType = fields.Enum(RedFlagType)
+    sex: Sex = fields.Enum(Sex)
 
     mobile: str = field(default="")
     first: str = field(default="")

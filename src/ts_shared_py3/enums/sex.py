@@ -3,7 +3,6 @@ from enum import IntEnum, unique
 import random
 from marshmallow_dataclass import NewType
 from marshmallow import fields, ValidationError
-
 from google.cloud.ndb import model
 
 
@@ -15,6 +14,10 @@ class Sex(IntEnum):
     UNKNOWN = 1
     FEMALE = 2
     MALE = 3
+
+    @property
+    def __members__(self) -> list[str]:
+        return [f.name for f in Sex]
 
     def __eq__(self, other) -> bool:
         """handle both int and object cases
@@ -70,25 +73,31 @@ class NdbSexProp(model.IntegerProperty):
         return Sex(value)
 
 
-class _SexSerialized(fields.Field):
-    """Field that serializes to a string of sex name"""
+class SexSerializedMa(fields.Enum):
+    """Serialize sex to/from enum/string
+    a marshmallow data-type
+    SexSerializedDc (below) is a marshmallow_dataclass type
+    """
 
-    def _serialize(self: _SexSerialized, value: Sex, attr, obj, **kwargs) -> str:
+    def _serialize(self: SexSerializedMa, value: Sex, attr, obj, **kwargs) -> str:
         if value is None:
             return ""
-        print("_SexSerialized:")
-        print(type(value))
+        print("SexSerialized:")
+        print(value.name, type(value))
         return value.name
 
-    def _deserialize(self: _SexSerialized, value: str, attr, data, **kwargs) -> Sex:
+    def _deserialize(self: SexSerializedMa, value: str, attr, data, **kwargs) -> Sex:
         try:
             return Sex[value]
         except ValueError as error:
-            raise ValidationError("Pin codes must contain only digits.") from error
+            return Sex.UNKNOWN
+            # raise ValidationError("Pin codes must contain only digits.") from error
 
-    def dump_default(self: _SexSerialized) -> Sex:
-        return Sex.UNKNOWN
+    # @property
+    # def dump_default(self: SexSerializedMa) -> Sex:
+    #     return Sex.UNKNOWN
 
 
-SexSerializedMsg = NewType("SexSerialized", Sex, field=fields.Enum)
-# Email = NewType("Email", str, field=marshmallow.fields.Email)
+SexSerializedDc = NewType(
+    "SexSerializedDc", str, field=SexSerializedMa  # (Sex, by_value=False)
+)
