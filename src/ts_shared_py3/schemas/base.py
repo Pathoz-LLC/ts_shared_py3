@@ -13,7 +13,7 @@ from ..constants import (
     ISO_8601_DATETIME_FORMAT,
     ISO_8601_TIME_FORMAT,
 )
-from ..enums.sex import Sex, SexSerializedDc, SexSerializedMa
+from ..enums.sex import Sex, SexSerializedMa
 from ..enums.accountType import AccountType, AcctTypeSerializedMsg
 
 
@@ -63,7 +63,7 @@ class DataClassBaseSchema(Schema):
         timedelta: ma_fields.TimeDelta,
         decimal.Decimal: ma_fields.Decimal,
         # custom below
-        Sex: SexSerializedDc,
+        Sex: SexSerializedMa,
         AccountType: AcctTypeSerializedMsg,
     }
     # OPTIONS_CLASS = SchemaCfgOpts

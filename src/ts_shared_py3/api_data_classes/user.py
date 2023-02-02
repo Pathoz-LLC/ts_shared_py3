@@ -6,7 +6,7 @@ from marshmallow import Schema, fields
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import Sex, SexSerializedMa, SexSerializedDc
+from ..enums.sex import Sex, SexSerializedMa
 from ..enums.accountType import AccountType, AcctTypeSerialized, AcctTypeSerializedMsg
 
 import logging
@@ -27,7 +27,7 @@ class UserProfileMsg(BaseApiData):
     """
 
     dob: date = field(metadata=dict(required=True))
-    sex: Sex = SexSerializedMa(Sex.UNKNOWN)
+    sex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
 
     userId: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
@@ -109,8 +109,8 @@ class UserIdMessage(BaseApiData):
 class UserDemographicsMsg(BaseApiData):
     #
     dob: date = field(metadata=dict(required=True))
-    sex: Sex = SexSerializedDc(Sex.UNKNOWN)
-    preferredSex: Sex = SexSerializedDc(Sex.UNKNOWN)
+    sex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
+    preferredSex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
 
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
@@ -134,8 +134,8 @@ class UserBioMessage(BaseApiData):
     dob: date = field(metadata=dict(required=True))
     expiresOn: date = field(metadata=dict(required=True))
     lastLogin: date = field(metadata=dict(required=True))
-    sex: Sex = SexSerializedDc(Sex.UNKNOWN)
-    preferredSex: Sex = SexSerializedDc(Sex.UNKNOWN)
+    sex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
+    preferredSex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
 
     userId: str = field(default="", metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))

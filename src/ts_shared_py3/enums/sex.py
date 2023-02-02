@@ -73,7 +73,7 @@ class NdbSexProp(model.IntegerProperty):
         return Sex(value)
 
 
-class SexSerializedMa(fields.Enum):
+class SexSerializedMa(fields.Field):
     """Serialize sex to/from enum/string
     a marshmallow data-type
     SexSerializedDc (below) is a marshmallow_dataclass type
@@ -98,6 +98,6 @@ class SexSerializedMa(fields.Enum):
     #     return Sex.UNKNOWN
 
 
-SexSerializedDc = NewType(
-    "SexSerializedDc", str, field=SexSerializedMa  # (Sex, by_value=False)
-)
+# SexSerializedDc = NewType(
+#     "SexSerializedDc", str, field=SexSerializedMa  # (Sex, by_value=False)
+# )

@@ -8,7 +8,7 @@ from marshmallow import Schema  # , validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import Sex, SexSerializedDc, SexSerializedMa
+from ..enums.sex import Sex, SexSerializedMa
 
 
 @dataclass(base_schema=DataClassBaseSchema)
@@ -89,7 +89,7 @@ class IncidentRowMessage(BaseApiData):
     repUserIntervalReviseHistory: str = field(default="")
 
     reportingUserIntervalRowNum: int = field(default=0)
-    reportingUserSex: SexSerializedDc = SexSerializedMa(Sex.UNKNOWN)
+    reportingUserSex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
     # a sequential user ID starting from 1 to keep privacy
     reportingUserDisplayID: int = field(default=0, metadata=dict(required=True))
     # how many distinct incidents has this user had with prospect

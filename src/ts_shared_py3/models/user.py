@@ -28,8 +28,6 @@ from ..enums.accountType import AccountType, NdbAcctTypeProp
 # from webapp2_extras.appengine.auth.models import User as BaseUserExpando
 # from webapp2_extras.appengine.auth.models import UserToken as BaseUserToken
 
-from ..api_data_classes.user import UserProfileMsg
-
 
 class UserToken(object):  # BaseUserToken
     """tracks multi tokens for each user
@@ -301,6 +299,8 @@ class DbUser(BaseNdbModel):  # BaseUserExpando
         return user, bearerToken
 
     def asMsg(self):
+        from ..api_data_classes.user import UserProfileMsg
+
         msg = UserProfileMsg()
         msg.userId = self.user_id
         msg.email = self.email
