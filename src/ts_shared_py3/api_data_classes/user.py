@@ -1,13 +1,13 @@
 from datetime import date, datetime
 from typing import ClassVar, Type
-from dataclasses import field  # , fields, make_dataclass
+from dataclasses import field
 from marshmallow_dataclass import dataclass
 from marshmallow import Schema, fields
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
-from ..enums.sex import Sex, SexSerializedMa
-from ..enums.accountType import AccountType, AcctTypeSerialized, AcctTypeSerializedMsg
+from ..enums.sex import Sex
+from ..enums.accountType import AccountType
 
 import logging
 
@@ -27,7 +27,7 @@ class UserProfileMsg(BaseApiData):
     """
 
     dob: date = field(metadata=dict(required=True))
-    sex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
+    sex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
 
     userId: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
@@ -109,8 +109,8 @@ class UserIdMessage(BaseApiData):
 class UserDemographicsMsg(BaseApiData):
     #
     dob: date = field(metadata=dict(required=True))
-    sex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
-    preferredSex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
+    sex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
+    preferredSex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
 
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
@@ -134,8 +134,8 @@ class UserBioMessage(BaseApiData):
     dob: date = field(metadata=dict(required=True))
     expiresOn: date = field(metadata=dict(required=True))
     lastLogin: date = field(metadata=dict(required=True))
-    sex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
-    preferredSex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
+    sex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
+    preferredSex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
 
     userId: str = field(default="", metadata=dict(required=True))
     handle: str = field(default="", metadata=dict(required=True))
@@ -146,7 +146,9 @@ class UserBioMessage(BaseApiData):
     phone: str = field(default="", metadata=dict(required=True))
 
     photoUrl: str = field(default="", metadata=dict(required=True))
-    accountLevel: int = field(default=0, metadata=dict(required=True))
+    accountLevel: AccountType = field(
+        default=AccountType.FREE, metadata=dict(required=True, enum=AccountType)
+    )
     provider_id: str = field(default="", metadata=dict(required=True))
     authToken: str = field(default="", metadata=dict(required=True))
     refreshToken: str = field(default="", metadata=dict(required=True))

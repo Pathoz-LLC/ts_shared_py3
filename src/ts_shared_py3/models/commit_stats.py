@@ -2,7 +2,7 @@ from random import randint
 from typing import Union, TypeVar
 
 import google.cloud.ndb as ndb
-from ..enums.commitLevel import DisplayCommitLvl, NdbCommitLvlProp
+from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 import logging
 
 # usage
@@ -24,7 +24,7 @@ class CommitRollup(ndb.Model):
     count = ndb.IntegerProperty(default=0)
 
     def __str__(self):
-        dcl = DisplayCommitLvl(self.commitLevel)
+        dcl = CommitLevel_Display(self.commitLevel)
         return "{0}:{1}".format(dcl.name, self.count)
 
     @staticmethod
@@ -35,7 +35,7 @@ class CommitRollup(ndb.Model):
         if ALL_COMMITLVL_DFLTS == None:
             ALL_COMMITLVL_DFLTS = [
                 CommitRollup(commitLevel=dcl, count=0)
-                for dcl in DisplayCommitLvl.masterList()
+                for dcl in CommitLevel_Display.masterList()
             ]
 
         return ALL_COMMITLVL_DFLTS
@@ -84,7 +84,7 @@ class CommitStats(ndb.Model):
         # store to ndb
         # I was somehow getting double len counts lists????
         # assert len(self.counts) == DisplayCommitLvl.typeCount(), "Err: Corrupt rec w {0} rows".format(len(self.counts))
-        if len(self.counts) == DisplayCommitLvl.typeCount():
+        if len(self.counts) == CommitLevel_Display.typeCount():
             self.put()
         else:
             m = "Err: CommitStats rec {0} had {1} rows".format(

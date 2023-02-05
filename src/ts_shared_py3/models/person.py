@@ -9,7 +9,7 @@ from ..enums.createAndMonitor import (
     NdbCreateReasonProp,
     NdbMonitorStatusProp,
 )
-from ..enums.remind_freq import RemindFreq
+from ..enums.remind_freq import RemindFreq, ReminderFreqSerializedMa
 from ..enums.sex import Sex, NdbSexProp
 from .baseNdb_model import BaseNdbModel
 from .values_beh_cat import UserAnswerStats
@@ -18,7 +18,7 @@ from .values_beh_cat import UserAnswerStats
 # might set the 1st 5 vals of appUnique (mobile phone) as
 # parent/ancestor to group similar vals and keep ACID within that space
 from ..enums.sex import Sex
-from ..enums.commitLevel import DisplayCommitLvl, NdbCommitLvlProp
+from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 from ..api_data_classes.person import PersonLocalRowMsg
 from .person_keys import PersonKeys, KeyTypeEnum
 from .user import DbUser
@@ -174,7 +174,7 @@ class PersonLocal(BaseNdbModel):
     # store literal vals from:  common.models.devotion_level.DevotionLevel
     # devotionLevel= ndb.StringProperty(indexed=False, default='CASUAL')
     devotionLevel = NdbCommitLvlProp(
-        required=True, default=DisplayCommitLvl.CASUAL, indexed=False
+        required=True, default=CommitLevel_Display.CASUAL, indexed=False
     )
     imagePath = ndb.TextProperty(indexed=False, default="")
     # default to mid-range score of 50 for new prospects
@@ -225,7 +225,7 @@ class PersonLocal(BaseNdbModel):
 
     def _updateFromMsg(self, msg: PersonLocalRowMsg):
         self.nickname = msg.nickname
-        self.devotionLevel = DisplayCommitLvl.fromStr(msg.devotionLevel)
+        self.devotionLevel = CommitLevel_Display.fromStr(msg.devotionLevel)
         self.imagePath = msg.imagePath
         self.monitorStatus = MonitorStatus(msg.monitorStatus)
         self.reminderFrequency = RemindFreq(msg.reminderFrequency)

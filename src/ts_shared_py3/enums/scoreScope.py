@@ -57,7 +57,7 @@ class NdbScoreScopeProp(model.IntegerProperty):
 from marshmallow import fields, ValidationError
 
 
-class ScoreScopeSerialized(fields.Field):
+class ScoreScopeSerialized(fields.Enum):
     """"""
 
     def _serialize(
@@ -74,6 +74,3 @@ class ScoreScopeSerialized(fields.Field):
             return ScoreScope[value]
         except ValueError as error:
             raise ValidationError("") from error
-
-    def dump_default(self: ScoreScopeSerialized) -> ScoreScope:
-        return ScoreScope.APP_AND_USER

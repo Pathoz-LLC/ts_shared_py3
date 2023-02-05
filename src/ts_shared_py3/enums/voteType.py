@@ -62,23 +62,20 @@ class NdbVoteTypeProp(model.IntegerProperty):
 from marshmallow import fields, ValidationError
 
 
-class VoteTypeSerialized(fields.Field):
+class VoteTypeSerializedMa(fields.Enum):
     """Field that serializes to a string of sex name"""
 
     def _serialize(
-        self: VoteTypeSerialized, value: VoteType, attr, obj, **kwargs
+        self: VoteTypeSerializedMa, value: VoteType, attr, obj, **kwargs
     ) -> str:
         if value is None:
             return ""
         return value.name
 
     def _deserialize(
-        self: VoteTypeSerialized, value: str, attr, data, **kwargs
+        self: VoteTypeSerializedMa, value: str, attr, data, **kwargs
     ) -> VoteType:
         try:
             return VoteType[value]
         except ValueError as error:
             raise ValidationError("Pin codes must contain only digits.") from error
-
-    def dump_default(self: VoteTypeSerialized) -> VoteType:
-        return VoteType.CONCERN

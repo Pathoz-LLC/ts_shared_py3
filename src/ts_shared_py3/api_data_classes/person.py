@@ -6,17 +6,14 @@ from marshmallow import Schema, fields
 
 from .base import BaseApiData
 from ..enums.sex import Sex
-from ..enums.commitLevel import CommitLvlSerializedMsg, DisplayCommitLvl
-from ..enums.redFlag import RedFlagTypeSerializedMsg, RedFlagType
-from ..enums.remind_freq import ReminderFreqSerializedMsg, RemindFreq
-from ..enums.createAndMonitor import (
-    MonitorStatus,
-    MonitorStatusSerializedMsg,
-    CreateReason,
-)
+from ..enums.commitLevel import CommitLvlSerializedMa, CommitLevel_Display
+from ..enums.redFlag import RedFlagType, RedFlagTypeSerializedMa
+from ..enums.remind_freq import RemindFreq, ReminderFreqSerializedMa
+from ..enums.createAndMonitor import MonitorStatus, MonitorStatusSerialized
+from ..api_data_classes.user import *
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonRowMsg(BaseApiData):
     #
     # deweyG: RedFlagTypeSerializedMsg = field()
@@ -24,8 +21,9 @@ class PersonRowMsg(BaseApiData):
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
-    redFlagBits: RedFlagType = fields.Enum(RedFlagType)
-    sex: Sex = fields.Enum(Sex)
+
+    redFlagBits: int = field(default=0)
+    sex: Sex = field(default=Sex.NEVERSET, metadata={"enum": Sex})
 
     mobile: str = field(default="")
     first: str = field(default="")
@@ -39,11 +37,15 @@ class PersonRowMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonLocalRowMsg(BaseApiData):
     id: int = field()
-    commitLevel: DisplayCommitLvl = field()
-    reminderFrequency: RemindFreq = field()
+    commitLevel: CommitLevel_Display = field(
+        default=CommitLevel_Display.CASUAL, metadata={"enum": CommitLevel_Display}
+    )
+    reminderFrequency: RemindFreq = field(
+        default=RemindFreq.DAILY, metadata={"enum": RemindFreq}
+    )
 
     modDateTime: datetime = field(default_factory=lambda: datetime.now())
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
@@ -62,19 +64,25 @@ class PersonLocalRowMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonFullWithLocal(BaseApiData):
     """combines atts from PersonRowMsg & PersonLocalRowMsg
     into one payload
     """
 
-    sex: Sex
-    redFlagBits: RedFlagType = field()
-    commitLevel: DisplayCommitLvl = field()
-    monitorStatus: MonitorStatus = field()
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
+
+    sex: Sex = field(default=Sex.NEVERSET, metadata={"enum": Sex})
+
+    commitLevel: CommitLevel_Display = field(
+        default=CommitLevel_Display.CASUAL, metadata={"enum": CommitLevel_Display}
+    )
+    monitorStatus: MonitorStatus = field(
+        default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus}
+    )
+    redFlagBits: int = field(default=0)
 
     mobile: str = field(default="")
     first: str = field(default="")
@@ -96,7 +104,7 @@ class PersonFullWithLocal(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonListMsg(BaseApiData):
     items: list[PersonFullWithLocal] = field(default_factory=lambda: [])
 
@@ -104,7 +112,7 @@ class PersonListMsg(BaseApiData):
 
 
 # Message types below are primary public classes
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonIdMessage(BaseApiData):
     # returned for create
     perId: int = field(default=0, metadata=dict(required=True))
@@ -113,7 +121,7 @@ class PersonIdMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonPhoneMessage(BaseApiData):
     phone: str = field(default="")
     # auth_token: str = field(default="")
@@ -121,7 +129,7 @@ class PersonPhoneMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonIdentifierMessage(BaseApiData):
     perId: int = field(default=0, metadata=dict(required=True))
     idValue: str = field(default="")
@@ -130,7 +138,7 @@ class PersonIdentifierMessage(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class PersonMockDataMsg(BaseApiData):
     perId: int = field(default=0, metadata=dict(required=True))
     fileName: str = field(default="better")
@@ -152,7 +160,7 @@ PersonIdMessageCollection: list[PersonIdMessage]
 PersonPhoneMessageCollection: list[PersonPhoneMessage]
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class IncidentUpdateOpinionMessage(BaseApiData):
     pass
     #
@@ -170,12 +178,14 @@ class IncidentUpdateOpinionMessage(BaseApiData):
 #     # tellStrength: int = field(default=0, metadata=dict(required=True))
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class RedFlagReportMsg(BaseApiData):
     """ """
 
     beganDateTime: datetime = field()
-    flagType: RedFlagTypeSerializedMsg
+    flagType: RedFlagType = field(
+        default=RedFlagType.NEVERSET, metadata=dict(required=True, enum=RedFlagType)
+    )
 
     personId: int = field(default=0, metadata=dict(required=True))
     userId: str = field(default="")
@@ -186,7 +196,7 @@ class RedFlagReportMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
+@dataclass(base_schema=DataClassBaseSchema)
 class RedFlagSummaryMsg(BaseApiData):
     personId: int = field(default=0, metadata=dict(required=True))
     revengeCount: int = field(default=0, metadata=dict(required=True))

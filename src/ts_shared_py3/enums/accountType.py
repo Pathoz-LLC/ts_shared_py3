@@ -83,7 +83,7 @@ class NdbAcctTypeProp(model.IntegerProperty):
             return AccountType(int(value))
         elif not isinstance(value, AccountType):
             raise TypeError(
-                "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
+                "expected CommitLevel_Display, int, str or unicd, got %s" % repr(value)
             )
 
     def _to_base_type(self, sx: AccountType):
@@ -96,7 +96,7 @@ class NdbAcctTypeProp(model.IntegerProperty):
         return AccountType(value)
 
 
-class AcctTypeSerialized(fields.Field):
+class AcctTypeSerialized(fields.Enum):
     """serialization"""
 
     def _serialize(
@@ -118,6 +118,6 @@ class AcctTypeSerialized(fields.Field):
     #     return AccountType.FREE
 
 
-AcctTypeSerializedMsg = NewType(
-    "AcctTypeSerialized", AcctTypeSerialized, field=fields.Enum(AccountType)
-)
+# AcctTypeSerializedMsg = NewType(
+#     "AcctTypeSerialized", AcctTypeSerialized, field=fields.Enum(AccountType)
+# )

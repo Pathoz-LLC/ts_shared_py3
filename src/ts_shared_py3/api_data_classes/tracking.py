@@ -1,14 +1,14 @@
 from datetime import date
-
 from typing import ClassVar, Type
 from dataclasses import field
 from marshmallow_dataclass import dataclass
 
-from marshmallow import Schema  # , validate
+from marshmallow import Schema, fields
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
 from ..enums.sex import Sex, SexSerializedMa
+from ..enums.commitLevel import CommitLevel_Display
 
 
 @dataclass(base_schema=DataClassBaseSchema)
@@ -29,7 +29,9 @@ class CommitLvlUpdateMsg(BaseApiData):
     startDate: date = field()
     persId: int = field(default=0, metadata=dict(required=True))
     userId: int = field(default=0, metadata=dict(required=True))
-    commitLvlDisplayCd: str = field(default="")
+    commitLvlDisplayCd: CommitLevel_Display = field(
+        default=CommitLevel_Display.CASUAL, metadata={"enum": CommitLevel_Display}
+    )
     # notificationId serves for authentication b4 changing data
     notificationId: str = field(default="")
 
@@ -89,7 +91,8 @@ class IncidentRowMessage(BaseApiData):
     repUserIntervalReviseHistory: str = field(default="")
 
     reportingUserIntervalRowNum: int = field(default=0)
-    reportingUserSex: Sex = SexSerializedMa(default=Sex.UNKNOWN)
+    # reportingUserSex: Sex = SexSerializedMa(Sex, default=Sex.UNKNOWN)
+    reportingUserSex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
     # a sequential user ID starting from 1 to keep privacy
     reportingUserDisplayID: int = field(default=0, metadata=dict(required=True))
     # how many distinct incidents has this user had with prospect

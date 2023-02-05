@@ -14,7 +14,20 @@ from ..constants import (
     ISO_8601_TIME_FORMAT,
 )
 from ..enums.sex import Sex, SexSerializedMa
-from ..enums.accountType import AccountType, AcctTypeSerializedMsg
+from ..enums.accountType import AccountType, AcctTypeSerialized
+from ..enums.activityType import ActivityType, ActivTypeSerialized
+from ..enums.commitLevel import CommitLevel_Display, CommitLvlSerializedMa
+from ..enums.createAndMonitor import (
+    CreateReason,
+    CreateReasonSerializedMa,
+    MonitorStatus,
+    MonitorStatusSerialized,
+)
+from ..enums.pushNotifyType import NotifyType, NotifyTypeSerializedMa
+from ..enums.queued_work import QueuedWorkTyp, QwTypeSerialized
+from ..enums.redFlag import RedFlagType, RedFlagTypeSerializedMa
+from ..enums.remind_freq import RemindFreq, ReminderFreqSerializedMa
+from ..enums.voteType import VoteType, VoteTypeSerializedMa
 
 
 @dataclass
@@ -62,9 +75,18 @@ class DataClassBaseSchema(Schema):
         date: ma_fields.Date,
         timedelta: ma_fields.TimeDelta,
         decimal.Decimal: ma_fields.Decimal,
-        # custom below
+        # custom ENUMS below
         Sex: SexSerializedMa,
-        AccountType: AcctTypeSerializedMsg,
+        AccountType: AcctTypeSerialized,
+        ActivityType: ActivTypeSerialized,
+        CommitLevel_Display: CommitLvlSerializedMa,
+        CreateReason: CreateReasonSerializedMa,
+        MonitorStatus: MonitorStatusSerialized,
+        NotifyType: NotifyTypeSerializedMa,
+        QueuedWorkTyp: QwTypeSerialized,
+        RedFlagType: RedFlagTypeSerializedMa,
+        RemindFreq: ReminderFreqSerializedMa,
+        VoteType: VoteTypeSerializedMa,
     }
     # OPTIONS_CLASS = SchemaCfgOpts
 

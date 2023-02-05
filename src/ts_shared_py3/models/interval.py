@@ -5,7 +5,7 @@ import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
 
 from ..schemas.tracking import IntervalMessage
-from ..enums.commitLevel import DisplayCommitLvl
+from ..enums.commitLevel import CommitLevel_Display
 from ..utils.date_conv import (
     calcOverlappingDays,
     overlappingDates,
@@ -40,9 +40,9 @@ class Interval(BaseNdbModel):
 
     commitLevel = ndb.IntegerProperty(
         required=True,
-        default=DisplayCommitLvl.CASUAL.value,
+        default=CommitLevel_Display.CASUAL.value,
         indexed=False,
-        choices=[cl.value for cl in DisplayCommitLvl],
+        choices=[cl.value for cl in CommitLevel_Display],
     )
 
     def __str__(self):
@@ -51,8 +51,8 @@ class Interval(BaseNdbModel):
         )
 
     @property
-    def commitLevelEnum(self) -> DisplayCommitLvl:
-        return DisplayCommitLvl(self.commitLevel)
+    def commitLevelEnum(self) -> CommitLevel_Display:
+        return CommitLevel_Display(self.commitLevel)
 
     @property
     def comparableEndDate(self):
@@ -152,9 +152,11 @@ class Interval(BaseNdbModel):
             enDt = stDt + timedelta(days=daysToAdd)
             # avoid adjacent phases
             curTopCL = (
-                DisplayCommitLvl.BROKENUP if len(series) < 1 else series[0].commitLevel
+                CommitLevel_Display.BROKENUP
+                if len(series) < 1
+                else series[0].commitLevel
             )
-            uic = DisplayCommitLvl.random(butNot=curTopCL)
+            uic = CommitLevel_Display.random(butNot=curTopCL)
             # last row created is newest & should go at top
             itvl = Interval(startDate=stDt, endDate=enDt, commitLevel=uic)
             series.insert(0, itvl)
@@ -190,7 +192,7 @@ class Interval(BaseNdbModel):
         # print(im.commitLvl)
         # print("cmtLvl: {0}".format(im.commitLvl.displayCode))
         interval = Interval()
-        interval.commitLevel = DisplayCommitLvl.fromStr(im.commitLvl.displayCode)
+        interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)
         interval.startDate = im.startDate
         interval.endDate = im.endDate
         return interval

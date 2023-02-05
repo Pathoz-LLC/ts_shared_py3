@@ -84,7 +84,7 @@ class QueuedWorkTyp(AutoName):
             return "undefined"
 
 
-class QwTypeSerialized(fields.Field):
+class QwTypeSerialized(fields.Enum):
     """serialization"""
 
     def _serialize(

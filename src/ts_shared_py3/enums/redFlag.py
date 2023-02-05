@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import IntEnum, unique
 from marshmallow_dataclass import NewType
 from google.cloud.ndb import model
+from marshmallow import fields, ValidationError
 
 
 @unique
@@ -44,29 +45,23 @@ class NdbRedFlagProp(model.IntegerProperty):
         return RedFlagType(value)  # return RedFlagType
 
 
-from marshmallow import fields, ValidationError
-
-
-class _RedFlagTypeSerialized(fields.Field):
+class RedFlagTypeSerializedMa(fields.Enum):
     """"""
 
     def _serialize(
-        self: _RedFlagTypeSerialized, value: RedFlagType, attr, obj, **kwargs
+        self: RedFlagTypeSerializedMa, value: RedFlagType, attr, obj, **kwargs
     ) -> str:
         if value is None:
             return ""
         return value.name
 
     def _deserialize(
-        self: _RedFlagTypeSerialized, value: str, attr, data, **kwargs
+        self: RedFlagTypeSerializedMa, value: str, attr, data, **kwargs
     ) -> RedFlagType:
         try:
             return RedFlagType[value]
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: _RedFlagTypeSerialized) -> RedFlagType:
-        return RedFlagType.NEVERSET
 
-
-RedFlagTypeSerializedMsg = NewType("RedFlagTypeSerialized", str, _RedFlagTypeSerialized)
+# RedFlagTypeSerializedMsg = NewType("RedFlagTypeSerialized", str, _RedFlagTypeSerialized)

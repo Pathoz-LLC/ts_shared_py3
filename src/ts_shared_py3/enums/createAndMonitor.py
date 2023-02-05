@@ -12,6 +12,30 @@ class CreateReason(IntEnum):
     # TEST = 4
 
 
+class CreateReasonSerializedMa(fields.Enum):
+    """Serialize sex to/from enum/string
+    a marshmallow data-type
+    SexSerializedDc (below) is a marshmallow_dataclass type
+    """
+
+    def _serialize(
+        self: CreateReasonSerializedMa, value: CreateReason, attr, obj, **kwargs
+    ) -> str:
+        if value is None:
+            return ""
+        # print("SexSerialized:")
+        # print(value.name, type(value))
+        return value.name
+
+    def _deserialize(
+        self: CreateReasonSerializedMa, value: str, attr, data, **kwargs
+    ) -> CreateReason:
+        try:
+            return Sex[value]
+        except ValueError as error:
+            return CreateReason.RELATIONSHIP
+
+
 class MonitorStatus(IntEnum):
     """
     keep this Enum in sync w MON_STATUS_DICT below
@@ -72,28 +96,28 @@ class NdbMonitorStatusProp(model.IntegerProperty):
         return MonitorStatus(value)
 
 
-class _MonitorStatusSerialized(fields.Field):
+class MonitorStatusSerialized(fields.Enum):
     """"""
 
     def _serialize(
-        self: _MonitorStatusSerialized, value: MonitorStatus, attr, obj, **kwargs
+        self: MonitorStatusSerialized, value: MonitorStatus, attr, obj, **kwargs
     ) -> str:
         if value is None:
             return ""
         return value.name
 
     def _deserialize(
-        self: _MonitorStatusSerialized, value: str, attr, data, **kwargs
+        self: MonitorStatusSerialized, value: str, attr, data, **kwargs
     ) -> MonitorStatus:
         try:
             return MonitorStatus[value]
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: _MonitorStatusSerialized) -> MonitorStatus:
+    def dump_default(self: MonitorStatusSerialized) -> MonitorStatus:
         return MonitorStatus
 
 
-MonitorStatusSerializedMsg = NewType(
-    "MonitorStatusSerialized", str, field=_MonitorStatusSerialized
-)
+# MonitorStatusSerializedMsg = NewType(
+#     "MonitorStatusSerialized", str, field=_MonitorStatusSerialized
+# )

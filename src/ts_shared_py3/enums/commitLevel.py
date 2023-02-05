@@ -9,15 +9,12 @@ import random
 #
 from .activityType import ActivityType
 
-from ..api_data_classes.tracking import (
-    CommitLvlApiMsg,
-    DevotionLevelListMessage,
-)
+# from ..api_data_classes.tracking import CommitLvlApiMsg
 
 # even tho biz logic is driven from LogicCommitLvl, since client uses
-# display vals, the public api to this module is via DisplayCommitLvl
+# display vals, the public api to this module is via CommitLevel_Display
 # from ts_shared_py3.enums.commitLevel import (
-#     DisplayCommitLvl,
+#     CommitLevel_Display,
 #     LogicCommitLvl,
 #     NdbCommitLvlProp,
 # )
@@ -28,9 +25,9 @@ _DevotionLevelListMessage = None
 
 
 @unique
-class LogicCommitLvl(IntEnum):
-    """governs simplified logic for various DisplayCommitLvl
-    dialog & incidents are driven by these values, not the DisplayCommitLvl
+class CommitLevel_Logic(IntEnum):
+    """governs simplified logic for various CommitLevel_Display
+    dialog & incidents are driven by these values, not the CommitLevel_Display
     """
 
     PREDATING = 0
@@ -38,9 +35,9 @@ class LogicCommitLvl(IntEnum):
     NONEXCLUSIVE = 2
     EXCLUSIVE = 3
 
-    def __eq__(self: LogicCommitLvl, other: LogicCommitLvl) -> bool:
+    def __eq__(self: CommitLevel_Logic, other: CommitLevel_Logic) -> bool:
         # handle both int and object cases
-        if isinstance(other, LogicCommitLvl):
+        if isinstance(other, CommitLevel_Logic):
             return self.value == other.value
         elif isinstance(other, int):
             return self.value == other
@@ -48,21 +45,21 @@ class LogicCommitLvl(IntEnum):
             return False
 
     @property
-    def code(self: LogicCommitLvl) -> str:
+    def code(self: CommitLevel_Logic) -> str:
         return self.name
 
     @property
-    def isSeparated(self: LogicCommitLvl) -> bool:
+    def isSeparated(self: CommitLevel_Logic) -> bool:
         return self.value < 2
 
     @property
-    def isExclusive(self: LogicCommitLvl) -> bool:
+    def isExclusive(self: CommitLevel_Logic) -> bool:
         return self.value == 3
 
 
 @unique
-class DisplayCommitLvl(IntEnum):
-    """DisplayCommitLvl of user to prospect
+class CommitLevel_Display(IntEnum):
+    """CommitLevel_Display of user to prospect
     perhaps add PREDATING for future features?
     make all uppercase
     """
@@ -73,20 +70,20 @@ class DisplayCommitLvl(IntEnum):
     EXCLUSIVE_AS = 3  # assumed
     EXCLUSIVE_MA = 4  # mutually agreed
 
-    def __eq__(self: DisplayCommitLvl, other: DisplayCommitLvl) -> bool:
+    def __eq__(self: CommitLevel_Display, other: CommitLevel_Display) -> bool:
         # handle both int and object cases
-        if isinstance(other, DisplayCommitLvl):
+        if isinstance(other, CommitLevel_Display):
             return self.value == other.value
         elif isinstance(other, int):
             return self.value == other
         else:
             return False
 
-    def pointsFromDeltaToCurrent(self: DisplayCommitLvl, currentPhase) -> int:
+    def pointsFromDeltaToCurrent(self: CommitLevel_Display, currentPhase) -> int:
         # gap width between CL indicates how big the change
         if self == currentPhase:
             return 0  # no change
-        elif currentPhase == DisplayCommitLvl.BROKENUP:
+        elif currentPhase == CommitLevel_Display.BROKENUP:
             return -1  # breakup is severe no matter distance from prior CL
 
         posGap = max(self.value, currentPhase.value) - min(
@@ -108,11 +105,11 @@ class DisplayCommitLvl(IntEnum):
     # )
 
     @property
-    def code(self: DisplayCommitLvl) -> str:
+    def code(self: CommitLevel_Display) -> str:
         return self.name
 
     @property
-    def displayVal(self: DisplayCommitLvl) -> str:
+    def displayVal(self: CommitLevel_Display) -> str:
         val = self.value
         if val == 0:
             return "BrokenUp; On a Break"
@@ -128,7 +125,7 @@ class DisplayCommitLvl(IntEnum):
             return "?Non-Monogamous"
 
     @property
-    def iconName(self: DisplayCommitLvl) -> str:
+    def iconName(self: CommitLevel_Display) -> str:
         if self == 0:
             return "cl_brokenUp"
         elif self == 1:
@@ -143,31 +140,31 @@ class DisplayCommitLvl(IntEnum):
             return "cl_nonExclusive"
 
     @property
-    def logic(self: DisplayCommitLvl) -> LogicCommitLvl:
+    def logic(self: CommitLevel_Display) -> CommitLevel_Logic:
         val = self.value
         if val == 0:
-            return LogicCommitLvl.SEPARATED
+            return CommitLevel_Logic.SEPARATED
         elif val == 1:
-            return LogicCommitLvl.NONEXCLUSIVE
+            return CommitLevel_Logic.NONEXCLUSIVE
         elif val == 2:
-            return LogicCommitLvl.NONEXCLUSIVE
+            return CommitLevel_Logic.NONEXCLUSIVE
         elif val == 3:
-            return LogicCommitLvl.EXCLUSIVE
+            return CommitLevel_Logic.EXCLUSIVE
         elif val == 4:
-            return LogicCommitLvl.EXCLUSIVE
+            return CommitLevel_Logic.EXCLUSIVE
         else:
-            return LogicCommitLvl.EXCLUSIVE
+            return CommitLevel_Logic.EXCLUSIVE
 
     @property
-    def isExclusive(self: DisplayCommitLvl) -> bool:
+    def isExclusive(self: CommitLevel_Display) -> bool:
         return self.logic.isExclusive
 
     @property
-    def isSeparated(self: DisplayCommitLvl) -> bool:
+    def isSeparated(self: CommitLevel_Display) -> bool:
         return self.logic.isSeparated
 
     @property
-    def asApiMsg(self: DisplayCommitLvl):
+    def asApiMsg(self: CommitLevel_Display):
         raise Exception("missing schema CommitLvlApiMsg", "??")
         return CommitLvlApiMsg(
             displayCode=self.code,
@@ -177,7 +174,7 @@ class DisplayCommitLvl(IntEnum):
         )
 
     @property
-    def asDict(self: DisplayCommitLvl) -> map[str, str]:
+    def asDict(self: CommitLevel_Display) -> map[str, str]:
         return dict(
             code=self.code,
             displayVal=self.displayVal,
@@ -187,12 +184,12 @@ class DisplayCommitLvl(IntEnum):
 
     # methods
 
-    def isIncreaseFrom(self: DisplayCommitLvl, prior: DisplayCommitLvl) -> bool:
-        # assert isinstance(prior, DisplayCommitLvl), "invalid arg"
+    def isIncreaseFrom(self: CommitLevel_Display, prior: CommitLevel_Display) -> bool:
+        # assert isinstance(prior, CommitLevel_Display), "invalid arg"
         return self.value >= prior.value
 
     def newsTypeFromCommitLvlDelta(
-        self: DisplayCommitLvl, priorCl
+        self: CommitLevel_Display, priorCl
     ) -> Optional[ActivityType]:
         """self == latest/newest
         priorCL is one right before this latest cl
@@ -212,74 +209,74 @@ class DisplayCommitLvl(IntEnum):
     # static
 
     @staticmethod
-    def masterList() -> list[DisplayCommitLvl]:
+    def masterList() -> list[CommitLevel_Display]:
         # order by depth of commitment:   apart <---> exclusive
         return [
-            DisplayCommitLvl.BROKENUP,
-            DisplayCommitLvl.CASUAL,
-            DisplayCommitLvl.NONEXCLUSIVE,
-            DisplayCommitLvl.EXCLUSIVE_AS,
-            DisplayCommitLvl.EXCLUSIVE_MA,
+            CommitLevel_Display.BROKENUP,
+            CommitLevel_Display.CASUAL,
+            CommitLevel_Display.NONEXCLUSIVE,
+            CommitLevel_Display.EXCLUSIVE_AS,
+            CommitLevel_Display.EXCLUSIVE_MA,
         ]
 
     @staticmethod
     def orderedListCodes() -> list[str]:
         # highest index is max commitment
-        return [cl.name for cl in DisplayCommitLvl.masterList()]
+        return [cl.name for cl in CommitLevel_Display.masterList()]
 
     @staticmethod
-    def fromStr(str) -> DisplayCommitLvl:
+    def fromStr(str) -> CommitLevel_Display:
         # init instance from api msg value
         # should handle str or int
         if isinstance(str, (int, float)):
-            return DisplayCommitLvl(int(str))
+            return CommitLevel_Display(int(str))
         upStr = str.upper()
-        return DisplayCommitLvl[upStr]
+        return CommitLevel_Display[upStr]
 
     @staticmethod
-    def default() -> DisplayCommitLvl:
-        return DisplayCommitLvl.CASUAL
+    def default() -> CommitLevel_Display:
+        return CommitLevel_Display.CASUAL
 
     # @staticmethod
     # def commitLvlListAsApiMsg():
     #     # value returned by client API
     #     global _DevotionLevelListMessage
     #     if _DevotionLevelListMessage is None:
-    #         _DevotionLevelListMessage = DisplayCommitLvl._buildClientMsgList()
+    #         _DevotionLevelListMessage = CommitLevel_Display._buildClientMsgList()
     #     return _DevotionLevelListMessage
 
     @staticmethod
     def typeCount() -> int:
-        return 5  # len(DisplayCommitLvl.masterList())
+        return 5  # len(CommitLevel_Display.masterList())
 
     @staticmethod
-    def masterDict() -> map[str, DisplayCommitLvl]:
+    def masterDict() -> map[str, CommitLevel_Display]:
         # key'd by code
         global _CommitLevelMasterDict
         if _CommitLevelMasterDict is None:
-            for rec in DisplayCommitLvl.masterList():
+            for rec in CommitLevel_Display.masterList():
                 _CommitLevelMasterDict[rec.code] = rec
         return _CommitLevelMasterDict
 
     @staticmethod
-    def logicClSeparated() -> LogicCommitLvl:
-        return LogicCommitLvl.SEPARATED
+    def logicClSeparated() -> CommitLevel_Logic:
+        return CommitLevel_Logic.SEPARATED
 
     #
     @staticmethod
-    def random(butNot: DisplayCommitLvl = None) -> DisplayCommitLvl:
+    def random(butNot: CommitLevel_Display = None) -> CommitLevel_Display:
         if butNot is None:
-            butNot = DisplayCommitLvl.BROKENUP
+            butNot = CommitLevel_Display.BROKENUP
         val: int = random.randint(0, 4)
         while val == butNot:
             val = random.randint(0, 4)
-        return DisplayCommitLvl(val)
+        return CommitLevel_Display(val)
 
     # @staticmethod
     # def _buildClientMsgList():
     #     raise Exception("missing schema DevotionLevelListMessage", "??")
     #     msg = DevotionLevelListMessage()
-    #     for cl in DisplayCommitLvl.masterList():
+    #     for cl in CommitLevel_Display.masterList():
     #         # dl = CommitLvlApiMsg(displayCode=cl.code, logicCode=cl.logic.code
     #         #                      , displayValue=cl.displayVal, iconName=cl.iconName)
     #         msg.items.append(cl.asApiMsg)
@@ -294,56 +291,56 @@ class DisplayCommitLvl(IntEnum):
 
     # @staticmethod
     # def to_message(Model, property, field, value):
-    #     return value.value  # value arg is DisplayCommitLvl obj
+    #     return value.value  # value arg is CommitLevel_Display obj
 
     # @staticmethod
     # def to_model(Message, property, field, value):
-    #     from common.enums.commitLevel import DisplayCommitLvl
+    #     from common.enums.commitLevel import CommitLevel_Display
 
-    #     return DisplayCommitLvl(value)
+    #     return CommitLevel_Display(value)
 
 
 class NdbCommitLvlProp(model.IntegerProperty):
     def _validate(self, value: int):
         if isinstance(value, (int)):
-            return DisplayCommitLvl(value)
+            return CommitLevel_Display(value)
         elif isinstance(value, (bytes, str)):
-            return DisplayCommitLvl(int(value))
-        elif not isinstance(value, DisplayCommitLvl):
+            return CommitLevel_Display(int(value))
+        elif not isinstance(value, CommitLevel_Display):
             raise TypeError(
-                "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
+                "expected CommitLevel_Display, int, str or unicd, got %s" % repr(value)
             )
 
-    def _to_base_type(self, sx: DisplayCommitLvl):
-        # convert DisplayCommitLvl to int
+    def _to_base_type(self, sx: CommitLevel_Display):
+        # convert CommitLevel_Display to int
         if isinstance(sx, int):
             return sx
         return int(sx.value)
 
     def _from_base_type(self, value: int):
-        return DisplayCommitLvl(value)  # return DisplayCommitLvl
+        return CommitLevel_Display(value)  # return CommitLevel_Display
 
 
-class _CommitLvlSerialized(fields.Field):
+class CommitLvlSerializedMa(fields.Enum):
     """Field that serializes to a string of sex name"""
 
     def _serialize(
-        self: _CommitLvlSerialized, value: DisplayCommitLvl, attr, obj, **kwargs
+        self: CommitLvlSerializedMa, value: CommitLevel_Display, attr, obj, **kwargs
     ) -> str:
         if value is None:
             return ""
         return value.name
 
     def _deserialize(
-        self: _CommitLvlSerialized, value: str, attr, data, **kwargs
-    ) -> DisplayCommitLvl:
+        self: CommitLvlSerializedMa, value: str, attr, data, **kwargs
+    ) -> CommitLevel_Display:
         try:
-            return DisplayCommitLvl[value]
+            return CommitLevel_Display[value]
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: _CommitLvlSerialized) -> DisplayCommitLvl:
-        return DisplayCommitLvl.NONEXCLUSIVE
+    def dump_default(self: CommitLvlSerializedMa) -> CommitLevel_Display:
+        return CommitLevel_Display.NONEXCLUSIVE
 
 
-CommitLvlSerializedMsg = NewType("CommitLvlSerialized", str, _CommitLvlSerialized)
+# CommitLvlSerializedMsg = NewType("CommitLvlSerialized", str, _CommitLvlSerialized)

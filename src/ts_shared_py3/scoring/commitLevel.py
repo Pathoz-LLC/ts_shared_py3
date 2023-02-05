@@ -1,4 +1,4 @@
-from ts_shared_py3.enums.commitLevel import DisplayCommitLvl
+from ts_shared_py3.enums.commitLevel import CommitLevel_Display
 
 _ALL_AS_DICT = None
 
@@ -20,12 +20,14 @@ def getCommitLevelImpact(fromPhaseClValue: int, toPhaseClValue: int) -> float:
 
 
 class CommitLvlWeight(object):
-    def __init__(self, frm: DisplayCommitLvl, to: DisplayCommitLvl, weight: float):
-        assert isinstance(frm, DisplayCommitLvl)
-        assert isinstance(to, DisplayCommitLvl)
+    def __init__(
+        self, frm: CommitLevel_Display, to: CommitLevel_Display, weight: float
+    ):
+        assert isinstance(frm, CommitLevel_Display)
+        assert isinstance(to, CommitLevel_Display)
 
-        self.frm: DisplayCommitLvl = frm
-        self.to: DisplayCommitLvl = to
+        self.frm: CommitLevel_Display = frm
+        self.to: CommitLevel_Display = to
         self.weight: float = float(weight)
 
     @property
@@ -40,30 +42,54 @@ class CommitLvlWeight(object):
 
 # document all weights for commitment level transitions from & to
 _ALL_FROM_TO_CL_WEIGHTS = [
-    CommitLvlWeight(DisplayCommitLvl.BROKENUP, DisplayCommitLvl.CASUAL, 0.25),
-    CommitLvlWeight(DisplayCommitLvl.BROKENUP, DisplayCommitLvl.NONEXCLUSIVE, 0.45),
-    CommitLvlWeight(DisplayCommitLvl.BROKENUP, DisplayCommitLvl.EXCLUSIVE_AS, 0.65),
-    CommitLvlWeight(DisplayCommitLvl.BROKENUP, DisplayCommitLvl.EXCLUSIVE_MA, 0.85),
+    CommitLvlWeight(CommitLevel_Display.BROKENUP, CommitLevel_Display.CASUAL, 0.25),
+    CommitLvlWeight(
+        CommitLevel_Display.BROKENUP, CommitLevel_Display.NONEXCLUSIVE, 0.45
+    ),
+    CommitLvlWeight(
+        CommitLevel_Display.BROKENUP, CommitLevel_Display.EXCLUSIVE_AS, 0.65
+    ),
+    CommitLvlWeight(
+        CommitLevel_Display.BROKENUP, CommitLevel_Display.EXCLUSIVE_MA, 0.85
+    ),
     # casual
-    CommitLvlWeight(DisplayCommitLvl.CASUAL, DisplayCommitLvl.BROKENUP, -0.2),
-    CommitLvlWeight(DisplayCommitLvl.CASUAL, DisplayCommitLvl.NONEXCLUSIVE, 0.2),
-    CommitLvlWeight(DisplayCommitLvl.CASUAL, DisplayCommitLvl.EXCLUSIVE_AS, 0.6),
-    CommitLvlWeight(DisplayCommitLvl.CASUAL, DisplayCommitLvl.EXCLUSIVE_MA, 0.8),
+    CommitLvlWeight(CommitLevel_Display.CASUAL, CommitLevel_Display.BROKENUP, -0.2),
+    CommitLvlWeight(CommitLevel_Display.CASUAL, CommitLevel_Display.NONEXCLUSIVE, 0.2),
+    CommitLvlWeight(CommitLevel_Display.CASUAL, CommitLevel_Display.EXCLUSIVE_AS, 0.6),
+    CommitLvlWeight(CommitLevel_Display.CASUAL, CommitLevel_Display.EXCLUSIVE_MA, 0.8),
     # NONEXCLUSIVE
-    CommitLvlWeight(DisplayCommitLvl.NONEXCLUSIVE, DisplayCommitLvl.BROKENUP, -0.4),
-    CommitLvlWeight(DisplayCommitLvl.NONEXCLUSIVE, DisplayCommitLvl.CASUAL, -0.3),
-    CommitLvlWeight(DisplayCommitLvl.NONEXCLUSIVE, DisplayCommitLvl.EXCLUSIVE_AS, 0.4),
-    CommitLvlWeight(DisplayCommitLvl.NONEXCLUSIVE, DisplayCommitLvl.EXCLUSIVE_MA, 0.7),
+    CommitLvlWeight(
+        CommitLevel_Display.NONEXCLUSIVE, CommitLevel_Display.BROKENUP, -0.4
+    ),
+    CommitLvlWeight(CommitLevel_Display.NONEXCLUSIVE, CommitLevel_Display.CASUAL, -0.3),
+    CommitLvlWeight(
+        CommitLevel_Display.NONEXCLUSIVE, CommitLevel_Display.EXCLUSIVE_AS, 0.4
+    ),
+    CommitLvlWeight(
+        CommitLevel_Display.NONEXCLUSIVE, CommitLevel_Display.EXCLUSIVE_MA, 0.7
+    ),
     # EXCLUSIVE_AS
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_AS, DisplayCommitLvl.BROKENUP, -0.8),
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_AS, DisplayCommitLvl.CASUAL, -0.6),
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_AS, DisplayCommitLvl.NONEXCLUSIVE, -0.4),
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_AS, DisplayCommitLvl.EXCLUSIVE_MA, 0.85),
+    CommitLvlWeight(
+        CommitLevel_Display.EXCLUSIVE_AS, CommitLevel_Display.BROKENUP, -0.8
+    ),
+    CommitLvlWeight(CommitLevel_Display.EXCLUSIVE_AS, CommitLevel_Display.CASUAL, -0.6),
+    CommitLvlWeight(
+        CommitLevel_Display.EXCLUSIVE_AS, CommitLevel_Display.NONEXCLUSIVE, -0.4
+    ),
+    CommitLvlWeight(
+        CommitLevel_Display.EXCLUSIVE_AS, CommitLevel_Display.EXCLUSIVE_MA, 0.85
+    ),
     # EXCLUSIVE_MA
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_MA, DisplayCommitLvl.BROKENUP, -0.9),
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_MA, DisplayCommitLvl.CASUAL, -0.7),
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_MA, DisplayCommitLvl.NONEXCLUSIVE, -0.6),
-    CommitLvlWeight(DisplayCommitLvl.EXCLUSIVE_MA, DisplayCommitLvl.EXCLUSIVE_AS, 0.5),
+    CommitLvlWeight(
+        CommitLevel_Display.EXCLUSIVE_MA, CommitLevel_Display.BROKENUP, -0.9
+    ),
+    CommitLvlWeight(CommitLevel_Display.EXCLUSIVE_MA, CommitLevel_Display.CASUAL, -0.7),
+    CommitLvlWeight(
+        CommitLevel_Display.EXCLUSIVE_MA, CommitLevel_Display.NONEXCLUSIVE, -0.6
+    ),
+    CommitLvlWeight(
+        CommitLevel_Display.EXCLUSIVE_MA, CommitLevel_Display.EXCLUSIVE_AS, 0.5
+    ),
 ]
 
 

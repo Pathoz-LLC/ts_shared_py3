@@ -90,7 +90,7 @@ class NdbActivityTypeProp(model.IntegerProperty):
             return ActivityType(int(value))
         elif not isinstance(value, ActivityType):
             raise TypeError(
-                "expected DisplayCommitLvl, int, str or unicd, got %s" % repr(value)
+                "expected CommitLevel_Display, int, str or unicd, got %s" % repr(value)
             )
 
     def _to_base_type(self, sx: ActivityType):
@@ -103,7 +103,7 @@ class NdbActivityTypeProp(model.IntegerProperty):
         return ActivityType(value)
 
 
-class ActivTypeSerialized(fields.Field):
+class ActivTypeSerialized(fields.Enum):
     """serialization"""
 
     def _serialize(
@@ -121,5 +121,5 @@ class ActivTypeSerialized(fields.Field):
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: ActivTypeSerialized) -> ActivityType:
-        return ActivityType.BEHAVIOR_REPORTED
+    # def dump_default(self: ActivTypeSerialized) -> ActivityType:
+    #     return ActivityType.BEHAVIOR_REPORTED

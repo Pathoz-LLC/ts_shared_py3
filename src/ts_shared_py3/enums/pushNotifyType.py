@@ -203,19 +203,21 @@ class NdbNotifyTypeProp(model.IntegerProperty):
         return NotifyType(value)
 
 
-class NotifyTypeSerialized(fields.Field):
+class NotifyTypeSerializedMa(fields.Enum):
     """"""
 
-    def _serialize(self: NotifyTypeSerialized, value: NotifyType, attr, obj, **kwargs):
+    def _serialize(
+        self: NotifyTypeSerializedMa, value: NotifyType, attr, obj, **kwargs
+    ):
         if value is None:
             return ""
         return value.name
 
-    def _deserialize(self: NotifyTypeSerialized, value: str, attr, data, **kwargs):
+    def _deserialize(self: NotifyTypeSerializedMa, value: str, attr, data, **kwargs):
         try:
             return NotifyType[value]
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: NotifyTypeSerialized) -> NotifyType:
-        return NotifyType.CHAT_MSG_RECEIVED
+    # def dump_default(self: NotifyTypeSerializedMa) -> NotifyType:
+    #     return NotifyType.CHAT_MSG_RECEIVED

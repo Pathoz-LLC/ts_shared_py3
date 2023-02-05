@@ -8,7 +8,7 @@ from google.cloud.ndb import model
 
 #
 from ..enums.alloc import AllocType  # , AllocLookup
-from ..enums.commitLevel import DisplayCommitLvl
+from ..enums.commitLevel import CommitLevel_Display
 
 # from .alloc import AllocType
 from ..constants import IMPACT_WEIGHT_DECIMALS
@@ -521,10 +521,10 @@ class ScoreRuleType(IntEnum):
 
     @staticmethod
     def fromPhaseChange(
-        currentPhase: DisplayCommitLvl, priorPhase: DisplayCommitLvl
+        currentPhase: CommitLevel_Display, priorPhase: CommitLevel_Display
     ) -> ScoreRuleType:
-        assert isinstance(currentPhase, DisplayCommitLvl), "invalid arg"
-        if currentPhase == DisplayCommitLvl.BROKENUP:
+        assert isinstance(currentPhase, CommitLevel_Display), "invalid arg"
+        if currentPhase == CommitLevel_Display.BROKENUP:
             return ScoreRuleType.BREAKUP
 
         if currentPhase.value < priorPhase.value:
@@ -599,7 +599,7 @@ class NdbScoringRuleProp(model.IntegerProperty):
 from marshmallow import fields, ValidationError
 
 
-class ScoreRuleTypeSerialized(fields.Field):
+class ScoreRuleTypeSerialized(fields.Enum):
     """"""
 
     def _serialize(

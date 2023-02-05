@@ -73,7 +73,7 @@ class NdbSexProp(model.IntegerProperty):
         return Sex(value)
 
 
-class SexSerializedMa(fields.Field):
+class SexSerializedMa(fields.Enum):
     """Serialize sex to/from enum/string
     a marshmallow data-type
     SexSerializedDc (below) is a marshmallow_dataclass type
@@ -82,8 +82,8 @@ class SexSerializedMa(fields.Field):
     def _serialize(self: SexSerializedMa, value: Sex, attr, obj, **kwargs) -> str:
         if value is None:
             return ""
-        print("SexSerialized:")
-        print(value.name, type(value))
+        # print("SexSerialized:")
+        # print(value.name, type(value))
         return value.name
 
     def _deserialize(self: SexSerializedMa, value: str, attr, data, **kwargs) -> Sex:
@@ -92,10 +92,6 @@ class SexSerializedMa(fields.Field):
         except ValueError as error:
             return Sex.UNKNOWN
             # raise ValidationError("Pin codes must contain only digits.") from error
-
-    # @property
-    # def dump_default(self: SexSerializedMa) -> Sex:
-    #     return Sex.UNKNOWN
 
 
 # SexSerializedDc = NewType(

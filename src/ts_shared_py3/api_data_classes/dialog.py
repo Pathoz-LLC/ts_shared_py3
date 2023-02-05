@@ -6,6 +6,7 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
+from ..enums.commitLevel import CommitLevel_Display
 from ..api_data_classes.tracking import TrackingPayloadMsgDc
 
 
@@ -16,7 +17,9 @@ class RelationshipPhaseSetupMessage(BaseApiData):
     use_id: str = field(default="", metadata=dict(required=True))
     per_id: int = field(default=0, metadata=dict(required=True))
     personName: str = field(default="", metadata=dict(required=True))
-    curCommitLevel: str = field(default="", metadata=dict(required=True))
+    curCommitLevel: CommitLevel_Display = field(
+        default=CommitLevel_Display.CASUAL, metadata=dict(enum=CommitLevel_Display)
+    )
     breakupCount: int = field(default=0, metadata=dict(required=True))
 
 

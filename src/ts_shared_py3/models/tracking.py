@@ -7,7 +7,7 @@ from typing import Optional, Iterable  # List
 #
 from ..scoring.commBehImpactConsenus import CommImpactConsensus
 from ..models.baseNdb_model import BaseNdbModel
-from ..enums.commitLevel import DisplayCommitLvl, LogicCommitLvl
+from ..enums.commitLevel import CommitLevel_Display, CommitLevel_Logic
 from .interval import Interval
 from ..utils.date_conv import calcOverlappingDays, dateTime_to_epoch
 from ..constants import DISTANT_FUTURE_DATE
@@ -103,26 +103,26 @@ class Tracking(BaseNdbModel):
     @property
     def daysBrokenUp(self: Tracking) -> int:
         brokeIntervals = [
-            i for i in self.intervals if i.commitLevel == DisplayCommitLvl.BROKENUP
+            i for i in self.intervals if i.commitLevel == CommitLevel_Display.BROKENUP
         ]
         if len(brokeIntervals) < 1:
             return 0
         return sum([i.dayCount for i in brokeIntervals])
 
     @property
-    def currentLogicCommitLvl(self: Tracking) -> LogicCommitLvl:
+    def currentLogicCommitLvl(self: Tracking) -> CommitLevel_Logic:
         """return CURRENT (based on most recent phase)
         logic/abstract commitment level
         """
         if self.intervalCount < 1:
-            return DisplayCommitLvl.logicClSeparated()
+            return CommitLevel_Display.logicClSeparated()
         return self.intervals[0].commitLevel.logic
 
     @property
-    def currentDisplayCommitLvl(self: Tracking) -> DisplayCommitLvl:
+    def currentDisplayCommitLvl(self: Tracking) -> CommitLevel_Display:
         """return CURRENT (based on most recent phase)"""
         if self.intervalCount < 1:
-            return DisplayCommitLvl.default()
+            return CommitLevel_Display.default()
         return self.intervals[0].commitLevel
 
     @property
