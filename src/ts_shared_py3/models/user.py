@@ -11,25 +11,13 @@ import google.cloud.ndb as ndb
 # from firebase_admin import auth
 # from google.auth.credentials import Credentials, CredentialsWithTokenUri
 
-
+from user_webapp import WaUserToken, WaUser
 from .baseNdb_model import BaseNdbModel
 from ..enums.sex import Sex, NdbSexProp
 from ..enums.accountType import AccountType, NdbAcctTypeProp
 
-# from ..utils.date_conv import message_to_date, date_to_message
 
-# FIXME  figure out flask replacement for webapp2 features disabled below
-
-# from webapp2_extras import security
-
-# source for these classes is here:
-# https://webapp-improved.appspot.com/_modules/webapp2_extras/appengine/auth/models.html
-# from webapp2_extras.appengine.auth.models import Unique
-# from webapp2_extras.appengine.auth.models import User as BaseUserExpando
-# from webapp2_extras.appengine.auth.models import UserToken as BaseUserToken
-
-
-class UserToken(object):  # BaseUserToken
+class UserToken(WaUserToken):  # BaseUserToken
     """tracks multi tokens for each user
     they can be logged in with several devices?
     """
@@ -139,7 +127,7 @@ FIRAUTH_FIELDNAMES_TO_STORE = {
 }
 
 
-class DbUser(BaseNdbModel):  # BaseUserExpando
+class DbUser(WaUser):  # BaseUserExpando
     """
     user rec; includes data from social profile
         as an expando table, it will store whatever fields you attach

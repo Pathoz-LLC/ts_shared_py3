@@ -98,7 +98,8 @@ class DataClassBaseSchema(Schema):
     ):
         print("Dewey 6677")
         print(type(loadedDataAsDict))
-        return self.__model__(**loadedDataAsDict)
+        # return self.__model__(**loadedDataAsDict)
+        return loadedDataAsDict
 
     # def handle_error(self: DataClassBaseSchema, exc, data: dict[AnyStr, Any], **kwargs):
     #     """Log and raise our custom exception when (de)serialization fails."""
