@@ -16,9 +16,10 @@ from ..schemas.base import DataClassBaseSchema
 class BaseApiData:
     """simple dict of data-types from JSON payload"""
 
-    def __init__(self, **kwargs) -> None:
-        # print("blah:")
-        # print(type(kwargs))
+    def __init__(self: BaseApiData, **kwargs: dict[str, Any]) -> None:
+        print("Dewey 3344:")
+        print(type(kwargs))
+        print(len(kwargs))
         if len(kwargs) > 0:
             self._updateAttsFromDict(kwargs)
 

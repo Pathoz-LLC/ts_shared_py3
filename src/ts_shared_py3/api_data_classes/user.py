@@ -29,31 +29,31 @@ class UserProfileMsg(BaseApiData):
     dob: date = field(metadata=dict(required=True))
     sex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
 
-    userId: str = field(default="", metadata=dict(required=True))
+    userId: str = field(default="", metadata=dict(required=False))
     email: str = field(default="", metadata=dict(required=True))
-    fullNameOrHandle: str = field(default="", metadata=dict(required=True))
-    photoUrl: str = field(default="", metadata=dict(required=True))
-    city: str = field(default="", metadata=dict(required=True))
-    state: str = field(default="", metadata=dict(required=True))
-    zip: str = field(default="", metadata=dict(required=True))
-
     first: str = field(default="", metadata=dict(required=True))
     last: str = field(default="", metadata=dict(required=True))
+    zip: str = field(default="", metadata=dict(required=True))
+    # optional bio fields
+    fullNameOrHandle: str = field(default="", metadata=dict(required=False))
+    photoUrl: str = field(default="", metadata=dict(required=False))
+    city: str = field(default="", metadata=dict(required=False))
+    state: str = field(default="", metadata=dict(required=False))
 
     # 0==IOS;  1==Android, 2==Web
     pushNotifyDeviceType: int = field(default=0, metadata=dict(required=True))
 
-    deviceModel: str = field(default="na", metadata=dict(required=True))
+    deviceModel: str = field(default="na", metadata=dict(required=False))
     deviceID: str = field(default="", metadata=dict(required=True))
 
-    promoCode: str = field(default="", metadata=dict(required=True))
+    promoCode: str = field(default="", metadata=dict(required=False))
     authProvider: str = field(default="email", metadata=dict(required=True))
 
     jwt: str = field(default="", metadata=dict(required=True))
     latitude: float = field(default=0.0)
     longitude: float = field(default=0.0)
     # FIXME
-    # accountLevel: AcctTypeSerialized = AcctTypeSerializedMsg(AccountType.FREE)
+    # accountLevel: AccountType = field(default=AccountType.FREE, metadata={"enum": AccountType})
     accountLevel: float = field(default=0.0)
 
     #

@@ -2,7 +2,7 @@ from __future__ import annotations
 import decimal
 from datetime import datetime, date, time, timedelta
 from marshmallow_dataclass import dataclass
-from marshmallow import Schema, post_load
+from marshmallow import Schema, post_load, SchemaOpts
 import marshmallow.fields as ma_fields
 from typing import Any, AnyStr
 
@@ -30,22 +30,24 @@ from ..enums.remind_freq import RemindFreq, ReminderFreqSerializedMa
 from ..enums.voteType import VoteType, VoteTypeSerializedMa
 
 
+class SchemaMetaOpts(SchemaOpts):
+    """Same as the default class Meta options, but adds "name" and
+    "plural_name" options for enveloping.
+    """
+
+    def __init__(self, meta, **kwargs):
+        SchemaOpts.__init__(self, meta, **kwargs)
+        self.dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%d"
+        self.datetimeformat = ISO_8601_DATETIME_FORMAT
+        self.timeformat = ISO_8601_TIME_FORMAT
+        # self.name = getattr(meta, "name", None)
+        # self.plural_name = getattr(meta, "plural_name", self.name)
+
+
 @dataclass
 class _ReplaceWithRealDataClass:
-    # niu = ma_fields.Enum(Sex.UNKNOWN)
+    # niu: str = field(default="", metadata=dict(required=False))
     pass
-
-
-# class SchemaCfgOpts(SchemaOpts):
-#     """Same as the default class Meta options, but adds "name" and
-#     "plural_name" options for enveloping.
-#     """
-
-#     def __init__(self, meta, **kwargs):
-#         SchemaOpts.__init__(self, meta, **kwargs)
-#         self.dateformat = getattr(meta, "dateformat", None)
-#         self.datetimeformat = getattr(meta, "datetimeformat", None)
-#         self.timeformat = getattr(meta, "timeformat", None)
 
 
 class DataClassBaseSchema(Schema):
@@ -60,6 +62,7 @@ class DataClassBaseSchema(Schema):
     """
 
     __model__ = _ReplaceWithRealDataClass
+    OPTIONS_CLASS = SchemaMetaOpts
     TYPE_MAPPING = {
         str: ma_fields.String,
         bytes: ma_fields.String,
@@ -88,17 +91,13 @@ class DataClassBaseSchema(Schema):
         RemindFreq: ReminderFreqSerializedMa,
         VoteType: VoteTypeSerializedMa,
     }
-    # OPTIONS_CLASS = SchemaCfgOpts
-
-    class Meta:
-        dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%d"
-        datetimeformat = ISO_8601_DATETIME_FORMAT
-        timeformat = ISO_8601_TIME_FORMAT
 
     @post_load
     def _makeModelObj(
         self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
     ):
+        print("Dewey 6677")
+        print(type(loadedDataAsDict))
         return self.__model__(**loadedDataAsDict)
 
     # def handle_error(self: DataClassBaseSchema, exc, data: dict[AnyStr, Any], **kwargs):
