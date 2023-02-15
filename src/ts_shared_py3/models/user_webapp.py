@@ -1,4 +1,6 @@
 import time
+import secrets
+
 import google.cloud.ndb as ndb
 from google.cloud.ndb import model
 
@@ -58,7 +60,9 @@ class WaUnique(model.Model):
             return e.put() if not e.key.get() else None
 
         entity = cls(key=model.Key(cls, value))
-        return model.transaction(lambda: txn(entity)) is not None
+        entity.put()
+        return True
+        # return model.transaction(lambda: txn(entity)) is not None
 
     @classmethod
     def create_multi(cls, values):
@@ -106,7 +110,7 @@ class WaUserToken(model.Model):
 
     created = model.DateTimeProperty(auto_now_add=True)
     updated = model.DateTimeProperty(auto_now=True)
-    user = model.StringProperty(required=True, indexed=False)
+    user = model.TextProperty(required=True, indexed=False)
     subject = model.StringProperty(required=True)
     token = model.StringProperty(required=True)
 
@@ -143,7 +147,7 @@ class WaUserToken(model.Model):
             The newly created :class:`UserToken`.
         """
         user = str(user)
-        token = token or security.generate_random_string(entropy=128)
+        token = token or secrets.token_urlsafe(128)
         key = cls.get_key(user, subject, token)
         entity = cls(key=key, user=user, subject=subject, token=token)
         entity.put()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 import time
 from datetime import date, datetime, timedelta
+import secrets
 import logging
 
 #
@@ -11,7 +12,7 @@ import google.cloud.ndb as ndb
 # from firebase_admin import auth
 # from google.auth.credentials import Credentials, CredentialsWithTokenUri
 
-from user_webapp import WaUserToken, WaUser
+from .user_webapp import WaUserToken, WaUser, WaUnique
 from .baseNdb_model import BaseNdbModel
 from ..enums.sex import Sex, NdbSexProp
 from ..enums.accountType import AccountType, NdbAcctTypeProp
@@ -24,7 +25,7 @@ class UserToken(WaUserToken):  # BaseUserToken
 
     SUBJECT_BEARER = "bearer"
 
-    # unique_model = Unique
+    unique_model = WaUnique
     bearer_token_timedelta = timedelta(days=365)
 
     refresh_token = ndb.StringProperty()
@@ -33,7 +34,7 @@ class UserToken(WaUserToken):  # BaseUserToken
     def create(cls, user, subject, token=None):
         if subject == cls.SUBJECT_BEARER:
             user = str(user)
-            token = token or security.generate_random_string(entropy=128)
+            token = token or secrets.token_urlsafe(128)
 
             # Bearer tokens must be unique on their own, without a user scope.
             key = cls.get_key(user, subject, token)
@@ -42,7 +43,7 @@ class UserToken(WaUserToken):  # BaseUserToken
                 user=user,
                 subject=subject,
                 token=token,
-                refresh_token=security.generate_random_string(entropy=128),
+                refresh_token=secrets.token_urlsafe(128),
             )
 
             # Refresh tokens must be unique
