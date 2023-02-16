@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Tuple
 import time
 from datetime import date, datetime, timedelta
 import secrets
@@ -7,10 +8,7 @@ import logging
 #
 import google.cloud.ndb as ndb
 
-# from google.cloud.ndb.utils import logging_debug
-#
-# from firebase_admin import auth
-# from google.auth.credentials import Credentials, CredentialsWithTokenUri
+from ts_shared_py3.api_data_classes.user import UserProfileMsg, UserIdMessage
 
 from .user_webapp import WaUserToken, WaUser, WaUnique
 from .baseNdb_model import BaseNdbModel
@@ -31,7 +29,7 @@ class UserToken(WaUserToken):  # BaseUserToken
     refresh_token = ndb.StringProperty()
 
     @classmethod
-    def create(cls, user, subject, token=None):
+    def create(cls, user, subject, token=None) -> UserToken:
         if subject == cls.SUBJECT_BEARER:
             user = str(user)
             token = token or secrets.token_urlsafe(128)
@@ -69,7 +67,7 @@ class UserToken(WaUserToken):  # BaseUserToken
         return entity
 
     @classmethod
-    def _extractSignatureFromJwt(cls, jwt):
+    def _extractSignatureFromJwt(cls, jwt) -> str:
         return jwt.split(".")[2]
 
     def expires_at(self):
@@ -179,7 +177,9 @@ class DbUser(WaUser):  # BaseUserExpando
     pushNotifyDeviceType = ndb.IntegerProperty(indexed=False, default=0)
 
     @classmethod
-    def createFromProfileMsg(cls, msg, firUserAsDict):
+    def createFromProfileMsg(
+        cls, msg: UserProfileMsg, firUserAsDict
+    ) -> Tuple[DbUser, str]:
         # sign-up (create account)
 
         user = cls.loadByEmailOrId(firAuthUserId=msg.userId)
@@ -246,7 +246,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return user, bearerToken
 
     @staticmethod
-    def updateFromProfileMsg(msg):
+    def updateFromProfileMsg(msg: UserProfileMsg) -> DbUser:
         # user edited profile
         user = DbUser.loadByEmailOrId(firAuthUserId=msg.userId)
         if user is None:
@@ -274,7 +274,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return user
 
     @staticmethod
-    def updateLastLogin(userId, jwt):
+    def updateLastLogin(userId: str, jwt: str) -> Tuple[DbUser, str]:
         # refresh token & store login date
 
         authToken = DbUser.token_model.create(userId, "auth", jwt)
@@ -287,7 +287,7 @@ class DbUser(WaUser):  # BaseUserExpando
         user.put()
         return user, bearerToken
 
-    def asMsg(self):
+    def asMsg(self) -> UserProfileMsg:
         from ..api_data_classes.user import UserProfileMsg
 
         msg = UserProfileMsg()
@@ -317,50 +317,50 @@ class DbUser(WaUser):  # BaseUserExpando
         return msg
 
     @property
-    def appPrefs(self):
+    def appPrefs(self: DbUser):  #  -> UserAppSettings
         from ..models.user_app_settings import UserAppSettings
 
         return UserAppSettings.get_or_create_by_user_id(self.user_id)
 
     @property
-    def isEntitledUser(self):
+    def isEntitledUser(self) -> bool:
         # special users who have privs without paying
         return 3 <= self.accountLevel.value <= 6
 
     @property
-    def subscriptionIsFullyPaid(self):
+    def subscriptionIsFullyPaid(self) -> bool:
         # applys only to normal customers (not entitled)
         return self.accountLevel.value == 0 or self.premiumExpireDt > date.today()
 
     @property
-    def isPaidUser(self):
+    def isPaidUser(self) -> bool:
         # applies to both normal customers and entitled users
         return (
             1 <= self.accountLevel.value <= 2 and self.subscriptionIsFullyPaid
         ) or self.isEntitledUser
 
     @property
-    def isFreeUser(self):
+    def isFreeUser(self: DbUser) -> bool:
         return not self.isPaidUser
 
     @property
-    def isIOS(self):
+    def isIOS(self: DbUser) -> bool:
         return self.pushNotifyDeviceType == 0
 
     # TODO consolidate user_id properties to just one below
     @property
-    def user_id(self):
+    def user_id(self: DbUser) -> str:
         return self.key.string_id()
 
     @property
-    def id_(self):  # added 04/08 by DG;
+    def id_(self: DbUser):  # added 04/08 by DG;
         """firebase auth uid & User.id_
         are equivalent and both strings
         """
         return self.key.string_id()
 
     @property
-    def name_(self):  # added 04/30 by DG
+    def name_(self) -> str:  # added 04/30 by DG
         l_name = "?"
         if self.first and self.last:
             l_name = self.first + " " + self.last
@@ -372,23 +372,23 @@ class DbUser(WaUser):  # BaseUserExpando
             l_name = self.email.split("@")[0]
         return l_name
 
-    def _pre_put_hook(self):
-        """runs at each put operation
-        adds defaults to first, last & handle fields
-        """
-        pass
-        # print('name:{0};  first:{1};  last:{2}'.format(self.name, self.first, self.last))
-        # if self.first == '' and self.name != '':
-        #     parts = self.name.split(' ')
-        #     self.first = parts[0]
-        #     if self.last == '':
-        #         if len(parts) > 1:
-        #             self.last = parts[1]
-        #         else:
-        #             self.last = 'unknown'
-        # if self.handle == '' and self.first != '':
-        #     firstStr = self.first
-        #     self.handle = firstStr[:2] + self.last
+    # def _pre_put_hook(self):
+    #     """runs at each put operation
+    #     adds defaults to first, last & handle fields
+    #     """
+    #     pass
+    # print('name:{0};  first:{1};  last:{2}'.format(self.name, self.first, self.last))
+    # if self.first == '' and self.name != '':
+    #     parts = self.name.split(' ')
+    #     self.first = parts[0]
+    #     if self.last == '':
+    #         if len(parts) > 1:
+    #             self.last = parts[1]
+    #         else:
+    #             self.last = 'unknown'
+    # if self.handle == '' and self.first != '':
+    #     firstStr = self.first
+    #     self.handle = firstStr[:2] + self.last
 
     # def updateFromToken(self, token):
     #     self.authToken = token.token
@@ -402,7 +402,7 @@ class DbUser(WaUser):  # BaseUserExpando
     #     # return save_future
 
     @classmethod
-    def get_by_bearer_token(cls, userId, token):
+    def get_by_bearer_token(cls, userId, token) -> DbUser:
         """Returns a user object based on a user ID and oauth bearer token.
 
         :param token:
@@ -434,7 +434,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return None, None
 
     @classmethod
-    def create_bearer_token(cls, user_id):
+    def create_bearer_token(cls, user_id) -> UserToken:
         """Creates a new oauth bearer token for a given user ID.
 
         :param user_id:
@@ -445,7 +445,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return cls.token_model.create(user_id, "bearer")
 
     @classmethod
-    def get_by_auth_token(cls, user_id, token):
+    def get_by_auth_token(cls, user_id, token) -> Tuple[DbUser, int]:
         """Returns a user object based on a user ID and token.
 
         :param user_id:
