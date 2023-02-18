@@ -92,14 +92,14 @@ class DataClassBaseSchema(Schema):
         VoteType: VoteTypeSerializedMa,
     }
 
-    @post_load
-    def _makeModelObj(
-        self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
-    ):
-        print("Dewey 6677")
-        print(type(loadedDataAsDict))
-        # return self.__model__(**loadedDataAsDict)
-        return loadedDataAsDict
+    # @post_load
+    # def _makeModelObj(
+    #     self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
+    # ):
+    #     # print("Dewey 6677")
+    #     # print(type(loadedDataAsDict))
+    #     # return self.__model__(**loadedDataAsDict)
+    #     return loadedDataAsDict
 
     # def handle_error(self: DataClassBaseSchema, exc, data: dict[AnyStr, Any], **kwargs):
     #     """Log and raise our custom exception when (de)serialization fails."""

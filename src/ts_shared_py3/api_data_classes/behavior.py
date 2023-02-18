@@ -56,7 +56,7 @@ BehaviorStatsRequestMessage = make_dataclass(
 class BehaviorRowMsg(BaseApiData):
     behaviorCode: str = field(metadata=dict(required=True))
     # used to find same rec upon update/replace
-    secsToOrigDtTm: Optional[int] = field()
+    secsToOrigDtTm: Optional[int] = field(default=0, metadata=dict(required=False))
     # origOccurDateTime: datetime = field()  # used to find same rec upon update/replace
 
     feelingStrength: int = field(default=2)  # 0-4
@@ -98,8 +98,8 @@ class BehaviorRowMsg(BaseApiData):
 class BehaviorHistoryMessage(BaseApiData):
     beganDatingDate: date = field()
     endedDatingDate: date = field()
-    firstLogDtTm: float = field(default=0.0)  # as epoch
-    lastLogDtTm: float = field(default=0.0)
+    firstLogDtTm: datetime = field(metadata=dict(required=False))  # as epoch
+    lastLogDtTm: datetime = field(metadata=dict(required=False))
     items: list[BehaviorRowMsg] = field(default_factory=lambda: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -129,6 +129,7 @@ class BehEntryWrapperMessage(BaseApiData):
     behaviorCode: str = field(default="", metadata=dict(required=True))
     feelingStrength: int = field(default=0, metadata=dict(required=True))
     longitude: float = field(default=0.0)
+    latitude: float = field(default=0.0)
     comments: str = field(default="")
     shareDetails: str = field(default="", metadata=dict(required=True))
     occurDateTime: float = field(default=0.0)  # as Epoch
@@ -144,7 +145,6 @@ class BehEntryWrapperMessage(BaseApiData):
     parentCatLabel: str = field(default="")
     rootCatLabel: str = field(default="")
     personName: str = field(default="", metadata=dict(required=True))
-    latitude: float = field(default=0.0)
     commRiskScore: float = field(default=0.0)
     # dont really need rowType currently because rootCat == commitLevel in "cl" case
     rowType: str = field(default="beh")  # or cl (commitLevel)

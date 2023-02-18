@@ -5,7 +5,7 @@ import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
 
 from ..schemas.tracking import IntervalMessage
-from ..enums.commitLevel import CommitLevel_Display
+from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 from ..utils.date_conv import (
     calcOverlappingDays,
     overlappingDates,
@@ -38,24 +38,24 @@ class Interval(BaseNdbModel):
         required=True, indexed=False, default=DISTANT_FUTURE_DATE
     )
 
-    commitLevel = ndb.IntegerProperty(
+    commitLevel: NdbCommitLvlProp = NdbCommitLvlProp(
         required=True,
-        default=CommitLevel_Display.CASUAL.value,
+        default=CommitLevel_Display.CASUAL,
         indexed=False,
-        choices=[cl.value for cl in CommitLevel_Display],
+        # choices=[cl.value for cl in CommitLevel_Display],
     )
 
-    def __str__(self):
+    def __str__(self: Interval):
         return "CL:{0} St:{1} En:{2}".format(
-            self.commitLevel.code, self.startDate, self.comparableEndDate
+            self.commitLevel, self.startDate, self.comparableEndDate
         )
 
     @property
-    def commitLevelEnum(self) -> CommitLevel_Display:
-        return CommitLevel_Display(self.commitLevel)
+    def commitLevelEnum(self: Interval) -> CommitLevel_Display:
+        return self.commitLevel
 
     @property
-    def comparableEndDate(self):
+    def comparableEndDate(self: Interval):
         # don't check overlaps with DISTANT future
         return date.today() if self.endDate >= DISTANT_FUTURE_DATE else self.endDate
 
@@ -73,12 +73,12 @@ class Interval(BaseNdbModel):
     #     return self.logic.code
 
     @property
-    def logic(self):
+    def logic(self: Interval):
         # returns a LogicCommitLvl
-        return self.commitLevelEnum.logic
+        return self.commitLevel.logic
 
     @property
-    def description(self):
+    def description(self: Interval):
         # return date history as a str
         _template = "Relationship Phase from {startDate} to {endDate} with Status of {commitment}"
         vals = dict(
@@ -89,11 +89,11 @@ class Interval(BaseNdbModel):
         return _template.format(**vals)
 
     @property
-    def dayCount(self):
+    def dayCount(self: Interval):
         # returns # of days between start & end date
         return (self.endDate - self.startDate).days
 
-    def overlapDayCount(self, intervalRec):
+    def overlapDayCount(self: Interval, intervalRec: Interval):
         """returns # of days that have some overlap
         with related dates on intervalRec
         """
@@ -104,7 +104,7 @@ class Interval(BaseNdbModel):
         )
         return overlapDays
 
-    def earliestOverlapDate(self, intervalRec):
+    def earliestOverlapDate(self: Interval, intervalRec: Interval):
         # will return None if no overlap
         st, en = overlappingDates(
             self.startDate, self.endDate, intervalRec.startDate, intervalRec.endDate
@@ -115,17 +115,17 @@ class Interval(BaseNdbModel):
     #     pass
 
     @property
-    def isTogetherPhase(self):
+    def isTogetherPhase(self: Interval):
         # return true if this interval represents anything other than separated/brokenup/predating
         return not self.commitLevelEnum.isSeparated
 
     @property
-    def isExclusivePhase(self):
+    def isExclusivePhase(self: Interval):
         # return true if this interval represents anything other than separated/brokenup/predating
         # print("isExclusiveTest on {0} yields {1}".format(self.commitLevel.code, self.commitLevel.isExclusive))
         return self.commitLevelEnum.isExclusive
 
-    def asDict(self):
+    def asDict(self: Interval):
         # used for testing via uidisplay_handlers
         return dict(
             startDate=self.startDate,

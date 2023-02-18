@@ -1,10 +1,8 @@
 from firebase_admin import messaging
-from common.firebase.admin import tsFirebaseApp
+from .admin import tsFirebaseApp
 
 # docs: https://github.com/firebase/firebase-admin-python/blob/master/firebase_admin/messaging.py
 # https://firebase.google.com/docs/reference/admin/python/firebase_admin.messaging.html#send
-
-
 
 
 # alertForAps = messaging.ApsAlert    # used to construct Aps
@@ -16,8 +14,6 @@ from common.firebase.admin import tsFirebaseApp
 # whatToSend = messaging.Message
 
 
-
-
 def sendPushMsg(msg):
-    """ dispatch msg to FCM """
+    """dispatch msg to FCM"""
     return messaging.send(msg, app=tsFirebaseApp)

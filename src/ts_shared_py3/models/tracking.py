@@ -1,12 +1,13 @@
 from __future__ import annotations
 import logging
-from datetime import date
+from datetime import datetime, date
 import google.cloud.ndb as ndb
 from typing import Optional, Iterable  # List
 
 #
 from ..scoring.commBehImpactConsenus import CommImpactConsensus
-from ..models.baseNdb_model import BaseNdbModel
+from ..api_data_classes.behavior import BehEntryWrapperMessage
+from .baseNdb_model import BaseNdbModel
 from ..enums.commitLevel import CommitLevel_Display, CommitLevel_Logic
 from .interval import Interval
 from ..utils.date_conv import calcOverlappingDays, dateTime_to_epoch
@@ -26,35 +27,72 @@ class Tracking(BaseNdbModel):
     most recent interval is at TOP ie [0]
     """
 
-    userKey = ndb.KeyProperty("User")  # user
-    personKey = ndb.KeyProperty("Person")  # guy
+    # userKey = ndb.KeyProperty("User")  # user
+    # personKey = ndb.KeyProperty("Person")  # guy
 
     # if enabled is turned off, getIncidents will return empty list....
-    enabled = ndb.BooleanProperty(default=True)  # true if active
+    enabled: bool = ndb.BooleanProperty(default=True)  # true if active
     # list of all intervals currently being tracked
     # most recent at top & oldest at bottom of this list
-    intervals = ndb.StructuredProperty(Interval, repeated=True)
+    intervals: list[Interval] = ndb.StructuredProperty(Interval, repeated=True)
 
     # metadata
-    lastCheckDateTime = ndb.DateTimeProperty(
+    lastCheckDateTime: datetime = ndb.DateTimeProperty(
         indexed=False
     )  # when last did we check for overlap incidents
-    addDateTime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-    modDateTime = ndb.DateTimeProperty(indexed=False)
+    addDateTime: datetime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+    modDateTime: datetime = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-    _canSave = True  # set False by roCloneWithActivePhases() method
+    _canSave: bool = True  # set False by roCloneWithActivePhases() method
     # normally we update personLocal rec when self.intervals is overwritten
     # saving track rec should fire check for incidents UNLESS
     # it is the incident check that is saving/putting this Tracking rec
-    _shouldCheckForIncidentsOnPut = True
+    _shouldCheckForIncidentsOnPut: bool = True
+
+    @staticmethod
+    def loadOrCreate(
+        userId: str,
+        persId: int,
+        *args,
+        startDt: date = None,
+        cl: CommitLevel_Display = CommitLevel_Display.CASUAL,
+    ) -> Tracking:
+        track = Tracking.loadByIds(userId=userId, personId=persId)
+        if track is not None:
+            return track
+        track = Tracking(
+            # userKey=ndb.Key("User", userId),
+            # personKey=ndb.Key("Person", persId),
+            enabled=True,
+            intervals=[
+                Interval(
+                    startDate=date.today(),
+                    endDate=DISTANT_FUTURE_DATE,
+                    commitLevel=cl.value,
+                )
+            ],
+            lastCheckDateTime=datetime.now(),
+        )
+        track.key = Tracking._makeKey(userId, persId)
+        track.put()
+        return track
+
+    @property
+    def intervalsAsBehMsgList(self: Tracking) -> list[BehEntryWrapperMessage]:
+        return [
+            BehEntryWrapperMessage(
+                behaviorCode=ivl.commitLevel.name, oppBehaviorCode=""
+            )
+            for ivl in self.intervals
+        ]
 
     @property
     def userId(self: Tracking) -> str:
-        return self.userKey.string_id()
+        return self.key.parent.string_id()
 
     @property
     def personId(self: Tracking) -> int:
-        return self.personKey.integer_id()
+        return self.key.integer_id()
 
     @property
     def intervalCount(self: Tracking) -> int:
@@ -153,17 +191,24 @@ class Tracking(BaseNdbModel):
         return overlapDays
 
     @staticmethod
+    def _makeKey(userId: str, personId: int) -> ndb.Key:
+        return ndb.Key("Tracking", personId, parent=ndb.Key("User", userId))
+
+    @staticmethod
     def loadByKeys(userKey: ndb.Key, personKey: ndb.Key) -> Tracking:
-        query = Tracking.query(
-            Tracking.userKey == userKey, Tracking.personKey == personKey
-        )
-        return query.get()
+        # query = Tracking.query(
+        #     Tracking.userKey == userKey, Tracking.personKey == personKey
+        # )
+        key = Tracking._makeKey(userKey.string_id(), personKey.integer_id())
+        return key.get()
 
     @staticmethod
     def loadByIds(userId: str, personId: int) -> Tracking:
-        userKey = ndb.Key("User", userId)
-        personKey = ndb.Key("Person", personId)
-        return Tracking.loadByKeys(userKey, personKey)
+        # userKey = ndb.Key("User", userId)
+        # personKey = ndb.Key("Person", personId)
+        # return Tracking.loadByKeys(userKey, personKey)
+        key = Tracking._makeKey(userId, personId)
+        return key.get()
 
     def _pre_put_hook(self: Tracking):
         assert (
@@ -180,8 +225,8 @@ class Tracking(BaseNdbModel):
         # check again anytime this track rec changes
         # print("track after_put for Pers %s has %d" % (self.personKey.integer_id(), len(self.intervals)))
         log.info(
-            "track after_put for Pers %s has %d (%s)",
-            self.personKey.integer_id(),
+            "track after_put for Pers %d has %d (%s)",
+            self.key.integer_id(),
             len(self.intervals),
             self.key,
         )

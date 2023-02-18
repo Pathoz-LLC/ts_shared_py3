@@ -55,7 +55,7 @@ class PersonLocalRowMsg(BaseApiData):
     last: str = field(default="")
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
-    monitorStatus: int = field(default=1)
+    monitorStatus: MonitorStatus = field(default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus)
     # redFlagBits: int = field(default=0, metadata=dict(required=True))
     xtra: str = field(default="")
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)

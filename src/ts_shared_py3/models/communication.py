@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date, timedelta, datetime
 from typing import Union, TypeVar
 
@@ -91,7 +92,7 @@ class CommunicationStats(BaseNdbModel):
     # def appendMsg(self, msg):
     #     msg.windows.append( self.toWindow() )
 
-    def toCommStatsMsg(self):
+    def toCommStatsMsg(self: CommunicationStats):
         from api_data_classes.communication import CommStatsMsg
 
         win = CommStatsMsg()
@@ -115,10 +116,10 @@ class CommunicationStats(BaseNdbModel):
         win.transcriptsAvailable = self.transcriptsAvailable
         return win
 
-    def _pre_put_hook(self):
+    def _pre_put_hook(self: CommunicationStats):
         self.calcScoreFromThisPeriod()
 
-    def calcScoreFromThisPeriod(self):
+    def calcScoreFromThisPeriod(self: CommunicationStats):
         """
         called by pre-put hook
         also works on a rollup of multiple windows
@@ -228,14 +229,14 @@ class CommunicationStats(BaseNdbModel):
 
     @staticmethod
     def calcAndStorePeriodStats(
-        userKey, personId, bucketedDictOfCommunicationEventRecs
+        userKey: ndb.Key, personId: int, bucketedDictOfCommunicationEventRecs: map
     ):
         """
         loop thru each set of recs in a bucket & write one CommunicationStats rec
         for each bucket (currently a week num as key)
         since we have hierarchical key, must add all recs at once (or 1 second)
         """
-        listCsRecs = []
+        listCsRecs: list[CommunicationStats] = []
         for (
             weekIdStr,
             arrayCeRecs4Week,
@@ -259,9 +260,8 @@ class CommunicationStats(BaseNdbModel):
     # or 1 single rollup rec
 
     @staticmethod
-    def getStatsForPeriod(userKey, personId, daysBack=30):
+    def getStatsForPeriod(userKey: ndb.Key, personId: int, daysBack: int = 30):
         """
-
         Args:
             userKey:
             personId:
@@ -270,21 +270,23 @@ class CommunicationStats(BaseNdbModel):
         Returns: [CommStatsListMsg]
 
         """
-        from api_data_classes.communication import CommStatsListMsg
+        from ..api_data_classes.communication import CommStatsListMsg
 
         userPersKey = ndb.Key("Person", personId, parent=userKey)
-        q = CommunicationStats.query(ancestor=userPersKey)
-        queryStartDttm = datetime.now() - timedelta(days=daysBack)
-        q.filter("sentDttm >=", queryStartDttm)
+        q: CommunicationStats = CommunicationStats.query(ancestor=userPersKey)
+        queryStartDttm: datetime = datetime.now() - timedelta(days=daysBack)
+        q.filter(CommunicationStats.startDtTm >= queryStartDttm)
         # now run query
-        statsAllWindows = q.fetch()
+        statsAllWindows: list[CommunicationStats] = q.fetch()
 
         cslm = CommStatsListMsg()
         cslm.periodStats = [cs.toCommStatsMsg() for cs in statsAllWindows]
         return cslm
 
     @staticmethod
-    def rollupListOfStatWindows(userKey, personId, daysBack=30):
+    def rollupListOfStatWindows(
+        userKey: ndb.Key, personId: int, daysBack: int = 30
+    ) -> CommunicationStats:
         """
         consolidate all weekly CommunicationStats score summary windows
         into one set of scores for return to the client
@@ -384,7 +386,7 @@ class CommunicationEvent(BaseNdbModel):
     text = ndb.TextProperty(indexed=False)  # , default=''
 
     @staticmethod
-    def fromMsg(msg, parentKey):
+    def fromMsg(msg, parentKey: ndb.Key):
         return CommunicationEvent(
             parent=parentKey,
             fromUser=msg.fromUser,
@@ -394,7 +396,8 @@ class CommunicationEvent(BaseNdbModel):
         )
 
     @staticmethod
-    def storeLatestRows(user, msg):
+    def storeLatestRows(user: ndb.Key, msg) -> None:
+        # : PersonIdMessage
         # since they have ancestor, use only 1 write per second
         # aka use put_multi to write in bulk
         userPersKey = ndb.Key("Person", msg.persId, parent=user.key)
@@ -402,7 +405,7 @@ class CommunicationEvent(BaseNdbModel):
         ndb.put_multi(allComEv)
 
     @staticmethod
-    def rollupToPeriodCount(userPersKey, startOnDtTm):
+    def rollupToPeriodCount(userPersKey: ndb.Key, startOnDtTm: datetime):
         """load all recs & sum stats
         called by task queue to work in background
         calls Dolphs stat calc code (CommunicationStats.calcPeriodStats) above

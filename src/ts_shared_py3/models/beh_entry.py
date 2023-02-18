@@ -57,18 +57,19 @@ class Entry(BaseNdbModel):  # ndb.model.Expando
     @property
     def longitude(self):
         if self.coords is not None:
-            return self.coords.lon  # type: ignore
+            # print(self.coords.longitude)
+            return self.coords.longitude  # type: ignore
         else:
             return 0
 
     @property
     def latitude(self):
         if self.coords is not None:
-            self.coords.lat  # type: ignore
+            self.coords.latitude  # type: ignore
         else:
             return 0
 
-    def to_msg(self, personId: int = 0):
+    def to_msg(self, personId: int = 0):  # -> BehaviorRowMsg
         from ..api_data_classes.behavior import BehaviorRowMsg
 
         brm = BehaviorRowMsg(

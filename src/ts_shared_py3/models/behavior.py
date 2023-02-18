@@ -95,7 +95,7 @@ class PersonBehavior(BaseNdbModel):
         originalDtTm: datetime = entry.occurDateTime + timedelta(
             seconds=secsFromOrigDtTm
         )
-        originalDtTm = originalDtTm.combine(originalDtTm.date, time=time(0, 0, 0, 0))
+        originalDtTm = originalDtTm.combine(originalDtTm.date(), time=time(0, 0, 0, 0))
 
         for rowNum, e in enumerate(self.entries):
             if e.occurDateTime == originalDtTm and e.behaviorCode == entry.behaviorCode:
@@ -151,12 +151,12 @@ class PersonBehavior(BaseNdbModel):
         return qry.fetch()
 
     # @staticmethod
-    # def loadBehaviorsWithDimensions(user, personId):
+    # def loadBehaviorsWithDimensions(user: DbUser, personId: int):
     #     """
     #         niu -- missing BehaviorDimensionScores class below
     #     """
     #     # returns raw data 4 behaviors/dimensions
-    #     from ts_shared_py3.models.behavior import
+    #     from .behavior import
     #     (
     #         BehaviorDimensionScores,
     #     )  # avoid circular import

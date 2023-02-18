@@ -19,7 +19,7 @@ from .values_beh_cat import UserAnswerStats
 # parent/ancestor to group similar vals and keep ACID within that space
 from ..enums.sex import Sex
 from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
-from ..api_data_classes.person import PersonLocalRowMsg
+from ..api_data_classes.person import PersonFullWithLocal, PersonLocalRowMsg
 from .person_keys import PersonKeys, KeyTypeEnum
 from .user import DbUser
 
@@ -223,7 +223,7 @@ class PersonLocal(BaseNdbModel):
 
         return Tracking.loadByKeys(self.userKey, self.personKey)
 
-    def _updateFromMsg(self, msg: PersonLocalRowMsg):
+    def _updateFromMsg(self, msg: PersonFullWithLocal):
         self.nickname = msg.nickname
         self.commitLevel = (
             msg.commitLevel
@@ -240,16 +240,16 @@ class PersonLocal(BaseNdbModel):
         return ndb.Key(DbUser, userIdStr, PersonLocal, personIdInt)
 
     @staticmethod
-    def fromMsg(msg):
+    def fromMsg(pfwl: PersonFullWithLocal):
         """convert msg into an instance"""
         pl = PersonLocal()
-        pl._updateFromMsg(msg)
+        pl._updateFromMsg(pfwl)
         # pl.modDateTime # handle in pre-put-hook
         return pl
 
     @staticmethod
     def createAndStore(
-        userKey: ndb.Key, personKey: ndb.Key, personLocalMsg: PersonLocalRowMsg
+        userKey: ndb.Key, personKey: ndb.Key, persFullLocalMsg: PersonFullWithLocal
     ) -> ndb.Key:
         """app user could delete Prospect, then add them again later..
         check if he exists and update monitor status if he does
@@ -257,11 +257,11 @@ class PersonLocal(BaseNdbModel):
         plKey = PersonLocal._makeKey(userKey.string_id(), personKey.integer_id())
         rec = plKey.get()
         if rec:
-            rec._updateFromMsg(personLocalMsg)
+            rec._updateFromMsg(persFullLocalMsg)
             rec.put()
             return plKey
 
-        pl = PersonLocal.fromMsg(personLocalMsg)
+        pl = PersonLocal.fromMsg(persFullLocalMsg)
         pl.key = plKey
         pl.put()
 

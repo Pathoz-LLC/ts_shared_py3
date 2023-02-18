@@ -20,8 +20,9 @@ from .activityType import ActivityType
 # )
 
 
-_CommitLevelMasterDict = None  # key'd by code
-_DevotionLevelListMessage = None
+# DO NOT change init vals below
+_CommitLevelMasterDict: map[str, CommitLevel_Display] = None  # key'd by code
+_CommitLevelListMessage: list[CommitLvlApiMsg] = None
 
 
 @unique
@@ -189,7 +190,7 @@ class CommitLevel_Display(IntEnum):
         return self.value >= prior.value
 
     def newsTypeFromCommitLvlDelta(
-        self: CommitLevel_Display, priorCl
+        self: CommitLevel_Display, priorCl: CommitLevel_Display
     ) -> Optional[ActivityType]:
         """self == latest/newest
         priorCL is one right before this latest cl
@@ -237,13 +238,13 @@ class CommitLevel_Display(IntEnum):
     def default() -> CommitLevel_Display:
         return CommitLevel_Display.CASUAL
 
-    # @staticmethod
-    # def commitLvlListAsApiMsg():
-    #     # value returned by client API
-    #     global _DevotionLevelListMessage
-    #     if _DevotionLevelListMessage is None:
-    #         _DevotionLevelListMessage = CommitLevel_Display._buildClientMsgList()
-    #     return _DevotionLevelListMessage
+    @staticmethod
+    def commitLvlListAsApiMsg():
+        # value returned by client API
+        global _CommitLevelListMessage
+        if _CommitLevelListMessage is None:
+            _CommitLevelListMessage = CommitLevel_Display._buildClientMsgList()
+        return _CommitLevelListMessage
 
     @staticmethod
     def typeCount() -> int:
@@ -272,15 +273,23 @@ class CommitLevel_Display(IntEnum):
             val = random.randint(0, 4)
         return CommitLevel_Display(val)
 
-    # @staticmethod
-    # def _buildClientMsgList():
-    #     raise Exception("missing schema DevotionLevelListMessage", "??")
-    #     msg = DevotionLevelListMessage()
-    #     for cl in CommitLevel_Display.masterList():
-    #         # dl = CommitLvlApiMsg(displayCode=cl.code, logicCode=cl.logic.code
-    #         #                      , displayValue=cl.displayVal, iconName=cl.iconName)
-    #         msg.items.append(cl.asApiMsg)
-    #     return msg
+    @staticmethod
+    def _buildClientMsgList():  # -> list[CommitLvlApiMsg]
+        from ..api_data_classes.tracking import (
+            CommitLvlApiMsg,
+            DevotionLevelListMessage,
+        )
+
+        msg: list[CommitLvlApiMsg] = []
+        for cl in CommitLevel_Display.masterList():
+            apMsg = CommitLvlApiMsg(
+                displayCode=cl.code,
+                logicCode=cl.logic.code,
+                displayValue=cl.displayVal,
+                iconName=cl.iconName,
+            )
+            msg.append(apMsg)
+        return msg
 
     # protorpc translators below
     # @staticmethod
@@ -319,6 +328,10 @@ class NdbCommitLvlProp(model.IntegerProperty):
 
     def _from_base_type(self, value: int):
         return CommitLevel_Display(value)  # return CommitLevel_Display
+
+    # @property
+    # def asEnum(self: NdbCommitLvlProp):
+    #     return self._from_base_type(self.value)
 
 
 class CommitLvlSerializedMa(fields.Enum):
