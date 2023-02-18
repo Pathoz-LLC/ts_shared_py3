@@ -41,15 +41,15 @@ class UserProfileMsg(BaseApiData):
     state: str = field(default="", metadata=dict(required=False))
 
     # 0==IOS;  1==Android, 2==Web
-    pushNotifyDeviceType: int = field(default=0, metadata=dict(required=True))
+    pushNotifyDeviceType: int = field(default=0, metadata=dict(required=False))
 
     deviceModel: str = field(default="na", metadata=dict(required=False))
     deviceID: str = field(default="", metadata=dict(required=True))
 
     promoCode: str = field(default="", metadata=dict(required=False))
-    authProvider: str = field(default="email", metadata=dict(required=True))
+    authProvider: str = field(default="email", metadata=dict(required=False))
 
-    jwt: str = field(default="", metadata=dict(required=True))
+    jwt: str = field(default="", metadata=dict(required=False))
     latitude: float = field(default=0.0)
     longitude: float = field(default=0.0)
     # FIXME
@@ -67,10 +67,10 @@ class AppSettingsMsg(BaseApiData):
     allowPushNotifications: bool = field(default=True)
     breakupArchiveAllProspects: bool = field(default=False)
 
-    autoLockAfterMinutes: int = field(default=0, metadata=dict(required=True))
+    autoLockAfterMinutes: int = field(default=0, metadata=dict(required=False))
     clearFeelingCheckReminders: bool = field(default=False)  # remove all alerts
 
-    blockedUserList: str = field(default="", metadata=dict(required=True))
+    blockedUserList: str = field(default="", metadata=dict(required=False))
     unblockAllUsers: bool = field(default=False)  # clears blocks on specific users
     # after sign-up or log-in, this bearer token goes in the header for subsequent requests
     apiToken: str = field(default="", metadata=dict(required=True))
@@ -97,7 +97,7 @@ class UserIdMessage(BaseApiData):
     """
 
     userId: str = field(default="", metadata=dict(required=True))
-    jwt: str = field(default="", metadata=dict(required=True))
+    jwt: str = field(default="", metadata=dict(required=False))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -115,8 +115,8 @@ class UserDemographicsMsg(BaseApiData):
     handle: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
-    phone: str = field(default="", metadata=dict(required=True))
-    imageURL: str = field(default="", metadata=dict(required=True))
+    phone: str = field(default="", metadata=dict(required=False))
+    imageURL: str = field(default="", metadata=dict(required=False))
     city: str = field(default="", metadata=dict(required=True))
     state: str = field(default="", metadata=dict(required=True))
     #
@@ -143,16 +143,16 @@ class UserBioMessage(BaseApiData):
     last: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
     email: str = field(default="", metadata=dict(required=True))
-    phone: str = field(default="", metadata=dict(required=True))
+    phone: str = field(default="", metadata=dict(required=False))
 
-    photoUrl: str = field(default="", metadata=dict(required=True))
+    photoUrl: str = field(default="", metadata=dict(required=False))
     accountLevel: AccountType = field(
         default=AccountType.FREE, metadata=dict(required=True, enum=AccountType)
     )
     provider_id: str = field(default="", metadata=dict(required=True))
     authToken: str = field(default="", metadata=dict(required=True))
     refreshToken: str = field(default="", metadata=dict(required=True))
-    promoCode: str = field(default="", metadata=dict(required=True))
+    promoCode: str = field(default="", metadata=dict(required=False))
     city: str = field(default="", metadata=dict(required=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -180,7 +180,7 @@ class UserCommunicationDetailsMsg(BaseApiData):
     saveBlockedValChanges: bool = field(default=False)
     saveSpamValChanges: bool = field(default=False)
     # change notes over time
-    comments: str = field(default="", metadata=dict(required=True))
+    comments: str = field(default="", metadata=dict(required=False))
 
     # client readable values
     canContinueChat: bool = field(default=False)

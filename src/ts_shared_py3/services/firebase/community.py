@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, date
+from typing import Dict, Any
 
 #
 from ts_shared_py3.utils.date_conv import (
@@ -67,7 +68,9 @@ class CommContentInfo(object):
 
         if activityType.hasBehCode:
             # typeSpecificValue should be a behCode
-            behNodeAsDict = behaviorDataShared.getBehAsDict(typeSpecificValue)
+            behNodeAsDict: Dict[str, Any] = behaviorDataShared.getBehAsDict(
+                typeSpecificValue
+            )
             assert len(behNodeAsDict) > 2, "invalid behavior code %s" % (
                 typeSpecificValue
             )
@@ -79,7 +82,7 @@ class CommContentInfo(object):
             """
             pass
 
-    def appendMeta(self, meta):
+    def appendMeta(self, meta: Dict[str, Any]):
         """add extra payload depending on activityType"""
         assert isinstance(meta, dict), "invalid arg to appendMeta (should be dict)"
         # client expects all meta vals to be string
@@ -102,9 +105,9 @@ class CommContentInfo(object):
         }
 
     @staticmethod
-    def _castMetaValsToStr(meta):
+    def _castMetaValsToStr(meta: Dict[str, Any]):
         # client expects meta dict to be all string vals
-        for k, v in meta.iteritems():
+        for k, v in meta.items():
             meta[k] = str(v)
         return meta
 

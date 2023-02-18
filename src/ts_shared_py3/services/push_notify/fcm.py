@@ -116,7 +116,7 @@ class PushNotifyTasks:
     #     print('Successfully sent message:', response)
 
     @staticmethod
-    def updateUserToken(userID, token="", deviceType=0):
+    def updateUserToken(userID: str, token: str = "", deviceType: int = 0):
         """0==IOS; 1==Android; 2==Web"""
         u = _loadUser(userID)
         u.pushNotifyRegToken = token
@@ -130,7 +130,7 @@ class PushNotifyTasks:
 
 
 def _loadUser(userID):
-    return User.loadByEmailOrId(None, userID)
+    return DbUser.loadByEmailOrId(None, userID)
     # return ndb.Key(User, userID).get()
 
 

@@ -290,29 +290,27 @@ class DbUser(WaUser):  # BaseUserExpando
     def asMsg(self) -> UserProfileMsg:
         from ..api_data_classes.user import UserProfileMsg
 
-        msg = UserProfileMsg()
-        msg.userId = self.user_id
-        msg.email = self.email
-        msg.fullNameOrHandle = self.name
-        msg.photoUrl = self.photoUrl
-        msg.dob = self.dob
-        msg.sex = "{0}".format(self.sex.value)
-        msg.city = self.city
-        msg.state = self.state
-        msg.zip = self.zip
-
-        msg.first = self.first
-        msg.last = self.last
-        msg.accountLevel = self.accountLevel.value
-
-        # 0==IOS;  1==Android, 2==Web
-        msg.pushNotifyDeviceType = self.pushNotifyDeviceType
-        msg.deviceModel = "na"
-        msg.deviceID = "na"
-        msg.jwt = "na"
-
-        msg.promoCode = "na"
-        msg.authProvider = self.provider_id
+        msg = UserProfileMsg(
+            userId=self.user_id,
+            email=self.email,
+            fullNameOrHandle=self.name,
+            photoUrl=self.photoUrl,
+            dob=self.dob,
+            sex=self.sex,
+            city=self.city,
+            state=self.state,
+            zip=self.zip,
+            first=self.first,
+            last=self.last,
+            accountLevel=self.accountLevel.value,
+            # 0==IOS;  1==Android, 2==Web
+            pushNotifyDeviceType=self.pushNotifyDeviceType,
+            deviceModel="na",
+            deviceID="na",
+            jwt="na",
+            promoCode="na",
+            authProvider=self.provider_id,
+        )
         # print(msg)
         return msg
 

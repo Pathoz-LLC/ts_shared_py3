@@ -1,10 +1,10 @@
 import logging
 from random import randint
 from datetime import datetime, timedelta
-
-# from google.appengine.api import taskqueue
+from google.cloud.tasks_v2 import HttpMethod
 
 from ..models.input_entry_adapter import InputEntryAdapter
+from ..services.taskq_setup import ts_task_client, getFullQueuePath
 
 # FIX BELOW
 # from ...constants import GAEQ_FOR_SCORING, SCORING_SERVICE_NAME
@@ -29,27 +29,40 @@ class ScoreDispatchHelper(object):
         taskName = "{0}-{1}".format(userId, prospectId)
         url = "/rescore/{0}/{1}".format(userId, prospectId)
 
-        try:
-            scoreQueue = taskqueue.Queue(name=GAEQ_FOR_SCORING)
-            scoreQueue.delete_tasks_by_name(taskName)
-        except:
-            pass
+        # try:
+        #     scoreQueue = taskqueue.Queue(name=GAEQ_FOR_SCORING)
+        #     scoreQueue.delete_tasks_by_name(taskName)
+        # except:
+        #     pass
+        # Construct the fully qualified queue name.
+        task_queue_name = getFullQueuePath(GAEQ_FOR_SCORING)
+
+        # Construct the request body.
+        task = {
+            "name": taskName,
+            "app_engine_http_request": {  # Specify the type of request.
+                "http_method": HttpMethod.GET,
+                "relative_uri": url,
+                # "body": encoded_payload,
+            },
+        }
 
         try:
-            _ = taskqueue.add(
-                queue_name=GAEQ_FOR_SCORING,
-                target=SCORING_SERVICE_NAME,
-                name=taskName,
-                url=url,
-                eta=dtTmEta,
-                retry_options=scoringRetryConfig,
-            )
-        except taskqueue.TaskAlreadyExistsError as e:
-            logging.error("Err...task {0} couldnt be deleted".format(taskName))
-        except taskqueue.DuplicateTaskNameError as e:
-            logging.warning(
-                "scoringQueue.DuplicateTaskNameError on {0} & {1}".format(e, taskName)
-            )
+            _ = ts_task_client.create_task(parent=task_queue_name, task=task)
+            # _ = taskqueue.add(
+            #     queue_name=GAEQ_FOR_SCORING,
+            #     target=SCORING_SERVICE_NAME,
+            #     name=taskName,
+            #     url=url,
+            #     eta=dtTmEta,
+            #     retry_options=scoringRetryConfig,
+            # )
+        # except taskqueue.TaskAlreadyExistsError as e:
+        #     logging.error("Err...task {0} couldnt be deleted".format(taskName))
+        # except taskqueue.DuplicateTaskNameError as e:
+        #     logging.warning(
+        #         "scoringQueue.DuplicateTaskNameError on {0} & {1}".format(e, taskName)
+        #     )
         except Exception as e:
             logging.error("scoringQueue.Error: %s (FIXME)" % e)
             if False:

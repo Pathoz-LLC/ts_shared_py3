@@ -173,7 +173,7 @@ class PersonLocal(BaseNdbModel):
     nickname = ndb.TextProperty(indexed=False, required=True)
     # store literal vals from:  common.models.devotion_level.DevotionLevel
     # devotionLevel= ndb.StringProperty(indexed=False, default='CASUAL')
-    devotionLevel = NdbCommitLvlProp(
+    commitLevel = NdbCommitLvlProp(
         required=True, default=CommitLevel_Display.CASUAL, indexed=False
     )
     imagePath = ndb.TextProperty(indexed=False, default="")
@@ -225,10 +225,14 @@ class PersonLocal(BaseNdbModel):
 
     def _updateFromMsg(self, msg: PersonLocalRowMsg):
         self.nickname = msg.nickname
-        self.devotionLevel = CommitLevel_Display.fromStr(msg.devotionLevel)
+        self.commitLevel = (
+            msg.commitLevel
+        )  # CommitLevel_Display.fromStr(msg.commitLevel)
         self.imagePath = msg.imagePath
         self.monitorStatus = MonitorStatus(msg.monitorStatus)
-        self.reminderFrequency = RemindFreq(msg.reminderFrequency)
+        self.reminderFrequency = (
+            msg.reminderFrequency
+        )  # RemindFreq(msg.reminderFrequency)
         self.recentTsConfidenceScore = 50.0  # default val
 
     @staticmethod
@@ -319,7 +323,7 @@ class PersonLocal(BaseNdbModel):
 
     def appendToMsg(self, msg):
         msg.nickname = self.nickname
-        msg.devotionLevel = self.devotionLevel.value
+        msg.devotionLevel = self.commitLevel.value
         msg.imagePath = self.imagePath
         # msg.overallScore = self.overallScore
         # msg.redFlagBits = self.redFlagBits
