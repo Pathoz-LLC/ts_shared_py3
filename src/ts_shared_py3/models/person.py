@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime, date, timedelta
 
 import google.cloud.ndb as ndb
@@ -19,7 +20,7 @@ from .values_beh_cat import UserAnswerStats
 # parent/ancestor to group similar vals and keep ACID within that space
 from ..enums.sex import Sex
 from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
-from ..api_data_classes.person import PersonFullWithLocal, PersonLocalRowMsg
+from ..api_data_classes.person import PersonFullLocalRowDc, PersonLocalRowDc
 from .person_keys import PersonKeys, KeyTypeEnum
 from .user import DbUser
 
@@ -82,7 +83,7 @@ class Person(BaseNdbModel):
     # _use_memcache = True
     # _use_datastore = False
     @staticmethod
-    def searchByPhone(phoneString):
+    def searchByPhone(phoneString: str):
         from ..models.person_keys import PersonKeys
 
         # print('searching Person by phone on %s  (%s)' % (phoneString, type(phoneString)) )
@@ -223,33 +224,28 @@ class PersonLocal(BaseNdbModel):
 
         return Tracking.loadByKeys(self.userKey, self.personKey)
 
-    def _updateFromMsg(self, msg: PersonFullWithLocal):
+    def _updateFromMsg(self, msg: PersonLocalRowMsg) -> None:
         self.nickname = msg.nickname
-        self.commitLevel = (
-            msg.commitLevel
-        )  # CommitLevel_Display.fromStr(msg.commitLevel)
+        self.commitLevel = msg.commitLevel
         self.imagePath = msg.imagePath
-        self.monitorStatus = MonitorStatus(msg.monitorStatus)
-        self.reminderFrequency = (
-            msg.reminderFrequency
-        )  # RemindFreq(msg.reminderFrequency)
-        self.recentTsConfidenceScore = 50.0  # default val
+        self.monitorStatus = msg.monitorStatus
+        self.reminderFrequency = msg.reminderFrequency
+        self.recentTsConfidenceScore = msg.tsConfidenceScore
 
     @staticmethod
-    def _makeKey(userIdStr: str, personIdInt: int):
+    def _makeKey(userIdStr: str, personIdInt: int) -> ndb.Key:
         return ndb.Key(DbUser, userIdStr, PersonLocal, personIdInt)
 
     @staticmethod
-    def fromMsg(pfwl: PersonFullWithLocal):
-        """convert msg into an instance"""
+    def fromFullMsg(pfwl: PersonFullLocalRowDc) -> PersonLocal:
+        """convert msg into a PersonLocalRowMsg instance"""
         pl = PersonLocal()
-        pl._updateFromMsg(pfwl)
-        # pl.modDateTime # handle in pre-put-hook
+        pl._updateFromMsg(pfwl.asLocalMsg)
         return pl
 
     @staticmethod
     def createAndStore(
-        userKey: ndb.Key, personKey: ndb.Key, persFullLocalMsg: PersonFullWithLocal
+        userKey: ndb.Key, personKey: ndb.Key, persFullLocalMsg: PersonFullLocalRowDc
     ) -> ndb.Key:
         """app user could delete Prospect, then add them again later..
         check if he exists and update monitor status if he does
@@ -261,7 +257,7 @@ class PersonLocal(BaseNdbModel):
             rec.put()
             return plKey
 
-        pl = PersonLocal.fromMsg(persFullLocalMsg)
+        pl = PersonLocal.fromFullMsg(persFullLocalMsg)
         pl.key = plKey
         pl.put()
 

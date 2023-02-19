@@ -174,7 +174,7 @@ if COMMIT_CHNG_FAKE_CCIW is None:
     )
 
 
-class CommImpactConsensus(Singleton):
+class CommImpactConsensus(metaclass=Singleton):
     """singleton object with all cummulative community
     consensus status rolled into a vote
 
@@ -186,6 +186,8 @@ class CommImpactConsensus(Singleton):
     """
 
     def __init__(self: CommImpactConsensus) -> None:
+        if self.init_completed:
+            return
         # dict of CommConsensusImpactWt
         self.impactWeightByComm: map[str, AppCommHybridImpactWt] = dict()
         # dict: key = posBehCode; val = negBehCode

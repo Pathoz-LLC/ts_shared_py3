@@ -1,3 +1,4 @@
+from __future__ import annotations
 import string
 import google.cloud.ndb as ndb
 
@@ -54,7 +55,7 @@ class PersonKeys(BaseNdbModel):
         pkey.put()
 
     @staticmethod
-    def searchByPhone(phoneString):  # ndb.AND
+    def searchByPhone(phoneString: str):  # ndb.AND
         phoneString = stripNonDigits(phoneString)
         pkRec = PersonKeys.query(
             PersonKeys.value == phoneString, PersonKeys.keyType == KeyTypeEnum.MBPHONE
@@ -70,7 +71,7 @@ class PersonKeys(BaseNdbModel):
             return None
 
     @staticmethod
-    def load(person):
+    def load(person) -> list[PersonKeys]:  # : Person
         return PersonKeys.query(ancestor=person.key).fetch()
 
 

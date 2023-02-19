@@ -138,13 +138,15 @@ class Alloc(object):
         return Alloc(groupBitSum)
 
 
-class AllocLookup(Singleton):
+class AllocLookup(metaclass=Singleton):
     """
     singleton class to figure out weight distribution for multiple entries
     in a day or bucket
     """
 
     def __init__(self: AllocLookup) -> None:
+        if self.init_completed:
+            return
         self.weights: map[int, Alloc] = _hydrateLookup()
 
     def getAllocWeightsFor(self: AllocLookup, groupBitSum: int) -> Alloc:

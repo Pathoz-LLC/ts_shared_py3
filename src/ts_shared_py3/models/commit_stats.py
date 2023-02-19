@@ -1,7 +1,10 @@
 from random import randint
 from typing import Union, TypeVar
 
+#
 import google.cloud.ndb as ndb
+
+#
 from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 import logging
 

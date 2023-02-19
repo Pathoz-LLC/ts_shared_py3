@@ -354,7 +354,7 @@ def getCategoryListSorted(
     return sortTupleList(tupList)
 
 
-class BehaviorSourceSingleton(Singleton):
+class BehaviorSourceSingleton(metaclass=Singleton):
     """
     takes raw Category & Behavior data from yaml files
         and generates a JSON file to be sent to app-clients via rest or rpc
@@ -378,7 +378,7 @@ class BehaviorSourceSingleton(Singleton):
     def __init__(
         self: BehaviorSourceSingleton,
         projRoot: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/",
-    ):  # ts_shared_py3/src/
+    ):
         """initialize the full object graph & also create master dict by code
 
         masterDict = {code: BehaviorCatNode}
@@ -387,6 +387,9 @@ class BehaviorSourceSingleton(Singleton):
 
         NOTE: hidden behaviors may be a problem for showing parent category on Behavior stats
         """
+        if self.init_completed:
+            return
+
         categoriesDict: dict[str, BehCatNode] = dict()
 
         # import os

@@ -60,7 +60,7 @@ class CfgBaseIfc(object):
 
 
 @dataclass(frozen=False)
-class FlaskWebAppCfg(Singleton, CfgBaseIfc):
+class FlaskWebAppCfg(CfgBaseIfc, metaclass=Singleton):
     """build in flask config vals"""
 
     DEBUG: bool = True
@@ -73,7 +73,7 @@ class FlaskWebAppCfg(Singleton, CfgBaseIfc):
 
 
 @dataclass(frozen=False)
-class OpenApiCfg(Singleton, CfgBaseIfc):
+class OpenApiCfg(CfgBaseIfc, metaclass=Singleton):
     """
     https://swagger.io/specification/
     https://flask-smorest.readthedocs.io/en/latest/openapi.html
@@ -147,7 +147,7 @@ class OpenApiCfg(Singleton, CfgBaseIfc):
 
 
 @dataclass(frozen=False)
-class GcpSvcsCfg(Singleton, CfgBaseIfc):
+class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
     """defaults only;  most in ENV vars"""
 
     PROJ_ID: str = "playerbusterapi"
@@ -184,7 +184,7 @@ class GcpSvcsCfg(Singleton, CfgBaseIfc):
 
 
 @dataclass(frozen=False)
-class FirebaseCfg(Singleton, CfgBaseIfc):
+class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
     fir_db_url: str = "https://playerbusterapi.firebaseio.com"
     firebase_admin_credential: str = (
         "playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json"
@@ -219,7 +219,7 @@ class FirebaseCfg(Singleton, CfgBaseIfc):
 
 
 @dataclass(frozen=False)
-class UserAuthCfg(Singleton, CfgBaseIfc):
+class UserAuthCfg(CfgBaseIfc, metaclass=Singleton):
     """JWT, credentials & security vals"""
 
     JWT_TOKEN_LOCATION: str = "headers"
@@ -235,7 +235,7 @@ class UserAuthCfg(Singleton, CfgBaseIfc):
 
 
 @dataclass(frozen=False)
-class LibCfg(Singleton, CfgBaseIfc):
+class LibCfg(CfgBaseIfc, metaclass=Singleton):
     """ """
 
     JSON_SORT_KEYS: bool = False

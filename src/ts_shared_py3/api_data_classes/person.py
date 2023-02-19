@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date, datetime
 from typing import ClassVar, Type
 from dataclasses import field
@@ -14,7 +15,7 @@ from ..api_data_classes.user import *
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonRowMsg(BaseApiData):
+class PersonRowDc(BaseApiData):
     #
     # deweyG: RedFlagTypeSerializedMsg = field()
     # pierceG: SexSerializedMsg = field()
@@ -38,7 +39,7 @@ class PersonRowMsg(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonLocalRowMsg(BaseApiData):
+class PersonLocalRowDc(BaseApiData):
     id: int = field()
     commitLevel: CommitLevel_Display = field(
         default=CommitLevel_Display.CASUAL, metadata={"enum": CommitLevel_Display}
@@ -55,7 +56,9 @@ class PersonLocalRowMsg(BaseApiData):
     last: str = field(default="")
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
-    monitorStatus: MonitorStatus = field(default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus)
+    monitorStatus: MonitorStatus = field(
+        default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus}
+    )
     # redFlagBits: int = field(default=0, metadata=dict(required=True))
     xtra: str = field(default="")
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)
@@ -65,7 +68,7 @@ class PersonLocalRowMsg(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonFullWithLocal(BaseApiData):
+class PersonFullLocalRowDc(BaseApiData):
     """combines atts from PersonRowMsg & PersonLocalRowMsg
     into one payload
     """
@@ -81,6 +84,9 @@ class PersonFullWithLocal(BaseApiData):
     )
     monitorStatus: MonitorStatus = field(
         default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus}
+    )
+    reminderFrequency: RemindFreq = field(
+        default=RemindFreq.DAILY, metadata={"enum": RemindFreq}
     )
     redFlagBits: int = field(default=0)
 
@@ -103,17 +109,37 @@ class PersonFullWithLocal(BaseApiData):
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
+    @property
+    def asLocalMsg(self: PersonFullLocalRowDc) -> PersonLocalRowDc:
+        return PersonLocalRowDc(
+            id=self.id,
+            first=self.first,
+            last=self.last,
+            nickname=self.nickname,
+            commitLevel=self.commitLevel,
+            reminderFrequency=self.reminderFrequency,
+            monitorStatus=self.monitorStatus,
+            imagePath=self.imagePath,
+            tsConfidenceScore=self.tsConfidenceScore,
+        )
+
+    @property
+    def asLocalDbRec(self: PersonFullLocalRowDc):  # -> PersonLocal
+        from ..models.person import PersonLocal
+
+        return PersonLocal.fromFullMsg(self)
+
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonListMsg(BaseApiData):
-    items: list[PersonFullWithLocal] = field(default_factory=lambda: [])
+class PersonListDc(BaseApiData):
+    items: list[PersonFullLocalRowDc] = field(default_factory=lambda: [])
 
     Schema: ClassVar[Type[Schema]] = Schema
 
 
 # Message types below are primary public classes
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonIdMessage(BaseApiData):
+class PersonIdDc(BaseApiData):
     # returned for create
     perId: int = field(default=0, metadata=dict(required=True))
     requestOptions: str = field(default="")
@@ -122,7 +148,7 @@ class PersonIdMessage(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonPhoneMessage(BaseApiData):
+class PersonPhoneDc(BaseApiData):
     phone: str = field(default="")
     # auth_token: str = field(default="")
     #
@@ -130,7 +156,7 @@ class PersonPhoneMessage(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonIdentifierMessage(BaseApiData):
+class PersonIdDescriptorDc(BaseApiData):
     perId: int = field(default=0, metadata=dict(required=True))
     idValue: str = field(default="")
     idType: str = field(default="")
@@ -139,7 +165,7 @@ class PersonIdentifierMessage(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class PersonMockDataMsg(BaseApiData):
+class PersonMockDataDc(BaseApiData):
     perId: int = field(default=0, metadata=dict(required=True))
     fileName: str = field(default="better")
     #
@@ -156,12 +182,12 @@ class PersonMockDataMsg(BaseApiData):
 # PersonListMessage: list[PersonMessage]
 
 # mostly hooks for testers
-PersonIdMessageCollection: list[PersonIdMessage]
-PersonPhoneMessageCollection: list[PersonPhoneMessage]
+PersonIdMessageCollection: list[PersonIdDc]
+PersonPhoneMessageCollection: list[PersonPhoneDc]
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class IncidentUpdateOpinionMessage(BaseApiData):
+class IncidentUpdateOpinionDc(BaseApiData):
     pass
     #
     Schema: ClassVar[Type[Schema]] = Schema
@@ -179,7 +205,7 @@ class IncidentUpdateOpinionMessage(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class RedFlagReportMsg(BaseApiData):
+class RedFlagReportDc(BaseApiData):
     """ """
 
     beganDateTime: datetime = field()
@@ -197,28 +223,28 @@ class RedFlagReportMsg(BaseApiData):
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class RedFlagSummaryMsg(BaseApiData):
+class RedFlagSummaryDc(BaseApiData):
     personId: int = field(default=0, metadata=dict(required=True))
     revengeCount: int = field(default=0, metadata=dict(required=True))
     catfishCount: int = field(default=0, metadata=dict(required=True))
     cheatedCount: int = field(default=0, metadata=dict(required=True))
     daterapeCount: int = field(default=0, metadata=dict(required=True))
-    reports: list[RedFlagReportMsg] = field(default_factory=lambda x: [])
+    reports: list[RedFlagReportDc] = field(default_factory=lambda x: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-PersonRowMsg.Schema.__model__ = PersonRowMsg
-PersonListMsg.Schema.__model__ = PersonListMsg
-PersonLocalRowMsg.Schema.__model__ = PersonLocalRowMsg
-PersonFullWithLocal.Schema.__model__ = PersonFullWithLocal
+PersonRowDc.Schema.__model__ = PersonRowDc
+PersonListDc.Schema.__model__ = PersonListDc
+PersonLocalRowDc.Schema.__model__ = PersonLocalRowDc
+PersonFullLocalRowDc.Schema.__model__ = PersonFullLocalRowDc
 
-PersonIdMessage.Schema.__model__ = PersonIdMessage
-PersonPhoneMessage.Schema.__model__ = PersonPhoneMessage
-PersonPhoneMessage.Schema.__model__ = PersonPhoneMessage
-PersonIdentifierMessage.Schema.__model__ = PersonIdentifierMessage
+PersonIdDc.Schema.__model__ = PersonIdDc
+PersonPhoneDc.Schema.__model__ = PersonPhoneDc
+PersonPhoneDc.Schema.__model__ = PersonPhoneDc
+PersonIdDescriptorDc.Schema.__model__ = PersonIdDescriptorDc
 
-PersonMockDataMsg.Schema.__model__ = PersonMockDataMsg
-IncidentUpdateOpinionMessage.Schema.__model__ = IncidentUpdateOpinionMessage
-RedFlagReportMsg.Schema.__model__ = RedFlagReportMsg
-RedFlagSummaryMsg.Schema.__model__ = RedFlagSummaryMsg
+PersonMockDataDc.Schema.__model__ = PersonMockDataDc
+IncidentUpdateOpinionDc.Schema.__model__ = IncidentUpdateOpinionDc
+RedFlagReportDc.Schema.__model__ = RedFlagReportDc
+RedFlagSummaryDc.Schema.__model__ = RedFlagSummaryDc

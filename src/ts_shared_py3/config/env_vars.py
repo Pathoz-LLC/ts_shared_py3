@@ -44,7 +44,7 @@ class CurrentEnvEnum(IntEnum):
     PROD = auto()
 
 
-class OsPathInfo(Singleton):
+class OsPathInfo(metaclass=Singleton):
     """used to find path to security & credential files for 3rd pty svcs"""
 
     @staticmethod
@@ -76,7 +76,7 @@ def _get_mid_path(svc_type: ThirdPtSvcType) -> str:
         return mid_dir_name
 
 
-class EnvVarVals(Singleton):
+class EnvVarVals(metaclass=Singleton):
     """ """
 
     # current runtime env as CurrentEnvEnum
