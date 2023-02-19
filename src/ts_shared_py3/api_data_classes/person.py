@@ -110,7 +110,7 @@ class PersonFullLocalRowDc(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
     @property
-    def asLocalMsg(self: PersonFullLocalRowDc) -> PersonLocalRowDc:
+    def asLocalDc(self: PersonFullLocalRowDc) -> PersonLocalRowDc:
         return PersonLocalRowDc(
             id=self.id,
             first=self.first,

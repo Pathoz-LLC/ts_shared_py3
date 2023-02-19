@@ -224,7 +224,7 @@ class PersonLocal(BaseNdbModel):
 
         return Tracking.loadByKeys(self.userKey, self.personKey)
 
-    def _updateFromMsg(self, msg: PersonLocalRowMsg) -> None:
+    def _updateFromMsg(self, msg: PersonLocalRowDc) -> None:
         self.nickname = msg.nickname
         self.commitLevel = msg.commitLevel
         self.imagePath = msg.imagePath
@@ -240,7 +240,7 @@ class PersonLocal(BaseNdbModel):
     def fromFullMsg(pfwl: PersonFullLocalRowDc) -> PersonLocal:
         """convert msg into a PersonLocalRowMsg instance"""
         pl = PersonLocal()
-        pl._updateFromMsg(pfwl.asLocalMsg)
+        pl._updateFromMsg(pfwl.asLocalDc)
         return pl
 
     @staticmethod

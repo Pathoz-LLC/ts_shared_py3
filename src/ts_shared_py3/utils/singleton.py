@@ -1,8 +1,10 @@
-from typing import Any
+# from typing import Any
 
 
 class Singleton(type):
     def __init__(self, name, bases, dic):
+        # init for metaclass; not real obj
+        # but self IS the class instance
         self.__single_instance = None
         super().__init__(name, bases, dic)
 
