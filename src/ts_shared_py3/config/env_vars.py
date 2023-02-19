@@ -79,10 +79,16 @@ def _get_mid_path(svc_type: ThirdPtSvcType) -> str:
 class EnvVarVals(metaclass=Singleton):
     """ """
 
+    def __init__(self) -> None:
+        if self.init_completed:
+            return
+        self.CURRENT_ENV = CurrentEnvEnum[os.environ.get("ENV", "LOCAL")]
+        self.init_completed = True
+
     # current runtime env as CurrentEnvEnum
-    @property
-    def CURRENT_ENV(self: EnvVarVals) -> CurrentEnvEnum:
-        return CurrentEnvEnum[os.environ.get("ENV", "LOCAL")]
+    # @property
+    # def CURRENT_ENV(self: EnvVarVals) -> CurrentEnvEnum:
+    #     return CurrentEnvEnum[os.environ.get("ENV", "LOCAL")]
 
     # Root path of project
     @property
