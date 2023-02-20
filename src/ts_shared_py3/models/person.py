@@ -105,6 +105,23 @@ class Person(BaseNdbModel):
     #     person.put()
     #     return person
 
+    def asFullLocDc(
+        self: Person, perId: int, personLocalRec: PersonLocal
+    ) -> PersonFullLocalRowDc:
+        selfProps = self.to_dict()
+        selfProps["id"] = perId
+        # remove fields not on the msg
+        del selfProps["tags"]
+        del selfProps["xtra"]
+        pf = PersonFullLocalRowDc(**selfProps)
+        pf.nickname = personLocalRec.nickname
+        pf.commitLevel = personLocalRec.commitLevel
+        pf.reminderFrequency = personLocalRec.reminderFrequency
+        pf.tsConfidenceScore = personLocalRec.recentTsConfidenceScore
+        pf.imagePath = personLocalRec.imagePath
+        pf.monitorStatus = personLocalRec.monitorStatus
+        return pf
+
     def add_identifier(self, value, keyType):
         # actually stores the value
         assert isinstance(keyType, KeyTypeEnum), "must be a KeyTypeEnum"

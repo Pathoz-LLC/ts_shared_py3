@@ -93,6 +93,7 @@ class PersonFullLocalRowDc(BaseApiData):
     mobile: str = field(default="")
     first: str = field(default="")
     last: str = field(default="")
+    alias: str = field(default="")
     email: str = field(default="")
     city: str = field(default="")
     state: str = field(default="")
