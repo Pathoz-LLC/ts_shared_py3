@@ -1,8 +1,10 @@
 from __future__ import annotations
 import string
+from typing import Optional
 import google.cloud.ndb as ndb
 
-#
+# next line causes circular import
+# from .person import Person, PersonLocal, PersonKeys
 from ..enums.keyType import KeyTypeEnum, NdbKeyTypeProp
 from .baseNdb_model import BaseNdbModel
 
@@ -16,13 +18,13 @@ NON_DIGITS_MAP = dict(
 )
 
 
-def stripNonDigits(value):
+def stripNonDigits(value: str):
     # remove non-digits
     # print('searching Person by phone on %s  (%s)' % (value, type(value)) )
     if isinstance(value, str):  # unicode string
-        return value.translate(NON_DIGITS_MAP)
-    elif isinstance(value, str):  # regular string
-        return value.translate(None, DELETE_CHARS)
+        return value.translate(DELETE_CHARS)  # NON_DIGITS_MAP
+    # elif isinstance(value, str):  # regular string
+    #     return value.translate(None, DELETE_CHARS)
     else:  # unknown type
         return str(value).translate(None, DELETE_CHARS)
 
@@ -38,13 +40,15 @@ class PersonKeys(BaseNdbModel):
     # from .person_model import Person     # get Person class
 
     @staticmethod
-    def storeMobileFor(person, phone):
+    def storeMobileFor(person: Person, phone: str):
         phone = stripNonDigits(phone)
         PersonKeys.attachFor(person, phone)
         # return
 
     @staticmethod
-    def attachFor(personAsParent, value, keyType=KeyTypeEnum.MBPHONE):
+    def attachFor(
+        personAsParent: Person, value: str, keyType: KeyTypeEnum = KeyTypeEnum.MBPHONE
+    ):
         # if not keyType.isdigit():
         #     keyType = KeyType.by_string(keyType)
         assert isinstance(
@@ -55,7 +59,7 @@ class PersonKeys(BaseNdbModel):
         pkey.put()
 
     @staticmethod
-    def searchByPhone(phoneString: str):  # ndb.AND
+    def searchByPhone(phoneString: str) -> Optional[Person]:  # ndb.AND
         phoneString = stripNonDigits(phoneString)
         pkRec = PersonKeys.query(
             PersonKeys.value == phoneString, PersonKeys.keyType == KeyTypeEnum.MBPHONE
@@ -71,7 +75,7 @@ class PersonKeys(BaseNdbModel):
             return None
 
     @staticmethod
-    def load(person) -> list[PersonKeys]:  # : Person
+    def load(person: Person) -> list[PersonKeys]:  # : Person
         return PersonKeys.query(ancestor=person.key).fetch()
 
 

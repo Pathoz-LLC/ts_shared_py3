@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import date
 from typing import ClassVar, Type
 from dataclasses import field
@@ -52,6 +53,10 @@ class IntervalMessage(BaseApiData):
     persId: int = field(default=0, metadata=dict(required=True))
 
     Schema: ClassVar[Type[Schema]] = Schema
+
+    @property
+    def hasDateChange(self: IntervalMessage) -> bool:
+        return self.startDate != self.oldStartDate and self.oldStartDate != None
 
 
 @dataclass(base_schema=DataClassBaseSchema)

@@ -114,8 +114,8 @@ class MonitorStatusSerialized(fields.Enum):
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: MonitorStatusSerialized) -> MonitorStatus:
-        return MonitorStatus
+    # def dump_default(self: MonitorStatusSerialized) -> MonitorStatus:
+    #     return MonitorStatus
 
 
 # MonitorStatusSerializedMsg = NewType(

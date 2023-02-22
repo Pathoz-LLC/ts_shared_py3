@@ -52,7 +52,7 @@ class InputEntryAdapter(BaseNdbModel):
         parentKey = BaseNdbModel.makeAncestor(userId, prospId)
         self.key = ndb.Key(self.__class__.__name__, None, parent=parentKey)
 
-    def save(self):  # : InputEntryAdapter
+    def save(self: InputEntryAdapter):  # : InputEntryAdapter
         self.put()
 
     @property
@@ -72,7 +72,7 @@ class InputEntryAdapter(BaseNdbModel):
     #     # return self.numArgs[0:2]
 
     @property
-    def ruleType(self) -> ScoreRuleType:
+    def ruleType(self: InputEntryAdapter) -> ScoreRuleType:
         # rt = ScoreRuleType(self.ruleTypeInt)
         # assert isinstance(
         #     rt, ScoreRuleType
@@ -81,17 +81,17 @@ class InputEntryAdapter(BaseNdbModel):
         return ScoreRuleType(self.ruleTypeInt)
 
     @property
-    def allocWeightType(self) -> AllocType:
+    def allocWeightType(self: InputEntryAdapter) -> AllocType:
         # determines how much weight to apply to this entry
         return self.ruleType.allocWeightType
 
     @property
-    def allocWeightInt(self) -> int:
+    def allocWeightInt(self: InputEntryAdapter) -> int:
         # int value of AllocType enum
         return self.allocWeightType.value
 
     @classmethod
-    def fromFeeling(cls, beh: Entry) -> InputEntryAdapter:
+    def fromFeeling(cls: InputEntryAdapter.__class__, beh: Entry) -> InputEntryAdapter:
         """
         called fromBehavior below
         behavior reports with no behCode;  aka feeling-only report
@@ -116,7 +116,7 @@ class InputEntryAdapter(BaseNdbModel):
         return ieAdapt
 
     @classmethod
-    def fromBehavior(cls, beh: Entry) -> InputEntryAdapter:
+    def fromBehavior(cls: InputEntryAdapter.__class__, beh: Entry) -> InputEntryAdapter:
         """
         point = beh.normalizedFeeling from -1 to 1
         """
@@ -152,7 +152,11 @@ class InputEntryAdapter(BaseNdbModel):
 
     @classmethod
     def fromValueAssessment(
-        cls, behCode: str, concernVote: int, freqVote: int, changeDt: date
+        cls: InputEntryAdapter.__class__,
+        behCode: str,
+        concernVote: int,
+        freqVote: int,
+        changeDt: date,
     ) -> InputEntryAdapter:
         """
         concern is how much this behavior "would" bother me
@@ -160,6 +164,9 @@ class InputEntryAdapter(BaseNdbModel):
         even tho these behaviors are negative, I suspect (check me)
         both concern & freq are stored as positive
         """
+        if changeDt == None:
+            changeDt = date.today()
+
         ruleType: ScoreRuleType = ScoreRuleType.valueRuleTypeFromNormFreqVot(freqVote)
         # calcServant = staticWeightsLookup.rowServantFor(behCode, ruleType)
 

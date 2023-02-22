@@ -10,7 +10,7 @@ from ..enums.createAndMonitor import (
     NdbCreateReasonProp,
     NdbMonitorStatusProp,
 )
-from ..enums.remind_freq import RemindFreq, ReminderFreqSerializedMa
+from ..enums.remind_freq import NdbRemindProp, RemindFreq, ReminderFreqSerializedMa
 from ..enums.sex import Sex, NdbSexProp
 from .baseNdb_model import BaseNdbModel
 from .values_beh_cat import UserAnswerStats
@@ -205,9 +205,7 @@ class PersonLocal(BaseNdbModel):
 
     # housekeeping vals
     monitorStatus = NdbMonitorStatusProp(default=MonitorStatus.ACTIVE)
-    reminderFrequency = NdbMonitorStatusProp(
-        indexed=False, default=MonitorStatus.ACTIVE
-    )
+    reminderFrequency = NdbRemindProp(indexed=False, default=RemindFreq.NEVER)
     createReason = NdbCreateReasonProp(
         required=True, default=CreateReason.RELATIONSHIP, indexed=False
     )
@@ -289,15 +287,16 @@ class PersonLocal(BaseNdbModel):
         return pl.key
 
     @staticmethod
-    def appendRequiredToMsg(msg):
+    def appendRequiredToMsg(msg: PersonRowDc) -> None:
         """provides default vals for messages"""
-        if msg.is_initialized():
-            return
-        msg.nickname = msg.get_assigned_value("nickname") or "notfound"
-        msg.devotionLevel = msg.get_assigned_value("devotionLevel") or "na"
+        # if msg.is_initialized():
+        #     return
+        # msg.nickname = msg.get_assigned_value("nickname") or "notfound"
+        # msg.co = msg.get_assigned_value("devotionLevel") or "na"
+        pass
 
     @staticmethod
-    def loadByUserKey(userKey, asnc=False):
+    def loadByUserKey(userKey: ndb.Key, asnc: bool = False):
         """loads all (even deleted or trust mode) for this user
         and then caller can filter based on value of monitorStatus
         return newest to oldest
@@ -312,13 +311,13 @@ class PersonLocal(BaseNdbModel):
             return q.fetch()
 
     @staticmethod
-    def getById(userKey, personId):
+    def getById(userKey: ndb.Key, personId: int) -> PersonLocal:
         """ """
         plKey = PersonLocal._makeKey(userKey.string_id(), personId)
         return plKey.get()
 
     @classmethod
-    def getByPhone(cls, user, phone):
+    def getByPhone(cls, user: DbUser, phone: str) -> Person:
         # find specific phone #, then compare its parent (People) key to those followed by cur user
 
         personByPhone = Person.searchByPhone(phone)
@@ -336,7 +335,7 @@ class PersonLocal(BaseNdbModel):
 
     def appendToMsg(self, msg):
         msg.nickname = self.nickname
-        msg.devotionLevel = self.commitLevel.value
+        msg.commitLevel = self.commitLevel.value
         msg.imagePath = self.imagePath
         # msg.overallScore = self.overallScore
         # msg.redFlagBits = self.redFlagBits

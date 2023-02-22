@@ -19,6 +19,7 @@ class KeywordSearch(ndb.Model):
 
     @staticmethod
     def loadOrCreateFromMsg(msg: BehaviorSearchTermMsg) -> KeywordSearch:
+        # should remember which users reported term
         key = ndb.Key(KeywordSearch, msg.searchPhrase)
         rec = KeywordSearch.load(key)
         if rec == None:
@@ -31,9 +32,9 @@ class KeywordSearch(ndb.Model):
             )
 
         rec.count += 1
-        rec.useIDs.append(msg.userID)
+        # rec.useIDs.append(msg.userID)
         return rec
 
     def save(self: KeywordSearch):
         #
-        self.key.put()
+        self.put()

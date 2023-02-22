@@ -47,7 +47,7 @@ class BehSummary(ndb.Model):
     # date when user changes their concern level
     changeDt = ndb.DateProperty(required=True, auto_now=True)
 
-    def _updateVals(self, valRateMsg: ValueRateMsg):
+    def _updateVals(self: BehSummary, valRateMsg: ValueRateMsg):
         """
         Args:
             svap: SaveValueAssessPayload
@@ -55,9 +55,13 @@ class BehSummary(ndb.Model):
         assert 1 <= valRateMsg.concernVote <= 4, "concern vote {0} out of range".format(
             valRateMsg.concernVote
         )
-        changeDt = message_to_date(valRateMsg.changeDt)
+        changeDt: date = valRateMsg.changeDt
+        if changeDt == None:
+            changeDt = date.today()
         if valRateMsg.concernVote != self.concernVote:
             self.changeDt = changeDt
+        else:
+            self.changeDt = date.today()
 
         self.concernVote = valRateMsg.concernVote
         for persFreqMsg in valRateMsg.frequencies:
@@ -66,7 +70,7 @@ class BehSummary(ndb.Model):
             # setting changeDt EXPLICITLY for testability; do not auto-set
             self.perProspect[idx].changeDt = changeDt
 
-    def _findOrAppendIdxForPerson(self, personID: int) -> int:
+    def _findOrAppendIdxForPerson(self: BehSummary, personID: int) -> int:
         """add ProspectSummary if not found"""
         personID = int(personID)
         for i, ps in enumerate(self.perProspect):
@@ -100,15 +104,14 @@ class UserValsByBehCat(ndb.Model):
     allBehaviors = ndb.LocalStructuredProperty(BehSummary, repeated=True)
 
     @property
-    def userID(self) -> str:
+    def userID(self: UserValsByBehCat) -> str:
         if self.key is None:
             return ""
         else:
-            # x = ndb.Key.string_id
-            return self.key.string_id
+            return self.key.parent().string_id()
 
     @property
-    def userCountStats(self):
+    def userCountStats(self: UserValsByBehCat) -> UserAnswerStats:
         """user global stats/counts values
         keep a copy of UserAnswerStats (persisted separately/globally)
         to govern whether user can get another question or not
@@ -117,19 +120,19 @@ class UserValsByBehCat(ndb.Model):
         return UserAnswerStats._loadOrCreate(self.userID)
 
     @property
-    def newestChangeDt(self) -> date:
+    def newestChangeDt(self: UserValsByBehCat) -> date:
         return max(self.changeDates)
 
     @property
-    def changeDates(self) -> list[date]:
+    def changeDates(self: UserValsByBehCat) -> list[date]:
         return [x.changeDt for x in self.allBehaviors]
 
-    def __str__(self) -> str:
+    def __str__(self: UserValsByBehCat) -> str:
         return "lastCd:{0} ansForCount:{1} userCountSum:{2}".format(
             self.lastBehCode, len(self.allBehaviors), str(self.userCountStats)
         )
 
-    def updateUserAnswer(self, valRateMsg: ValueRateMsg):
+    def updateUserAnswer(self: UserValsByBehCat, valRateMsg: ValueRateMsg):
         # valRateMsg is instance of ValuesClient()
         # update nested struc from ValueRateMsg
         if len(valRateMsg.frequencies) > 0:
@@ -140,21 +143,25 @@ class UserValsByBehCat(ndb.Model):
         # store to disk
         self._save()  # will also save (separately) the user-global UserAnswerStats rec
 
-    def questionsAllowedToday(self, perDayAllowance: int) -> int:
+    def questionsAllowedToday(self: UserValsByBehCat, perDayAllowance: int) -> int:
         """
         nxtQuestReqPayload: NextQuestRequestPayload
         return int
         """
         return self.userCountStats.remainingQuestionsAvail(perDayAllowance)
 
-    def maybePriorAnsForBehCode(self, behCode: str) -> Optional[BehSummary]:
+    def maybePriorAnsForBehCode(
+        self: UserValsByBehCat, behCode: str
+    ) -> Optional[BehSummary]:
         """find prior answer if exists"""
         for bs in self.allBehaviors:
             if bs.behCode == behCode:
                 return bs
         return None
 
-    def _appendOrUpdateVoteVals(self, valRateMsg: ValueRateMsg) -> None:
+    def _appendOrUpdateVoteVals(
+        self: UserValsByBehCat, valRateMsg: ValueRateMsg
+    ) -> None:
         """update both self & UserAnswerStats from SaveValueAssessPayload
         valRateMsg is instance of ValuesClient()
         """
@@ -170,7 +177,7 @@ class UserValsByBehCat(ndb.Model):
         idx = self._findOrAppendIdxForBehCode(valRateMsg.behCode)
         self.allBehaviors[idx]._updateVals(valRateMsg)
 
-    def _findOrAppendIdxForBehCode(self, behCode: str) -> int:
+    def _findOrAppendIdxForBehCode(self: UserValsByBehCat, behCode: str) -> int:
         """which row contains rec summary for behCode
         FIXME: make this a generator to be faster
         """
@@ -181,7 +188,7 @@ class UserValsByBehCat(ndb.Model):
         self.allBehaviors.append(BehSummary._newRecFor(behCode))
         return len(self.allBehaviors) - 1
 
-    def _save(self) -> None:
+    def _save(self: UserValsByBehCat) -> None:
         self.userCountStats.save()  # separate-table; not persisted on this instance
         self.put()
 
@@ -200,7 +207,7 @@ class UserValsByBehCat(ndb.Model):
     @staticmethod
     def loadOrCreate(userID: str, category: str) -> UserValsByBehCat:
         # global userCountCache
-        key = UserValsByBehCat._makeKey(userID, category)
+        key = UserValsByBehCat._makeKey(userID, category)  # UserValsByBehCat
         rec = key.get()
         if rec is None:
             rec = UserValsByBehCat._emptyNewRec(userID, category)

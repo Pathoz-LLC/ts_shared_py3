@@ -1,7 +1,10 @@
+from __future__ import annotations
 from datetime import datetime, date, time, timedelta
 from typing import Union
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
+
+# from ts_shared_py3.api_data_classes.person import RedFlagReportDc
 
 from ..enums.redFlag import RedFlagType, NdbRedFlagProp
 from .baseNdb_model import BaseNdbModel
@@ -33,15 +36,15 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
     modifyDateTime = ndb.DateTimeProperty(indexed=False)
 
     @property
-    def personID(self):
+    def personID(self: RedFlagReport):
         persKey = self.key.parent().parent()
         return persKey.integer_id()
 
-    def toMsg(self):
-        from api_data_classes.person import RedFlagReportMsg
+    def toMsg(self: RedFlagReport):
+        from ..api_data_classes.person import RedFlagReportDc
 
-        return RedFlagReportMsg(
-            userId=self.userKey.id(),
+        return RedFlagReportDc(
+            userId=self.userKey.string_id(),
             personId=self.personID,
             flagType=self.flagType.value,
             comment=self.comment,
@@ -50,7 +53,7 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
         )
 
     @staticmethod
-    def fromMsg(msg, userId):
+    def fromMsg(msg: RedFlagReportDc, userId: str):
         now = datetime.now()
         beganDt = msg.beganDateTime if msg.beganDateTime else now
         beganDt = beganDt.replace(tzinfo=None)
@@ -67,7 +70,7 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
         return rfr
 
     @staticmethod
-    def _makeKey(userID, personID, flagType):
+    def _makeKey(userID: str, personID: int, flagType: RedFlagType):
         # this structure prevents duplicates & makes deletion/recindtion a simple operation
         flagTypeKey = RedFlagReport.getAncestorKey(personID, flagType)
         return ndb.Key(RedFlagReport, userID, parent=flagTypeKey)

@@ -218,7 +218,7 @@ class RedFlagReportDc(BaseApiData):
     userId: str = field(default="")
     comment: str = field(default="")
     url: str = field(default="")
-    rescinded: int = field(default=0, metadata=dict(required=True))
+    rescinded: int = field(default=0, metadata=dict(required=False))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 

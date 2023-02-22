@@ -157,13 +157,19 @@ class BehEntryWrapperMessage(BaseApiData):
 @dataclass()
 class BehaviorLogSummaryMessage(BaseApiData):
     endedDatingDt: date = field()
-    beganDatingDt: date = field(metadata=dict(required=True))
+    beganDatingDt: date = field(
+        default_factory=lambda: date.today(), metadata=dict(required=True)
+    )
 
     persId: int = field(default=0, metadata=dict(required=True))
     persName: str = field(default="", metadata=dict(required=True))
     persCurRelStatus: str = field(default="CASUAL")  # enums.DisplayCommitLvl
-    firstEntryDttm: date = field(default=0, metadata=dict(required=True))  # as epoch
-    lastEntryDttm: date = field(default=0, metadata=dict(required=True))
+    firstEntryDttm: date = field(
+        default_factory=lambda: date.today(), metadata=dict(required=True)
+    )  # as epoch
+    lastEntryDttm: date = field(
+        default_factory=lambda: date.today(), metadata=dict(required=True)
+    )
     count: int = field(default=0, metadata=dict(required=True))
     entries: list[BehEntryWrapperMessage] = field(default_factory=lambda: [])
     phaseHistory: list[TrackingPayloadMsgDc] = field(default_factory=lambda: [])
@@ -202,7 +208,7 @@ class BehOrCatMsg(BaseApiData):
 class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
-    children: list[str] = field(default_factory=lambda x: [])
+    children: list[str] = field(default_factory=lambda: [])
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -251,7 +257,6 @@ class BehStatMsg(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
 class BehStatMsgAdapter:
     @staticmethod
     def toDict(behStatMsg):
@@ -274,8 +279,11 @@ class VoteTypeMsg(BaseApiData):
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
+    @staticmethod
+    def defaultEmpty() -> VoteTypeMsg:
+        return VoteTypeMsg(feelings=[], concern=[], frequency=[])
 
-@dataclass()
+
 class VoteTypeMsgAdapter:
     @staticmethod
     def toDict(voteTypeMsg):
@@ -303,18 +311,16 @@ class VoteTypeMsgAdapter:
 class BehVoteStatsMsg(BaseApiData):
     behaviorCode: str = field(default="", metadata=dict(required=True))
     categoryName: str = field(default="", metadata=dict(required=True))
-    female: list[VoteTypeMsg] = field(default_factory=lambda: [])
-    male: list[VoteTypeMsg] = field(default_factory=lambda: [])
-    unknown: list[VoteTypeMsg] = field(default_factory=lambda: [])
+    female: VoteTypeMsg = field(default_factory=lambda: VoteTypeMsg.defaultEmpty())
+    male: VoteTypeMsg = field(default_factory=lambda: VoteTypeMsg.defaultEmpty())
+    unknown: VoteTypeMsg = field(default_factory=lambda: VoteTypeMsg.defaultEmpty())
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass()
 class BehVoteStatAdapter:
 
     #
-    Schema: ClassVar[Type[Schema]] = Schema
 
     @staticmethod
     def toDict(behVoteStatsMsg):
@@ -371,10 +377,10 @@ CatCodeTextMsg.Schema.__model__ = CatCodeTextMsg
 
 TopCategoriesMsg.Schema.__model__ = TopCategoriesMsg
 BehStatMsg.Schema.__model__ = BehStatMsg
-BehStatMsgAdapter.Schema.__model__ = BehStatMsgAdapter
+# BehStatMsgAdapter.Schema.__model__ = BehStatMsgAdapter
 VoteTypeMsg.Schema.__model__ = VoteTypeMsg
 
-VoteTypeMsgAdapter.Schema.__model__ = VoteTypeMsgAdapter
+# VoteTypeMsgAdapter.Schema.__model__ = VoteTypeMsgAdapter
 BehVoteStatsMsg.Schema.__model__ = BehVoteStatsMsg
-BehVoteStatAdapter.Schema.__model__ = BehVoteStatAdapter
+# BehVoteStatAdapter.Schema.__model__ = BehVoteStatAdapter
 BehSrchLogMsg.Schema.__model__ = BehSrchLogMsg

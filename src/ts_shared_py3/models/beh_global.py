@@ -100,7 +100,7 @@ class CountTotals:
         returns a BehVoteStatsMsg msg
     """
 
-    def __init__(self, bru: BehaviorRollup):
+    def __init__(self: CountTotals, bru: BehaviorRollup):
         """construct obj with one bru
         then use self.append() to add stats from other bru shards
         """
@@ -113,24 +113,24 @@ class CountTotals:
         )
         self.msg.categoryName = bru.categoryName
 
-    def __eq__(self, other):
+    def __eq__(self: CountTotals, other: CountTotals):
         if isinstance(other, CountTotals):
             if other.msg == self.msg:
                 return True
             return False
         return False
 
-    def __ne__(self, other):
+    def __ne__(self: CountTotals, other: CountTotals):
         return not self.__eq__(other)
 
-    def append(self, bru):
+    def append(self: CountTotals, bru: BehaviorRollup):
         # add to dict
         d = bru.msgFor(Sex.FEMALE)
-        self.msg.female = CountTotals.merge(self.msg.female, d)
+        self.msg.female = CountTotals.merge(self.msg.female[0], d)
         d = bru.msgFor(Sex.MALE)
-        self.msg.male = CountTotals.merge(self.msg.male, d)
+        self.msg.male = CountTotals.merge(self.msg.male[0], d)
         d = bru.msgFor(Sex.UNKNOWN)
-        self.msg.unknown = CountTotals.merge(self.msg.unknown, d)
+        self.msg.unknown = CountTotals.merge(self.msg.unknown[0], d)
 
     def _slotsToPct(self, voteRecForSex):
         # min of 1 to avoid divide by zero
@@ -167,7 +167,7 @@ class CountTotals:
         self.convertToPctByType(VoteType.FREQUENCY)
 
     @staticmethod
-    def merge(mainMsg, newMsg):
+    def merge(mainMsg: VoteTypeMsg, newMsg: VoteTypeMsg):
         """
         main func for combining partitioned global stats recs into
         one rec with all counts rolled together
@@ -564,7 +564,7 @@ class BehaviorRollup(ndb.Model):
         return VoteTypeMsg(feeling=feeling, concern=concern, frequency=frequency)
 
     @staticmethod
-    def getStatsForBehavior(behCode: str):
+    def getStatsForBehavior(behCode: str) -> BehVoteStatsMsg:
         """API to Retrieve the value for a given sharded counter.
         Args:
             behCode: behavior code name of the counter.

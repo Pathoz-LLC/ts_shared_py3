@@ -9,6 +9,7 @@ import random
 #
 from .activityType import ActivityType
 
+# next line causes circular import;  leave commented
 # from ..api_data_classes.tracking import CommitLvlApiMsg
 
 # even tho biz logic is driven from LogicCommitLvl, since client uses
@@ -352,8 +353,8 @@ class CommitLvlSerializedMa(fields.Enum):
         except ValueError as error:
             raise ValidationError("") from error
 
-    def dump_default(self: CommitLvlSerializedMa) -> CommitLevel_Display:
-        return CommitLevel_Display.NONEXCLUSIVE
+    # def dump_default(self: CommitLvlSerializedMa) -> CommitLevel_Display:
+    #     return CommitLevel_Display.NONEXCLUSIVE
 
 
 # CommitLvlSerializedMsg = NewType("CommitLvlSerialized", str, _CommitLvlSerialized)
