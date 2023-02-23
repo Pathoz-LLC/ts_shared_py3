@@ -287,15 +287,17 @@ class DbUser(WaUser):  # BaseUserExpando
         user.put()
         return user, bearerToken
 
-    def asMsg(self) -> UserProfileMsg:
+    def asMsg(self: DbUser) -> UserProfileMsg:
         from ..api_data_classes.user import UserProfileMsg
+
+        selfDob: date = self.dob or date.today()
 
         msg = UserProfileMsg(
             userId=self.user_id,
             email=self.email,
             fullNameOrHandle=self.name,
             photoUrl=self.photoUrl,
-            dob=self.dob,
+            dob=selfDob,
             sex=self.sex,
             city=self.city,
             state=self.state,
@@ -321,17 +323,17 @@ class DbUser(WaUser):  # BaseUserExpando
         return UserAppSettings.get_or_create_by_user_id(self.user_id)
 
     @property
-    def isEntitledUser(self) -> bool:
+    def isEntitledUser(self: DbUser) -> bool:
         # special users who have privs without paying
         return 3 <= self.accountLevel.value <= 6
 
     @property
-    def subscriptionIsFullyPaid(self) -> bool:
+    def subscriptionIsFullyPaid(self: DbUser) -> bool:
         # applys only to normal customers (not entitled)
         return self.accountLevel.value == 0 or self.premiumExpireDt > date.today()
 
     @property
-    def isPaidUser(self) -> bool:
+    def isPaidUser(self: DbUser) -> bool:
         # applies to both normal customers and entitled users
         return (
             1 <= self.accountLevel.value <= 2 and self.subscriptionIsFullyPaid
@@ -358,7 +360,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return self.key.string_id()
 
     @property
-    def name_(self) -> str:  # added 04/30 by DG
+    def name_(self: DbUser) -> str:  # added 04/30 by DG
         l_name = "?"
         if self.first and self.last:
             l_name = self.first + " " + self.last
@@ -400,7 +402,7 @@ class DbUser(WaUser):  # BaseUserExpando
     #     # return save_future
 
     @classmethod
-    def get_by_bearer_token(cls, userId, token) -> DbUser:
+    def get_by_bearer_token(cls, userId: str, token: str) -> DbUser:
         """Returns a user object based on a user ID and oauth bearer token.
 
         :param token:
@@ -432,7 +434,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return None, None
 
     @classmethod
-    def create_bearer_token(cls, user_id) -> UserToken:
+    def create_bearer_token(cls, user_id: str) -> UserToken:
         """Creates a new oauth bearer token for a given user ID.
 
         :param user_id:
@@ -443,7 +445,7 @@ class DbUser(WaUser):  # BaseUserExpando
         return cls.token_model.create(user_id, "bearer")
 
     @classmethod
-    def get_by_auth_token(cls, user_id, token) -> Tuple[DbUser, int]:
+    def get_by_auth_token(cls, user_id: str, token: str) -> Tuple[DbUser, int]:
         """Returns a user object based on a user ID and token.
 
         :param user_id:
@@ -482,7 +484,7 @@ class DbUser(WaUser):  # BaseUserExpando
     #     pass
 
     @staticmethod
-    def loadByEmailOrId(email="", firAuthUserId=""):
+    def loadByEmailOrId(email: str = "", firAuthUserId: str = ""):
         if len(firAuthUserId) > 2:
             user = ndb.Key(DbUser, firAuthUserId).get()
         else:
@@ -499,6 +501,7 @@ class DbUser(WaUser):  # BaseUserExpando
             u = DbUser()
             u.key = uKey
             u.email = email
+            u.dob = date.today()
             u.authToken = token
             u.refreshToken = token
             u.first = "gen by"

@@ -73,7 +73,7 @@ class Tracking(BaseNdbModel):
             ],
             lastCheckDateTime=datetime.now(),
         )
-        track.key = Tracking._makeKey(userId, persId)
+        track.key = Tracking.makeUserPersKey(userId, persId)
         track.put()
         return track
 
@@ -191,7 +191,7 @@ class Tracking(BaseNdbModel):
         return overlapDays
 
     @staticmethod
-    def _makeKey(userId: str, personId: int) -> ndb.Key:
+    def makeUserPersKey(userId: str, personId: int) -> ndb.Key:
         return ndb.Key("Tracking", personId, parent=ndb.Key("User", userId))
 
     @staticmethod
@@ -199,7 +199,7 @@ class Tracking(BaseNdbModel):
         # query = Tracking.query(
         #     Tracking.userKey == userKey, Tracking.personKey == personKey
         # )
-        key = Tracking._makeKey(userKey.string_id(), personKey.integer_id())
+        key = Tracking.makeUserPersKey(userKey.string_id(), personKey.integer_id())
         return key.get()
 
     @staticmethod
@@ -207,7 +207,7 @@ class Tracking(BaseNdbModel):
         # userKey = ndb.Key("User", userId)
         # personKey = ndb.Key("Person", personId)
         # return Tracking.loadByKeys(userKey, personKey)
-        key = Tracking._makeKey(userId, personId)
+        key = Tracking.makeUserPersKey(userId, personId)
         return key.get()
 
     def _pre_put_hook(self: Tracking):

@@ -4,7 +4,8 @@ from typing import Union
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
 
-# from ts_shared_py3.api_data_classes.person import RedFlagReportDc
+# circular import
+from ts_shared_py3.api_data_classes.person import RedFlagReportDc
 
 from ..enums.redFlag import RedFlagType, NdbRedFlagProp
 from .baseNdb_model import BaseNdbModel

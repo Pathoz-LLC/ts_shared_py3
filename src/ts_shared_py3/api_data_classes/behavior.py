@@ -14,6 +14,10 @@ from .tracking import TrackingPayloadMsgDc
     equal to the Classname
     this will allow creation & return of actual Model instances
     inside our endpoints
+
+    the old proto msgs COULD NOT have methods or properties
+    and so I built ADAPTER classes to do conversion
+    those are no longer needed with marshmallow / py3
 """
 
 # example of validation
@@ -252,18 +256,22 @@ class TopCategoriesMsg(BaseApiData):
 class BehStatMsg(BaseApiData):
     # embedded in VoteTypeMsg
     totCount: int = field(default=0, metadata=dict(required=True))
-    slotCounts: list[int] = field(default_factory=lambda: [])
+    slotCounts: list[int] = field(default_factory=lambda: [0, 0, 0, 0, 0])
     #
     Schema: ClassVar[Type[Schema]] = Schema
+
+    @staticmethod
+    def emptyDefault() -> BehStatMsg:
+        return BehStatMsg(totCount=0, slotCounts=[0, 0, 0, 0, 0])
 
 
 class BehStatMsgAdapter:
     @staticmethod
-    def toDict(behStatMsg):
+    def toDict(behStatMsg) -> map[str, map]:
         return {"totCount": behStatMsg.totCount, "slotCounts": behStatMsg.slotCounts}
 
     @staticmethod
-    def fromDict(dct):
+    def fromDict(dct: map[str, map]) -> BehStatMsg:
         # print("BehStatMsg: %s" % dct)
         tc = dct.get("totCount", 0)
         sc = dct.get("slotCounts", [0, 0, 0, 0])
@@ -273,9 +281,9 @@ class BehStatMsgAdapter:
 @dataclass()
 class VoteTypeMsg(BaseApiData):
     # embedded in BehVoteStatsMsg
-    feeling: list[BehStatMsg] = field(default_factory=lambda: [])
-    concern: list[BehStatMsg] = field(default_factory=lambda: [])
-    frequency: list[BehStatMsg] = field(default_factory=lambda: [])
+    feeling: BehStatMsg = field(default_factory=lambda: BehStatMsg.emptyDefault())
+    concern: BehStatMsg = field(default_factory=lambda: BehStatMsg.emptyDefault())
+    frequency: BehStatMsg = field(default_factory=lambda: BehStatMsg.emptyDefault())
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -286,7 +294,7 @@ class VoteTypeMsg(BaseApiData):
 
 class VoteTypeMsgAdapter:
     @staticmethod
-    def toDict(voteTypeMsg):
+    def toDict(voteTypeMsg: VoteTypeMsg) -> map[str, map]:
         return {
             "feeling": BehStatMsgAdapter.toDict(voteTypeMsg.feeling),
             "concern": BehStatMsgAdapter.toDict(voteTypeMsg.concern),
@@ -294,7 +302,7 @@ class VoteTypeMsgAdapter:
         }
 
     @staticmethod
-    def fromDict(dct: dict):
+    def fromDict(dct: dict) -> VoteTypeMsg:
         feel = dct.get("feeling", {})
         if not isinstance(feel, BehStatMsg):
             feel = BehStatMsgAdapter.fromDict(feel)
@@ -323,7 +331,7 @@ class BehVoteStatAdapter:
     #
 
     @staticmethod
-    def toDict(behVoteStatsMsg):
+    def toDict(behVoteStatsMsg) -> map[str, map]:
         return {
             "behaviorCode": behVoteStatsMsg.behaviorCode,
             "female": VoteTypeMsgAdapter.toDict(behVoteStatsMsg.female),
@@ -333,7 +341,7 @@ class BehVoteStatAdapter:
         }
 
     @staticmethod
-    def fromDict(dct):
+    def fromDict(dct) -> BehVoteStatsMsg:
         bc = dct.get("behaviorCode", "unknown")
         f = dct.get("female", {})
         if not isinstance(f, VoteTypeMsg):

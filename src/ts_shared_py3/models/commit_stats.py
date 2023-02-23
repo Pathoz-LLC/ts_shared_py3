@@ -1,3 +1,4 @@
+from __future__ import annotations
 from random import randint
 from typing import Union, TypeVar
 
@@ -56,11 +57,15 @@ class CommitStats(ndb.Model):
     # we're counting on index position in CommitStats.counts
     counts = ndb.LocalStructuredProperty(CommitRollup, repeated=True)
 
-    def __str__(self):
+    def __str__(self: CommitStats):
         x = "\n".join([str(cr) for cr in self.counts])
         return "\n{0}".format(x)
 
-    def _update(self, curCommitLvl, priorCommitLvl):
+    def _update(
+        self: CommitStats,
+        curCommitLvl: CommitLevel_Display,
+        priorCommitLvl: CommitLevel_Display,
+    ):
         """ """
         for cr in self.counts:
             if cr.commitLevel == priorCommitLvl and cr.count > 0:
@@ -69,13 +74,13 @@ class CommitStats(ndb.Model):
                 cr.count += 1
         # assert updtCount == targetCount, "value not updated {0}-{1}".format(updtCount, targetCount)
 
-    def _mergeCountsToSelf(self, rec):
+    def _mergeCountsToSelf(self: CommitStats, rec):
         # copy vals from another shard onto this rec
         for idx, cr in enumerate(rec.counts[0:5]):
             self.counts[idx].count += cr.count
             assert idx < 5, "enumerate yielding %s from %s" % (idx, len(rec.counts))
 
-    def _convertCountToPctOfTotal(self):
+    def _convertCountToPctOfTotal(self: CommitStats):
         total = self.sumOfCount
         total = float(total)  # avoid floor division
         # dm = "ConvertCountToPctOfTotal:  counts:{0}  total:{1}".format(self.counts, total)
@@ -83,7 +88,7 @@ class CommitStats(ndb.Model):
         for cr in self.counts:
             cr.count = int((cr.count / total) * 100)
 
-    def _save(self):
+    def _save(self: CommitStats):
         # store to ndb
         # I was somehow getting double len counts lists????
         # assert len(self.counts) == DisplayCommitLvl.typeCount(), "Err: Corrupt rec w {0} rows".format(len(self.counts))
@@ -97,12 +102,12 @@ class CommitStats(ndb.Model):
             print(m)
 
     @property
-    def sumOfCount(self):
+    def sumOfCount(self: CommitStats):
         # never return zero to avoid divide error
         return max(1, sum([cr.count for cr in self.counts]))
 
     @property
-    def asDict(self):
+    def asDict(self: CommitStats):
         # return self as nested dictionary
         d = dict()
         for cr in self.counts:
@@ -111,7 +116,9 @@ class CommitStats(ndb.Model):
 
     @staticmethod
     @ndb.transactional(retries=1)
-    def updateCounts(curCommitLvl, priorCommitLvl=None):
+    def updateCounts(
+        curCommitLvl: CommitLevel_Display, priorCommitLvl: CommitLevel_Display = None
+    ):
         """public api to store updated stats"""
         rec = CommitStats._loadOrCreateRec()
         rec._update(curCommitLvl, priorCommitLvl)
@@ -169,7 +176,7 @@ class CommitStats(ndb.Model):
         return [r for r in allRecs if r is not None]
 
     @staticmethod
-    def _all_keys(region):
+    def _all_keys(region: str = None):
         """Returns all possible keys for the counter name given the config.
         Returns:
             The full list of ndb.Key values corresponding to all the possible
@@ -190,7 +197,7 @@ class CommitStats(ndb.Model):
             rec._save()
 
 
-def _makeCommitStatsShardKey(region, instanceID):
+def _makeCommitStatsShardKey(region: str, instanceID: int):
     assert instanceID > 0, "invalid ID"
     return ndb.Key("Region", region, CommitStats, instanceID)
 

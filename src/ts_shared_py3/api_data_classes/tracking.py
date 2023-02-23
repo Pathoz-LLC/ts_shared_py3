@@ -29,7 +29,7 @@ class CommitLvlUpdateMsg(BaseApiData):
 
     startDate: date = field()
     persId: int = field(default=0, metadata=dict(required=True))
-    userId: int = field(default=0, metadata=dict(required=True))
+    userId: str = field(default="", metadata=dict(required=True))
     commitLvlDisplayCd: CommitLevel_Display = field(
         default=CommitLevel_Display.CASUAL, metadata={"enum": CommitLevel_Display}
     )
