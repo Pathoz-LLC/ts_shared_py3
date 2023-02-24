@@ -47,6 +47,9 @@ class PersonLocalRowDc(BaseApiData):
     reminderFrequency: RemindFreq = field(
         default=RemindFreq.DAILY, metadata={"enum": RemindFreq}
     )
+    monitorStatus: MonitorStatus = field(
+        default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus}
+    )
 
     modDateTime: datetime = field(default_factory=lambda: datetime.now())
     addDateTime: datetime = field(default_factory=lambda: datetime.now())
@@ -56,9 +59,7 @@ class PersonLocalRowDc(BaseApiData):
     last: str = field(default="")
     imagePath: str = field(default="")
     # overallScore: int = field(default=0, metadata=dict(required=True))
-    monitorStatus: MonitorStatus = field(
-        default=MonitorStatus.ACTIVE, metadata={"enum": MonitorStatus}
-    )
+
     # redFlagBits: int = field(default=0, metadata=dict(required=True))
     xtra: str = field(default="")
     # relStateOverview = BaseApiDataField(RelationshipStateOverviewMessage, 8, repeated=False)

@@ -7,7 +7,12 @@ from datetime import datetime, date, time
 from collections import namedtuple
 
 #
-from ..api_data_classes.tracking import IncidentRowMessage
+from ..enums.sex import Sex, NdbSexProp
+from ..api_data_classes.tracking import (
+    IncidentRowMessage,
+    IncidentDetailsMessage,
+    IntervalMessage,
+)
 from .tracking import Tracking
 from .baseNdb_model import BaseNdbModel
 from .interval import Interval
@@ -211,7 +216,42 @@ class Incident(BaseNdbModel):
         self.overlapDays = self.userInterval.overlapDayCount(self.reportingUserInterval)
         self.earliestOverlapDate = self.overlapStartDate
 
-    def toMsg(self):
+    @staticmethod
+    def fromMsg(irm: IncidentRowMessage) -> Incident:
+        # TODO
+        return Incident(
+            trackingKey="",
+            userKey="",
+            personKey="",
+            evidenceStatus="",
+            reportingUserId="",
+            reportingUserSex="",
+            earliestOverlapDate="",
+            overlapDays="",
+            userIntervalRowNum="",
+            userInterval="",
+            reportingUserInterval="",
+            reportingUserIntervalRowNum="",
+            repUserIntervalReviseHistory="",
+            addDateTime="",
+            modDateTime="",
+        )
+
+    @staticmethod
+    def msgFromList(
+        persId: int, foundIncidents: list[Incident]
+    ) -> IncidentDetailsMessage:
+        irmList: list[IncidentRowMessage] = [ic.toMsg for ic in foundIncidents]
+        setUserIds: set[str] = set([ic.userKey.string_id() for ic in foundIncidents])
+        return IncidentDetailsMessage(
+            persId=persId,
+            items=irmList,
+            asOfDate=date.today(),
+            userOverlapCount=len(setUserIds),
+        )
+
+    @property
+    def toMsg(self: Incident) -> IncidentRowMessage:
         """
         this is in use & should hang off of "IncidentRowMessageConverter" (below)
         which Rob built for testing
@@ -223,11 +263,11 @@ class Incident(BaseNdbModel):
             IncidentRowMessage:
         """
         irm = IncidentRowMessage()
-        irm.incidentId = self.key.id()
+        irm.incidentId = self.key.integer_id()
         # irm.userTruthOpinion = self.userTruthOpinion.number
         irm.evidenceStatus = self.evidenceStatus.value
         irm.reportingUserId = self.reportingUserId
-        irm.reportingUserSex = (self.reportingUserSex or Sex.UNKNOWN).value
+        irm.reportingUserSex = self.reportingUserSex or Sex.UNKNOWN
         irm.earliestOverlapDate = self.earliestOverlapDate
         irm.overlapDays = self.overlapDays
         irm.userIntervalRowNum = self.userIntervalRowNum

@@ -164,7 +164,7 @@ class Interval(BaseNdbModel):
         series[0].endDate = DISTANT_FUTURE_DATE
         return series
 
-    def toMsg(self, persId=0):
+    def toMsg(self: Interval, persId: int = 0):
         """
         Args:
             interval:
@@ -189,10 +189,15 @@ class Interval(BaseNdbModel):
         Returns:
             Interval
         """
+        from ts_shared_py3.api_data_classes.tracking import CommitLvlUpdateMsg
+
         # print(im.commitLvl)
         # print("cmtLvl: {0}".format(im.commitLvl.displayCode))
         interval = Interval()
-        interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)
+        if isinstance(im.commitLvl, CommitLevel_Display):
+            interval.commitLevel = im.commitLvl
+        elif isinstance(im.commitLvl, CommitLvlUpdateMsg):
+            interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)
         interval.startDate = im.startDate
         interval.endDate = im.endDate
         return interval

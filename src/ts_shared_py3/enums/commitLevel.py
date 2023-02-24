@@ -9,6 +9,7 @@ import random
 #
 from .activityType import ActivityType
 
+
 # next line causes circular import;  leave commented
 # from ..api_data_classes.tracking import CommitLvlApiMsg
 
@@ -166,8 +167,10 @@ class CommitLevel_Display(IntEnum):
         return self.logic.isSeparated
 
     @property
-    def asApiMsg(self: CommitLevel_Display):
-        raise Exception("missing schema CommitLvlApiMsg", "??")
+    def asApiMsg(self: CommitLevel_Display):  # -> CommitLvlApiMsg:
+        # raise Exception("missing schema CommitLvlApiMsg", "??")
+        from ..schemas.tracking import CommitLvlApiMsg
+
         return CommitLvlApiMsg(
             displayCode=self.code,
             logicCode=self.logic.code,
@@ -227,7 +230,7 @@ class CommitLevel_Display(IntEnum):
         return [cl.name for cl in CommitLevel_Display.masterList()]
 
     @staticmethod
-    def fromStr(str) -> CommitLevel_Display:
+    def fromStr(str: str):  # -> CommitLevel_Display:
         # init instance from api msg value
         # should handle str or int
         if isinstance(str, (int, float)):

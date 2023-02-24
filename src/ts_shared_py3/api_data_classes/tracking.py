@@ -115,6 +115,17 @@ class IncidentDetailsMessage(BaseApiData):
 
     Schema: ClassVar[Type[Schema]] = Schema
 
+    # @staticmethod
+    # def fromListIncidents(
+    #     persId: int, listIncdts: list["Incident"]
+    # ) -> IncidentDetailsMessage:
+    #     from models.incident import Incident
+
+    #     items = [IncidentRowMessage.fromIncdt(icd) for icd in listIncdts]
+    #     return IncidentDetailsMessage(
+    #         asOfDate=date.today(), persId=persId, userOverlapCount=0, items=items
+    #     )
+
 
 @dataclass(base_schema=DataClassBaseSchema)
 class IncidentTruthMessage(BaseApiData):

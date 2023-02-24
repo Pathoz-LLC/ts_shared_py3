@@ -1,6 +1,8 @@
+from __future__ import annotations
 from enum import IntEnum, unique
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
+
 
 from .baseNdb_model import BaseNdbModel
 
@@ -34,39 +36,39 @@ class PersonActivity(BaseNdbModel):  # ndb.model.Expando
     editCounts = ndb.IntegerProperty(repeated=True, indexed=False)
 
     @property
-    def userId(self):
+    def userId(self: PersonActivity):
         # return user ID as str
         return self.key.parent().string_id()
 
     @property
-    def personId(self):
+    def personId(self: PersonActivity):
         # return person/prospect ID as int
         return self.key.integer_id()
 
     @staticmethod
-    def bumpFeeling(userIdStr, personIdInt, isPos=True):
+    def bumpFeeling(userIdStr: str, personIdInt: int, isPos=True):
         typ = ActivityLogType.POS_FEEL if isPos else ActivityLogType.NEG_FEEL
         PersonActivity.update(userIdStr, personIdInt, typ)
 
     @staticmethod
-    def bumpBehavior(userIdStr, personIdInt, isPos=True):
+    def bumpBehavior(userIdStr: str, personIdInt: int, isPos: bool = True):
         typ = ActivityLogType.POS_BEH if isPos else ActivityLogType.NEG_BEH
         PersonActivity.update(userIdStr, personIdInt, typ)
 
     @staticmethod
-    def bumpValues(userIdStr, listPersonIdsInt, isPos=False):
+    def bumpValues(userIdStr: str, listPersonIdsInt: list[int], isPos: bool = False):
         # receives multiple prospect IDs
         typ = ActivityLogType.VAL_ASSESS
         for pid in listPersonIdsInt:
             PersonActivity.update(userIdStr, pid, typ)
 
     @staticmethod
-    def bumpCommitLevel(userIdStr, personIdInt, isPos=True):
+    def bumpCommitLevel(userIdStr: str, personIdInt: int, isPos: bool = True):
         typ = ActivityLogType.POS_CLCHG if isPos else ActivityLogType.NEG_CLCHG
         PersonActivity.update(userIdStr, personIdInt, typ)
 
     @staticmethod
-    def update(userIdStr, personIdInt, logType):
+    def update(userIdStr: str, personIdInt: int, logType: ActivityLogType):
         # assert isinstance(logType, ActivityLogType), 'wrong arg type'
 
         key = PersonActivity._makeKey(userIdStr, personIdInt)
@@ -79,11 +81,11 @@ class PersonActivity(BaseNdbModel):  # ndb.model.Expando
         rec.put()
 
     @staticmethod
-    def _makeKey(userIdStr, personIdInt):
+    def _makeKey(userIdStr: str, personIdInt: int):
         return ndb.Key("User", userIdStr, PersonActivity, personIdInt)
 
     @staticmethod
-    def loadAllUntouchedFor(days=30):
+    def loadAllUntouchedFor(days: int = 30):
         # return list of tuple of (userId, prospectId)
         lastTouchDay = datetime.now() - timedelta(days=days)
         tdStart = lastTouchDay.replace(hour=0, minute=0, second=0)

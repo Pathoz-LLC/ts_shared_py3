@@ -37,9 +37,9 @@ class SchemaMetaOpts(SchemaOpts):
 
     def __init__(self, meta, **kwargs):
         SchemaOpts.__init__(self, meta, **kwargs)
-        self.dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%d"
-        self.datetimeformat = ISO_8601_DATETIME_FORMAT
-        self.timeformat = ISO_8601_TIME_FORMAT
+        # self.dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%d"
+        # self.datetimeformat = ISO_8601_DATETIME_FORMAT
+        # self.timeformat = ISO_8601_TIME_FORMAT
         # self.name = getattr(meta, "name", None)
         # self.plural_name = getattr(meta, "plural_name", self.name)
 

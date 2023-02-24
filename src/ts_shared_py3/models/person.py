@@ -366,14 +366,14 @@ class PersonLocal(BaseNdbModel):
         self.modDateTime = datetime.now()
 
     @staticmethod
-    def updateDevotionLevel(
-        user: DbUser, personKey: ndb.Key, displayCommitLvlEnum: CommitLevel_Display
+    def updateCommitLevel(
+        user: DbUser, personId: int, displayCommitLvlEnum: CommitLevel_Display
     ):
         """keep person record and Tracking incidents in sync
         called by updateCurrentCommitmentFromTracker below
         """
         # q = PersonLocal.query(PersonLocal.userKey == user.key, PersonLocal.personKey == personKey)
-        personLoc = PersonLocal.getById(user.key, personKey.integer_id())
+        personLoc = PersonLocal.getById(user.key, personId)
         if personLoc:
             personLoc.commitLevel = displayCommitLvlEnum
             personLoc.put()

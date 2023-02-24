@@ -7,7 +7,9 @@ from typing import Optional, Iterable  # List
 #
 from ..scoring.commBehImpactConsenus import CommImpactConsensus
 from ..api_data_classes.behavior import BehEntryWrapperMessage
+from ..api_data_classes.scoring import RequRelationshipOverviewData
 from .baseNdb_model import BaseNdbModel
+from .user import DbUser
 from ..enums.commitLevel import CommitLevel_Display, CommitLevel_Logic
 from .interval import Interval
 from ..utils.date_conv import calcOverlappingDays, dateTime_to_epoch
@@ -233,3 +235,20 @@ class Tracking(BaseNdbModel):
         # print(self.key)
         # TrackingTasks.checkForIncidents(self.key)
         # self._shouldCheckForIncidentsOnPut = False
+
+    # @staticmethod
+    # def loadRelStateOverview(user: DbUser, relationshipOverviewMsg: RequRelationshipOverviewData):
+    #     """  NIU:  moved to scoring server
+
+    #     called by score/chart/bigPicture screen
+    #     Args:
+    #         User:
+    #         RequRelationshipOverviewMsg: (3 props)
+
+    #     Returns: ProspectScoreMsg
+    #     """
+    #     userProspScoreCollection = Tracking._rescoreForUser(user, relationshipOverviewMsg.persId, relationshipOverviewMsg.monthsBackFromNow)
+    #     sm = userProspScoreCollection.toScoresMsg(relationshipOverviewMsg.priorUserScore,
+    #          relationshipOverviewMsg.priorAppScore, relationshipOverviewMsg.persName)
+    #     Tracking._updateProspectLocal(user, relationshipOverviewMsg.persId, userProspScoreCollection)
+    #     return sm
