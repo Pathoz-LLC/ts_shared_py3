@@ -9,6 +9,14 @@ from .base import BaseApiData
 
 
 @dataclass
+class RecalcScoringStart(BaseApiData):
+    userId: str = field(default="0")
+    persId: int = field(default=0)
+
+    Schema: ClassVar[Type[Schema]] = Schema
+
+
+@dataclass
 class RequRelationshipOverviewData(BaseApiData):
     """
     used by client to request score data
@@ -123,3 +131,4 @@ OneWindowScoreData.Schema.__model__ = OneWindowScoreData
 CurPhaseRelStateData.Schema.__model__ = CurPhaseRelStateData
 ScoreMetadataData.Schema.__model__ = ScoreMetadataData
 ProspectScoreData.Schema.__model__ = ProspectScoreData
+RecalcScoringStart.Schema.__model = RecalcScoringStart

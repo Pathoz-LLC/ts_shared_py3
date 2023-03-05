@@ -1,9 +1,12 @@
 from __future__ import annotations
 import marshmallow as ma
+from marshmallow import validate as maValid
+
+# from marshmallow_dataclass import dataclass
 
 #
-from ..api_data_classes import scoring as DataClasses
-from .base import DataClassBaseSchema, NdbBaseSchemaWithKey
+from ..api_data_classes import scoring as ScoringDataClasses
+from .base import DataClassBaseSchema
 
 """
 the whole job of these schema objects is to define the format/structure
@@ -14,9 +17,9 @@ with required (& default) values populated
 """
 
 
-class RecalcStartSchema(ma.Schema):
-    userId = ma.fields.String(required=True)
-    persId = ma.fields.Integer(required=True)
+# class RecalcStartSchema(ma.Schema):
+#     userId = ma.fields.String(required=True)
+#     persId = ma.fields.Integer(required=True)
 
 
 class RequRelationshipOverviewSchema(ma.Schema):
@@ -27,7 +30,7 @@ class RequRelationshipOverviewSchema(ma.Schema):
     sent data-values stored on the returned RequRelationshipOverviewData
     """
 
-    __model__ = DataClasses.RequRelationshipOverviewData  # override base class
+    __model__ = ScoringDataClasses.RequRelationshipOverviewData  # override base class
 
     userId = ma.fields.String(required=True)
     persId = ma.fields.Integer(required=True)
@@ -44,13 +47,13 @@ class RequRelationshipOverviewSchema(ma.Schema):
     @ma.post_load()
     def _getInstance(
         self: RequRelationshipOverviewSchema, dDict: dict[str, str], **kwargs
-    ) -> DataClasses.RequRelationshipOverviewData:
+    ) -> ScoringDataClasses.RequRelationshipOverviewData:
         # construct a DataClasses.RequRelationshipOverviewData() & return
         rec = self.__model__()
         assert isinstance(
             rec, self.__model__
         ), "could not create valid RequRelationshipOverviewData from data sent by RequRelationshipOverviewSchema?"
-        rec.updateAttsFromDict(dDict)
+        rec._updateAttsFromDict(dDict)
         return rec
 
 
@@ -64,9 +67,11 @@ class OneWindowScoreMsg(DataClassBaseSchema):
         not received from client
     """
 
-    __model__ = DataClasses.OneWindowScoreData  # override base class
+    __model__ = ScoringDataClasses.OneWindowScoreData  # override base class
 
-    pointNum = ma.fields.Int(default=0, required=True)  # pointNum = day_num
+    pointNum = ma.fields.Int(
+        default=0, required=True
+    )  # pointNum = day_num  , metadata={"validate": maValid.ContainsNoneOf([None])}
     centerDtOfWindow = ma.fields.Date(required=True)
     # avg of scores below
     # score = ma.fields.Float(default=0.0, required=True)
@@ -102,7 +107,7 @@ class CurPhaseRelStateMsg(DataClassBaseSchema):
         not received from client
     """
 
-    __model__ = DataClasses.CurPhaseRelStateData  # override base class
+    __model__ = ScoringDataClasses.CurPhaseRelStateData  # override base class
 
     scores = ma.fields.Nested(OneWindowScoreMsg, required=True)
     # score descriptions
@@ -121,7 +126,7 @@ class ScoreMetadataSchema(DataClassBaseSchema):
     not received from client
     """
 
-    __model__ = DataClasses.ScoreMetadataData  # override base class
+    __model__ = ScoringDataClasses.ScoreMetadataData  # override base class
 
     firstLogDate = ma.fields.Date(dump_only=True)
     lastLogDate = ma.fields.Date(dump_only=True)
@@ -138,7 +143,7 @@ class ProspectScoreSchema(DataClassBaseSchema):
         api_data_classes.RequRelationshipOverviewData
     """
 
-    __model__ = DataClasses.ProspectScoreData  # override base class
+    __model__ = ScoringDataClasses.ProspectScoreData  # override base class
 
     # ProspectScoreMsg; rolls together current score with prior-period scores
     persId = ma.fields.Int(default=0, required=True)

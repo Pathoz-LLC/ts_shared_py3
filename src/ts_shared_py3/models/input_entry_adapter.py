@@ -5,6 +5,7 @@ import google.cloud.ndb as ndb
 #
 from ..enums.alloc import AllocType, Alloc
 from ..enums.scoreRuleType import ScoreRuleType
+from ..enums.commitLevel import CommitLevel_Display
 from .baseNdb_model import BaseNdbModel
 from ..models.behavior import Entry
 from ..models.incident import Incident
@@ -227,10 +228,8 @@ class InputEntryAdapter(BaseNdbModel):
         # print(type(priorPhase.commitLevelEnum))
         # print(type(mostRecentPhase.commitLevelEnum))
         assert isinstance(
-            mostRecentPhase.commitLevelEnum, cmtLvl.DisplayCommitLvl
-        ) and isinstance(
-            priorPhase.commitLevelEnum, cmtLvl.DisplayCommitLvl
-        ), "invalid arg"
+            mostRecentPhase.commitLevelEnum, CommitLevel_Display
+        ) and isinstance(priorPhase.commitLevelEnum, CommitLevel_Display), "invalid arg"
 
         recentPhaseStart = mostRecentPhase.startDate
         # assert isinstance(recentPhaseStart, date), "invalid arg"
