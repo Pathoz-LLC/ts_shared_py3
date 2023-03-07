@@ -22,6 +22,8 @@ import json  # dumps( {} ) turns dict into string
 from dataclasses import dataclass
 from marshmallow.fields import Number
 
+from pathlib import Path
+
 #
 from ...constants import (
     APP_IMPACT_WEIGHT_MAX,
@@ -44,10 +46,13 @@ from .beh_constants import (
 # normalize both Behaviors & Categories into BehaviorCatNode before sending to the client
 
 
-def forRowInYaml(relFilePath: str, funcToRun: Callable) -> list[BehCatNode]:
+def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
     """process yaml file using passed function"""
     yamlRows = []
-    with open(relFilePath) as f:  # service_backend/dialog/
+
+    p = Path(__file__).with_name(fileName)
+    with p.open("r") as f:
+        # with open(relFilePath) as f:  # service_backend/dialog/
         try:
             yamlRows = yaml.load(f, Loader=yaml.FullLoader)
             # yamlRows = fileAsDict.get('questions')
@@ -377,7 +382,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
     def __init__(
         self: BehaviorSourceSingleton,
-        projRoot: str = "",  # /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/
+        niuPath: str = "",
     ):
         """initialize the full object graph & also create master dict by code
 
@@ -399,12 +404,12 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
         # forRowInYaml returns a list which we can ignore here
         forRowInYaml(
-            projRoot + "config/behavior/category.yaml",  # common/config/behavior/
+            "category.yaml",
             makePerRowFunc(True, categoriesDict),
         )
         behaviorsDict: dict[str, BehCatNode] = dict()  # behavior
         forRowInYaml(
-            projRoot + "config/behavior/behaviors.yaml",
+            "behaviors.yaml",
             makePerRowFunc(False, behaviorsDict),
         )
 
