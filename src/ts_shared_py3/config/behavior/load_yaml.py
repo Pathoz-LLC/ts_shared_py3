@@ -50,9 +50,12 @@ def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
     """process yaml file using passed function"""
     yamlRows = []
 
-    p = Path(__file__).with_name(fileName)
-    with p.open("r") as f:
-        # with open(relFilePath) as f:  # service_backend/dialog/
+    import os
+    import sys
+
+    # p = Path(__file__).with_name(fileName)
+    # with p.open("r") as f:
+    with open(os.path.join(sys.path[0], fileName), "r") as f:
         try:
             yamlRows = yaml.load(f, Loader=yaml.FullLoader)
             # yamlRows = fileAsDict.get('questions')
