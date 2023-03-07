@@ -377,7 +377,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
     def __init__(
         self: BehaviorSourceSingleton,
-        projRoot: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/",
+        projRoot: str = "",  # /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/
     ):
         """initialize the full object graph & also create master dict by code
 

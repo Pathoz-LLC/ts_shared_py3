@@ -4,7 +4,8 @@ from datetime import date
 PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "playerbusterapi")
 BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "playerbusterapi.appspot.com/")
 FIR_CREDS_FILENAME = os.environ.get(
-    "FIR_CREDS_FILENAME", "playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json"
+    "FIREBASE_ADMIN_CREDENTIAL",
+    "auth/stage/playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json",
 )
 
 # END DATE for latest Interval/Phase that has not ended

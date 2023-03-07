@@ -153,7 +153,7 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
     PROJ_ID: str = "playerbusterapi"
     APP_ID: str = "com.pathoz.touchstone.stage"
     STORAGE_BUCKET_ROOT_PATH: str = "example-gcs-bucket"
-    GOOGLE_APPLICATION_CREDENTIALS: str = "playerbusterapi-540f7db98f01.json"
+    GOOGLE_APPLICATION_CREDENTIALS: str = "auth/stage/tsapipy3-28638db28462.json"
 
     # @property
     def GOOGLE_CRED_CERT(self: GcpSvcsCfg) -> credentials.Certificate:

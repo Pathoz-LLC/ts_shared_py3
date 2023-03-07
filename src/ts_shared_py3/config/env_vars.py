@@ -49,11 +49,12 @@ class OsPathInfo(metaclass=Singleton):
 
     @staticmethod
     def get_credential_path(thirdPtSvc: ThirdPtSvcType, cred_file_name: str) -> str:
-        global _ROOT_PATH_PREFIX
-        if _ROOT_PATH_PREFIX is None:
-            _ROOT_PATH_PREFIX = _get_root_path()
-        mid_path = _get_mid_path(thirdPtSvc)
-        return _ROOT_PATH_PREFIX + mid_path + "/" + cred_file_name
+        return cred_file_name
+        # global _ROOT_PATH_PREFIX
+        # if _ROOT_PATH_PREFIX is None:
+        #     _ROOT_PATH_PREFIX = _get_root_path()
+        # mid_path = _get_mid_path(thirdPtSvc)
+        # return _ROOT_PATH_PREFIX + mid_path + "/" + cred_file_name
 
 
 def _get_root_path() -> str:
@@ -146,7 +147,7 @@ class EnvVarVals(metaclass=Singleton):
     def GOOGLE_APPLICATION_CREDENTIALS(self: EnvVarVals) -> str:
         return os.environ.get(
             "GOOGLE_APPLICATION_CREDENTIALS",
-            "tsapipy3-28638db28462.json",
+            "auth/stage/tsapipy3-28638db28462.json",
         )
 
     @property
