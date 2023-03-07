@@ -15,14 +15,13 @@ Behavior level:
 """
 from __future__ import annotations
 from typing import Callable, Tuple, Dict, Any, List
-import logging
 import random
 import yaml
 import json  # dumps( {} ) turns dict into string
+from pathlib import Path
 from dataclasses import dataclass
 from marshmallow.fields import Number
-
-from pathlib import Path
+import logging
 
 #
 from ...constants import (
@@ -50,12 +49,18 @@ def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
     """process yaml file using passed function"""
     yamlRows = []
 
-    import os
-    import sys
-
-    # p = Path(__file__).with_name(fileName)
-    # with p.open("r") as f:
-    with open(os.path.join(sys.path[0], fileName), "r") as f:
+    pHome = Path.home()
+    p = Path(__file__).with_name(fileName)
+    pa: Path = Path.absolute()
+    xx: Path = pa.resolve()
+    logging.warn("forRowInYaml")
+    logging.warn("file: {0}".format(__file__))
+    logging.warn("pHome: {0}".format(pHome.as_posix()))
+    logging.warn("pPosx: {0}".format(p.as_posix()))
+    logging.warn("absolute: {0}".format(pa.as_posix()))
+    logging.warn("xx: {0}".format(xx.as_posix()))
+    with p.open("r") as f:
+        # with open(os.path.join(sys.path[0], fileName), "r") as f:
         try:
             yamlRows = yaml.load(f, Loader=yaml.FullLoader)
             # yamlRows = fileAsDict.get('questions')
