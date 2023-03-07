@@ -51,7 +51,7 @@ def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
 
     pHome = Path.home()
     p = Path(__file__).with_name(fileName)
-    pa: Path = Path().absolute()
+    pa: Path = Path(__file__).absolute()
     xx: Path = pa.resolve()
     logging.warn("forRowInYaml")
     logging.warn("file: {0}".format(__file__))
