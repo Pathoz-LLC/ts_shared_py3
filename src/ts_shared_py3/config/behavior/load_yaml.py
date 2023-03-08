@@ -77,13 +77,14 @@ def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
     # f = trav.open(fileName, mode="r")
 
     source: ilr.Traversable = files(__package__).joinpath(fileName)  # PosixPath
-    with open(source) as f:
-        try:
-            yamlRows = yaml.load(f, Loader=yaml.FullLoader)
-            # yamlRows = fileAsDict.get('questions')
-        except yaml.YAMLError as exc:
-            print(exc)
-            raise
+    f = source.open(mode="r")
+    # with open(source) as f:
+    try:
+        yamlRows = yaml.load(f, Loader=yaml.FullLoader)
+        # yamlRows = fileAsDict.get('questions')
+    except yaml.YAMLError as exc:
+        print(exc)
+        raise
 
     # print('yamlRows:')
     # print(yamlRows)
