@@ -18,10 +18,15 @@ from typing import Callable, Tuple, Dict, Any, List
 import random
 import yaml
 import json  # dumps( {} ) turns dict into string
-from pathlib import Path
+
+# from pathlib import Path
+# import inspect
 from dataclasses import dataclass
 from marshmallow.fields import Number
 import logging
+from importlib.resources import files, as_file
+import importlib.resources as ilr
+
 
 #
 from ...constants import (
@@ -49,20 +54,30 @@ def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
     """process yaml file using passed function"""
     yamlRows = []
 
-    pHome = Path.home()
-    p = Path(__file__).with_name(fileName)
-    pa: Path = Path(__file__).absolute()
-    res: Path = Path().resolve()
-    cwd: Path = Path().cwd()
-    logging.warn("forRowInYaml")
-    # logging.warn("file: {0}".format(__file__))
-    logging.warn("pHome: {0}".format(pHome.as_posix()))
-    logging.warn("pPosx: {0}".format(p.as_posix()))
-    # logging.warn("absolute: {0}".format(pa.as_posix()))
-    logging.warn("res: {0}".format(res.as_posix()))
-    logging.warn("cwd: {0}".format(cwd.as_posix()))
-    with p.open("r") as f:
-        # with open(os.path.join(sys.path[0], fileName), "r") as f:
+    # inspFile = inspect.getfile(inspect.currentframe())
+
+    # pHome = Path.home()
+    # p = Path(__file__).with_name(fileName)
+    # pa: Path = Path(__file__).absolute()
+    # res: Path = Path().resolve()
+    # cwd: Path = Path().cwd()
+    # logging.warn("forRowInYaml")
+    # # logging.warn("file: {0}".format(__file__))
+    # logging.warn("pHome: {0}".format(pHome.as_posix()))
+    # logging.warn("pPosx: {0}".format(p.as_posix()))
+    # # logging.warn("absolute: {0}".format(pa.as_posix()))
+    # logging.warn("res: {0}".format(res.as_posix()))
+    # logging.warn("cwd: {0}".format(cwd.as_posix()))
+    # f = importlib.resources.read_text(__package__, fileName)
+    # with p.open("r") as f:
+    # with open(os.path.join(sys.path[0], fileName), "r") as f:
+    #
+    # path = ilr.Resource()
+    # trav: ilr.Traversable = ilr.files(__package__)
+    # f = trav.open(fileName, mode="r")
+
+    source: ilr.Traversable = files(__package__).joinpath(fileName)  # PosixPath
+    with open(source) as f:
         try:
             yamlRows = yaml.load(f, Loader=yaml.FullLoader)
             # yamlRows = fileAsDict.get('questions')
