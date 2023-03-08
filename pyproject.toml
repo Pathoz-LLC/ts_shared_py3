@@ -22,5 +22,5 @@ classifiers = [
 "Bug Tracker" = "https://github.com/Pathoz-LLC/ts_shared_py3/issues"
 
 [tool.setuptools]
-# packages = ["ts_shared_py3", "ts_shared_py3.api_data_classes", "ts_shared_py3.config", "ts_shared_py3.enums", "ts_shared_py3.models", "ts_shared_py3.schemas", "ts_shared_py3.scoring", "ts_shared_py3.services", "ts_shared_py3.utils", "ts_shared_py3.wrappers"]
+packages = ["ts_shared_py3", "ts_shared_py3.api_data_classes", "ts_shared_py3.config", "ts_shared_py3.enums", "ts_shared_py3.models", "ts_shared_py3.schemas", "ts_shared_py3.scoring", "ts_shared_py3.services", "ts_shared_py3.utils", "ts_shared_py3.wrappers", "ts_shared_py3.config.behavior", "ts_shared_py3.config.scoring", "ts_shared_py3.services.firebase", "ts_shared_py3.services.ndb", "ts_shared_py3.services.push_notify"]
 package-dir = {ts_shared_py3='src/ts_shared_py3'}
