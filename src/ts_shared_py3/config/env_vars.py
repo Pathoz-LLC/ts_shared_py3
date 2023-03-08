@@ -140,14 +140,14 @@ class EnvVarVals(metaclass=Singleton):
     def FIREBASE_ADMIN_CREDENTIAL(self: EnvVarVals) -> str:
         return os.environ.get(
             "FIREBASE_ADMIN_CREDENTIAL",
-            "playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json",
+            "auth/stage/ts-firebase-adminsdk.json",
         )
 
     @property
     def GOOGLE_APPLICATION_CREDENTIALS(self: EnvVarVals) -> str:
         return os.environ.get(
             "GOOGLE_APPLICATION_CREDENTIALS",
-            "auth/stage/tsapipy3-28638db28462.json",
+            "auth/stage/ts-gae-admin.json",
         )
 
     @property

@@ -153,7 +153,7 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
     PROJ_ID: str = "playerbusterapi"
     APP_ID: str = "com.pathoz.touchstone.stage"
     STORAGE_BUCKET_ROOT_PATH: str = "example-gcs-bucket"
-    GOOGLE_APPLICATION_CREDENTIALS: str = "auth/stage/tsapipy3-28638db28462.json"
+    GOOGLE_APPLICATION_CREDENTIALS: str = "auth/stage/ts-gae-admin.json"
 
     # @property
     def GOOGLE_CRED_CERT(self: GcpSvcsCfg) -> credentials.Certificate:
@@ -186,9 +186,7 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
 @dataclass(frozen=False)
 class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
     fir_db_url: str = "https://playerbusterapi.firebaseio.com"
-    firebase_admin_credential: str = (
-        "playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json"
-    )
+    firebase_admin_credential: str = "auth/stage/ts-firebase-adminsdk.json"
 
     apiKey: str = "YOUR_API_KEY"
     authDomain: str = "YOUR_API_DOMAIN"
