@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ts_shared_py3"
-version = "0.0.18"
+version = "0.0.19"
 authors = [
   { name="Dewey Gaedcke", email="dewey@pathoz.com" },
 ]
 description = "Shared components for TS backend"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -20,3 +20,7 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/Pathoz-LLC/ts_shared_py3"
 "Bug Tracker" = "https://github.com/Pathoz-LLC/ts_shared_py3/issues"
+
+[tool.setuptools]
+packages = ["ts_shared_py3"]
+package-dir = {ts_shared_py3='src/ts_shared_py3'}
