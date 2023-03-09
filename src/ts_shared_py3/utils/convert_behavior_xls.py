@@ -268,7 +268,7 @@ class CsvToYaml(object):
 def instantiateSingletonAsTest():
     from config.behavior.load_yaml import BehaviorSourceSingleton
 
-    masterObj = BehaviorSourceSingleton.loadAll()
+    masterObj = BehaviorSourceSingleton()
 
     if DEBUG_MODE:
         masterDict = masterObj.masterDict

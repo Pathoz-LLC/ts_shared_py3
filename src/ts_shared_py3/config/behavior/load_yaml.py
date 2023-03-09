@@ -397,20 +397,20 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             graph   dict as tree of codes
     """
 
-    @staticmethod
-    def loadAll(catPath: str, behPath: str) -> BehaviorSourceSingleton:
-        #
-        # categoriesDict = dict()
-        # # forRowInYaml returns a list which we can ignore here
-        # forRowInYaml(projRoot + 'common/behavior/category.yaml', makePerRowFunc(Category, categoriesDict))
-        # behaviorsDict = dict()  # behavior
-        # forRowInYaml(projRoot + 'common/behavior/behaviors.yaml', makePerRowFunc(BehaviorRowYaml, behaviorsDict))
-        return BehaviorSourceSingleton(catPath, behPath)
+    # @staticmethod
+    # def loadAll(catPath: str, behPath: str) -> BehaviorSourceSingleton:
+    #     #
+    #     # categoriesDict = dict()
+    #     # # forRowInYaml returns a list which we can ignore here
+    #     # forRowInYaml(projRoot + 'common/behavior/category.yaml', makePerRowFunc(Category, categoriesDict))
+    #     # behaviorsDict = dict()  # behavior
+    #     # forRowInYaml(projRoot + 'common/behavior/behaviors.yaml', makePerRowFunc(BehaviorRowYaml, behaviorsDict))
+    #     return BehaviorSourceSingleton(catPath, behPath)
 
     def __init__(
         self: BehaviorSourceSingleton,
-        catPath: str,
-        behPath: str,
+        catPath: str = "static/data/category.yaml",
+        behPath: str = "static/data/behaviors.yaml",
     ):
         """initialize the full object graph & also create master dict by code
 
@@ -831,8 +831,8 @@ class BcnEncoder(json.JSONEncoder):
 if __name__ == "__main__":
     from os import path, getcwd
 
-    cwd = path.abspath(getcwd())
-    masterObj = BehaviorSourceSingleton.loadAll(cwd)
+    # cwd = path.abspath(getcwd())
+    masterObj = BehaviorSourceSingleton()
 
     # print masterObj.__dict__
     # print '\n\n\n'
