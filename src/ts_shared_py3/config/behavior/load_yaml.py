@@ -50,7 +50,7 @@ from .beh_constants import (
 # normalize both Behaviors & Categories into BehaviorCatNode before sending to the client
 
 
-def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
+def forRowInYaml(fullFilePath: str, funcToRun: Callable) -> list[BehCatNode]:
     """process yaml file using passed function"""
     yamlRows = []
 
@@ -76,15 +76,16 @@ def forRowInYaml(fileName: str, funcToRun: Callable) -> list[BehCatNode]:
     # trav: ilr.Traversable = ilr.files(__package__)
     # f = trav.open(fileName, mode="r")
 
-    source: ilr.Traversable = files(__package__).joinpath(fileName)  # PosixPath
-    f = source.open(mode="r")
-    # with open(source) as f:
-    try:
-        yamlRows = yaml.load(f, Loader=yaml.FullLoader)
-        # yamlRows = fileAsDict.get('questions')
-    except yaml.YAMLError as exc:
-        print(exc)
-        raise
+    # source: ilr.Traversable = files(__package__).joinpath(fullFilePath)  # PosixPath
+    # f = source.open(mode="r")
+
+    with open(fullFilePath) as f:
+        try:
+            yamlRows = yaml.load(f, Loader=yaml.FullLoader)
+            # yamlRows = fileAsDict.get('questions')
+        except yaml.YAMLError as exc:
+            print(exc)
+            raise
 
     # print('yamlRows:')
     # print(yamlRows)
@@ -397,18 +398,19 @@ class BehaviorSourceSingleton(metaclass=Singleton):
     """
 
     @staticmethod
-    def loadAll(projRoot: str = "") -> BehaviorSourceSingleton:
+    def loadAll(catPath: str, behPath: str) -> BehaviorSourceSingleton:
         #
         # categoriesDict = dict()
         # # forRowInYaml returns a list which we can ignore here
         # forRowInYaml(projRoot + 'common/behavior/category.yaml', makePerRowFunc(Category, categoriesDict))
         # behaviorsDict = dict()  # behavior
         # forRowInYaml(projRoot + 'common/behavior/behaviors.yaml', makePerRowFunc(BehaviorRowYaml, behaviorsDict))
-        return BehaviorSourceSingleton(projRoot)
+        return BehaviorSourceSingleton(catPath, behPath)
 
     def __init__(
         self: BehaviorSourceSingleton,
-        niuPath: str = "",
+        catPath: str,
+        behPath: str,
     ):
         """initialize the full object graph & also create master dict by code
 
@@ -430,12 +432,12 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
         # forRowInYaml returns a list which we can ignore here
         forRowInYaml(
-            "category.yaml",
+            catPath,
             makePerRowFunc(True, categoriesDict),
         )
         behaviorsDict: dict[str, BehCatNode] = dict()  # behavior
         forRowInYaml(
-            "behaviors.yaml",
+            behPath,
             makePerRowFunc(False, behaviorsDict),
         )
 
