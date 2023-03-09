@@ -152,7 +152,7 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
 
     PROJ_ID: str = "playerbusterapi"
     APP_ID: str = "com.pathoz.touchstone.stage"
-    STORAGE_BUCKET_ROOT_PATH: str = "example-gcs-bucket"
+    STORAGE_BUCKET_ROOT_PATH: str = "playerbusterapi.appspot.com"
     GOOGLE_APPLICATION_CREDENTIALS: str = "auth/stage/ts-gae-admin.json"
 
     # @property
@@ -188,14 +188,15 @@ class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
     fir_db_url: str = "https://playerbusterapi.firebaseio.com"
     firebase_admin_credential: str = "auth/stage/ts-firebase-adminsdk.json"
 
-    apiKey: str = "YOUR_API_KEY"
-    authDomain: str = "YOUR_API_DOMAIN"
-    databaseURL: str = "YOUR_URL"
+    apiKey: str = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQClzq3QDyYr7sB8\n61SZ8sCWYA77eSqELPqi37Z7e046LlfalHuw6SbSW5vG+j4dD21bJUN+6a7Xgsob\nT5s9O2HZJCVf+44PnuWxeBatl4RTbv4/3LDd9szPe/PrGmi3Nda9Q6gKR6Ap4vw2\neVX6WR3e+VDXM30e9FjvleySJNyhvNL9+Lf6mNR8jWqNUVlKCg7WYUPQw44919nj\nP+zeWqhO0PAtRA957EdRi81IYbdgbLtrTv+Qx46Tax0Ej56NkQ0Q+ftBBWdoptSC\n+S0FZ9FaaJOv5i9p3eB/SjYQLUlV36Byi5z/MK7IWhoSvolanbFHBirtHbc0hNhF\nP4+y2LixAgMBAAECggEABE2x+zV5cyh2PIfLIVfIod6KZQKHFPkp5DJURS41IJN1\nWkoCT9wtUsZn66kxFYYB+5yi/NdJ33QYlM7jI5q39m/WvIAF9ufT5GBOjmDhYVz/\nIl8zA//U3wnDkfWUhDTUhwMLiIDFanDmxO8vSRkpClGERKGkfLow2L8WbdChHV2D\nlgAm+lKLChvzAydWayxE6uyDTaPim9HyxmX9KqB8dtIoPMoFjGaWOWWs6EPGW3JS\nSgGK/fDbqlK4xaw+zkAmNfF3ePbkr1nEfHqvcuX2VQqLptpT++3MAJWLwMeKvZsi\nDhhSe5im7Hesz+c69y0G8JPMGrVNjSUtL+W6zsHisQKBgQDSJi4oa7+AFuzCXsht\n/TZnfW49Zv6hlbUcImJtvMs0pOwFPePUxrxAQ6c11j29/TabvvBNGkiehaT0q+QA\nf6boJEUFNV01ZygZgunXbP0RECS8IZ1ZHSnyCrX3F4i/XMhW+YfIhD9uP6K2ySuc\n3QTLwC230CqNAhENdE1RGrVw/QKBgQDJ+8zSTvVrLL2I3MLGgFg69Wd6Rl+Zxppz\nDafVbNzLgl6pxto71yL9k0AzONkVC9HHu3H2HWwvPIVtqtcwt4jaHMPMSs/UW7oN\nSVPSkqLaU3bB0upZC5HHRKM+xZQ06x0Ol8+FB1acUiU15mNiuOUuuqgv6gUJBQrY\nDI6B8eG+xQKBgQCOyRRZsIQoUutBUcdbPE3n2Ui6/a0LOz4YRKCeMUXcmiYnlZqk\nqvejrpQBN3UyDsc44W5C5RXsZ5/iApzjXdiZKHOhC1Yuf822L8YU8l+sZUygazKP\nJwqmA3MJ1Xq7kx4oQllo+7phfWlgSqWQanfkvMoTd6RBtOLDQn96GOypPQKBgCSQ\niMupr5PvTYBxNnFo2pARzOG9y6Cy61LYrgFc67uLpkdl0Cv1DkiJV53uNJ4yvY9C\nx6aePO9wLVdlDf+rugKCIo/hGy5+THgLRjlggkqzwVPlMrdb+M/yBPtgGSxbQ69Y\nnCCg63TxCftv8Z31isei0r+Zxb+UQhpKa6Hqf8thAoGAYu7hib/HwpnsjRMuzrzG\n+YXX/gGp45aAOKoEtqlYEGBhSLBV+FUQuhQt9Srg/U5U7fvs4M2/lwxFn2Dl7M58\nviS2mJUGEhefoqm87epW71JynZWJKPr6M2gX4tIdSIGs06Njy4rrjg9I5nbI0S56\nINMA7ejml6O34SdGNpk6Vy8=\n-----END PRIVATE KEY-----\n"
+    authDomain: str = "https://accounts.google.com/o/oauth2/auth"
+    databaseURL: str = "https://playerbusterapi.firebaseio.com/"
     projectId: str = "playerbusterapi"
-    storageBucket: str = "example-gcs-bucket"
-    messagingSenderId: str = "YOUR_MESSENGER_ID"
+    storageBucket: str = "playerbusterapi.appspot.com"
+    messagingSenderId: str = "115850684003"
     appId: str = "com.pathoz.touchstone.stage"
     measurementId: str = "YOUR_MEASUREMENT_ID"
+    serviceAccount: str = "auth/stage/ts-firebase-adminsdk.json"
 
     @property
     def hardcoded_dict(self: FirebaseCfg) -> dict[str, str]:
@@ -209,6 +210,7 @@ class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
             "messagingSenderId": "115850684003",
             "appId": "com.pathoz.touchstone.stage",
             "measurementId": "YOUR_MEASUREMENT_ID",
+            "serviceAccount": "auth/stage/ts-firebase-adminsdk.json",
         }
 
     # @property
