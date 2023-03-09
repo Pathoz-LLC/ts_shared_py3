@@ -5,7 +5,7 @@ PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "playerbusterapi")
 BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "playerbusterapi.appspot.com/")
 FIR_CREDS_FILENAME = os.environ.get(
     "FIREBASE_ADMIN_CREDENTIAL",
-    "auth/stage/playerbusterapi-firebase-adminsdk-6ksdg-b582e4140c.json",
+    "auth/stage/ts-firebase-adminsdk.json",
 )
 
 # END DATE for latest Interval/Phase that has not ended

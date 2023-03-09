@@ -120,7 +120,7 @@ class EnvVarVals(metaclass=Singleton):
 
     @property
     def PROJ_ID(self: EnvVarVals) -> str:
-        return os.environ.get("PROJ_ID", "playerbusterapi")
+        return os.environ.get("PROJ_ID", "tsapi-stage2")
 
     @property
     def HOST_URL(self: EnvVarVals) -> str:
@@ -128,12 +128,12 @@ class EnvVarVals(metaclass=Singleton):
 
     @property
     def BASE_URL(self: EnvVarVals) -> str:
-        return os.environ.get("BASE_URL", "playerbusterapi.appspot.com/")
+        return os.environ.get("BASE_URL", "tsapi-stage2.appspot.com/")
 
     @property
     def FIR_DB_URL(self: EnvVarVals) -> str:
         return os.environ.get(
-            "FIR_DB_URL_SUFFIX", "https://playerbusterapi.firebaseio.com"
+            "FIR_DB_URL_SUFFIX", "https://tsapi-stage2.firebaseio.com"
         )
 
     @property
