@@ -12,7 +12,7 @@ IS_DEV_SERVER = False
 # usage:
 # from .config import ts_client, QUEUE_PATH, createTaskPayload
 
-# google.auth.exceptions.DefaultCredentialsError: File playerbusterapi-540f7db98f01.json was not found.
+# google.auth.exceptions.DefaultCredentialsError: File tsapi-stage2-540f7db98f01.json was not found.
 gcpCfg = GcpSvcsCfg()
 ts_task_client = CloudTasksAsyncClient(
     credentials=gcpCfg.GOOGLE_APPLICATION_CREDENTIALS

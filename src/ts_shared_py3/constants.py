@@ -1,8 +1,8 @@
 import os
 from datetime import date
 
-PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "playerbusterapi")
-BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "playerbusterapi.appspot.com/")
+PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "tsapi-stage2")
+BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "tsapi-stage2.appspot.com/")
 FIR_CREDS_FILENAME = os.environ.get(
     "FIREBASE_ADMIN_CREDENTIAL",
     "auth/stage/ts-firebase-adminsdk.json",

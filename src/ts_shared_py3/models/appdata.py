@@ -6,7 +6,7 @@ class AppConfig(BaseNdbModel):
     """singleton -- 1 row in table
     these values stored from the form at
         http://admin.api.touchstone.pathoz.com/config
-        http://admin.playerbusterapi.appspot.com/config
+        http://admin.tsapi-stage2.appspot.com/config
 
     loaded by get_or_insert() with 'config' as the key value"""
 

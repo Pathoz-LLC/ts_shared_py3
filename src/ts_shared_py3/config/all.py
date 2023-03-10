@@ -205,7 +205,7 @@ class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
             "apiKey": "",
             "authDomain": "https://accounts.google.com/o/oauth2/auth",
             "databaseURL": "https://tsapi-stage2.firebaseio.com/",
-            "projectId": "playerbusterapi",
+            "projectId": "tsapi-stage2",
             "storageBucket": "tsapi-stage2.appspot.com",
             "messagingSenderId": "115850684003",
             "appId": "com.pathoz.touchstone.stage",
