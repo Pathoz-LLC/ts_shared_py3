@@ -106,7 +106,7 @@ class PersonBehavior(BaseNdbModel):
         #     secsFromOrigDtTm = 0
         # entry.modifyDateTime = datetime.now()
 
-        self.entries[secsFromOrigDtTm] = entry
+        # self.entries[secsFromOrigDtTm] = entry
         self._latestEntry = entry
         self.put()
         self.clearCache()
