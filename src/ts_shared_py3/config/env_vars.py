@@ -165,12 +165,13 @@ class EnvVarVals(metaclass=Singleton):
         return {
             "apiKey": "YOUR_API_KEY",
             "authDomain": "YOUR_API_DOMAIN",
-            "databaseURL": "YOUR_URL",
+            "databaseURL": self.FIR_DB_URL,
             "projectId": self.PROJ_ID,
             "storageBucket": self.STORAGE_BUCKET_ROOT_PATH,
             "messagingSenderId": "YOUR_MESSENGER_ID",
             "appId": self.APP_ID,
             "measurementId": "YOUR_MEASUREMENT_ID",
+            "serviceAccount": self.FIREBASE_ADMIN_CREDENTIAL,
         }
 
     def list_prop_names(self) -> list[str]:
