@@ -40,7 +40,7 @@ class NotifyType(IntEnum):
         ]
 
     @staticmethod
-    def allAsStr():
+    def allAsStr() -> list[str]:
         return [t.name for t in NotifyType.all()]
 
     def getMockData(self):

@@ -2,6 +2,7 @@ from __future__ import annotations
 from enum import Enum, unique, auto
 from marshmallow import fields, ValidationError
 
+
 #
 class AutoName(Enum):
     def _generate_next_value_(
@@ -17,11 +18,15 @@ class QueuedWorkTyp(AutoName):
     # initiate RedFlag recalc
     PERSON_REDFLAGUPDATE = auto()
     # Notify if no data entered on prospect after x days
+    SEND_PUSH_NOTIFY = auto()
     PERSON_AUTOBREAKUP_WARN = auto()
     PERSON_AUTOBREAKUP_DONE = auto()
 
     # Notify abt value assess counts
     VALUES_QUESTIONSAVAILABLE = auto()
+
+    # data changed; start rescoring
+    START_RESCORING = auto()
     # stats
 
     # roll up the deception tell frequencies into memcache
@@ -43,7 +48,30 @@ class QueuedWorkTyp(AutoName):
         return cls[name]
 
     @property
-    def handlerRoute(self: QueuedWorkTyp) -> str:
+    def queueName(self) -> str:
+        # tracking-queue
+        # push-notify-queue
+        # comm-news-queue
+        # scoring-queue
+        # default
+        if self in [QueuedWorkTyp.TRACK_CHECKFORINCIDENTS]:
+            return "tracking-queue"
+        elif self in [
+            QueuedWorkTyp.SEND_PUSH_NOTIFY,
+            QueuedWorkTyp.PERSON_AUTOBREAKUP_WARN,
+            QueuedWorkTyp.PERSON_AUTOBREAKUP_DONE,
+        ]:
+            return "push-notify-queue"
+        elif self in [QueuedWorkTyp.COMMUNITY_NEWS, QueuedWorkTyp.COMMUNITY_NEWSFORGE]:
+            return "comm-news-queue"
+        elif self in [QueuedWorkTyp.START_RESCORING]:
+            return "scoring-queue"
+        else:
+            # everything else sent on default
+            return "default"
+
+    @property
+    def postHandlerUriSuffix(self: QueuedWorkTyp) -> str:
         """_summary_
 
         Args:
