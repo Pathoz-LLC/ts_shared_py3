@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from google.cloud.tasks_v2 import HttpMethod
 
 from ..models.input_entry_adapter import InputEntryAdapter
-from ..services.taskq_dispatch import ts_task_client, getFullQueuePath
+from ..services.taskq_dispatch import do_background_work, do_background_work_get
 
 # FIX BELOW
 # from ...constants import GAEQ_FOR_SCORING, SCORING_SERVICE_NAME
@@ -29,26 +29,27 @@ class ScoreDispatchHelper(object):
         taskName = "{0}-{1}".format(userId, prospectId)
         url = "/rescore/{0}/{1}".format(userId, prospectId)
 
-        # try:
-        #     scoreQueue = taskqueue.Queue(name=GAEQ_FOR_SCORING)
-        #     scoreQueue.delete_tasks_by_name(taskName)
-        # except:
-        #     pass
-        # Construct the fully qualified queue name.
-        task_queue_name = getFullQueuePath(GAEQ_FOR_SCORING)
+        # # try:
+        # #     scoreQueue = taskqueue.Queue(name=GAEQ_FOR_SCORING)
+        # #     scoreQueue.delete_tasks_by_name(taskName)
+        # # except:
+        # #     pass
+        # # Construct the fully qualified queue name.
+        # task_queue_name = getFullQueuePath(GAEQ_FOR_SCORING)
 
-        # Construct the request body.
-        task = {
-            "name": taskName,
-            "app_engine_http_request": {  # Specify the type of request.
-                "http_method": HttpMethod.GET,
-                "relative_uri": url,
-                # "body": encoded_payload,
-            },
-        }
+        # # Construct the request body.
+        # task = {
+        #     "name": taskName,
+        #     "app_engine_http_request": {  # Specify the type of request.
+        #         "http_method": HttpMethod.GET,
+        #         "relative_uri": url,
+        #         # "body": encoded_payload,
+        #     },
+        # }
 
         try:
-            _ = ts_task_client.create_task(parent=task_queue_name, task=task)
+            # _ = ts_task_client.create_task(parent=task_queue_name, task=task)
+            do_background_work_get(url, GAEQ_FOR_SCORING, None, taskName)
             # _ = taskqueue.add(
             #     queue_name=GAEQ_FOR_SCORING,
             #     target=SCORING_SERVICE_NAME,

@@ -105,7 +105,8 @@ class QueuedWorkTyp(AutoName):
         elif self is QueuedWorkTyp.COMMUNITY_NEWSFORGE:
             return "test/comm/newsForge"
         elif self is QueuedWorkTyp.TESTDEPLOY:
-            return "test/comm/deploy"
+            # return "test/comm/deploy"
+            return "/queued/test/postToQueue"
         elif self is QueuedWorkTyp.STATS_MAKEFAKE:
             return "test/stats/fake"
         else:
