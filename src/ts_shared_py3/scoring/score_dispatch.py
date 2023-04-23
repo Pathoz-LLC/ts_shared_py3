@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from google.cloud.tasks_v2 import HttpMethod
 
 from ..models.input_entry_adapter import InputEntryAdapter
-from ..services.taskq_setup import ts_task_client, getFullQueuePath
+from ..services.taskq_dispatch import ts_task_client, getFullQueuePath
 
 # FIX BELOW
 # from ...constants import GAEQ_FOR_SCORING, SCORING_SERVICE_NAME

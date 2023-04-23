@@ -16,10 +16,10 @@ EARLY_DEFAULT_DATE = date(2015, 1, 1)
 IS_RUNNING_LOCAL = False
 
 if os.getenv("GAE_ENV", "").startswith("standard"):
-    # Production in the standard environment
+    # Production/Stage in the standard environment
     IS_RUNNING_LOCAL = False
 else:
-    # Local execution.
+    # running on localhost
     IS_RUNNING_LOCAL = True
 
 
