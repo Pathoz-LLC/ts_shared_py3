@@ -20,7 +20,8 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
     IS_RUNNING_LOCAL = False
 else:
     # running on localhost
-    IS_RUNNING_LOCAL = True
+    # IS_RUNNING_LOCAL = True
+    pass
 
 
 # usage:
