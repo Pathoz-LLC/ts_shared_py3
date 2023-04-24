@@ -8,8 +8,9 @@ python src/main_validate.py
 #### to install from github
 python3 -m pip install git+https://github.com/Pathoz-LLC/ts_shared_py3.git#egg=ts_shared_py3
 or if you want it editable:
-    pip install -e /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3 --force-reinstall --target ts_shared_py3
+    pip install -e /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3 --force-reinstall
     pip uninstall ts_shared_py3
+    pip install /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3 --force-reinstall
 
 
 
