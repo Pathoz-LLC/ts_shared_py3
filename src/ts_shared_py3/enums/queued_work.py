@@ -72,7 +72,8 @@ class QueuedWorkTyp(AutoName):
 
     @property
     def postHandlerUriSuffix(self: QueuedWorkTyp) -> str:
-        """_summary_
+        """
+        use in annotating the handler
 
         Args:
             self (QueuedWorkTyp): _description_
@@ -106,11 +107,16 @@ class QueuedWorkTyp(AutoName):
             return "test/comm/newsForge"
         elif self is QueuedWorkTyp.TESTDEPLOY:
             # return "test/comm/deploy"
-            return "/queued/test/postToQueue"
+            return "test/postToQueue"
         elif self is QueuedWorkTyp.STATS_MAKEFAKE:
             return "test/stats/fake"
         else:
             return "undefined"
+
+    @property
+    def postHandlerFullUri(self: QueuedWorkTyp) -> str:
+        # use in creating the task
+        return "/queued/" + self.postHandlerUriSuffix
 
 
 class QwTypeSerialized(fields.Enum):
