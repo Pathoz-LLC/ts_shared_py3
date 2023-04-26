@@ -110,13 +110,16 @@ class QueuedWorkTyp(AutoName):
             return "test/postToQueue"
         elif self is QueuedWorkTyp.STATS_MAKEFAKE:
             return "test/stats/fake"
+        elif self is QueuedWorkTyp.SEND_PUSH_NOTIFY:
+            # not a handler on its own
+            return "pn/sent/by/parent/queued/work"
         else:
             return "undefined"
 
     @property
     def postHandlerFullUri(self: QueuedWorkTyp) -> str:
         # use in creating the task
-        return "/queued/" + self.postHandlerUriSuffix
+        return "queued/" + self.postHandlerUriSuffix
 
 
 class QwTypeSerialized(fields.Enum):

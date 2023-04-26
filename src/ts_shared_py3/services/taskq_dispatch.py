@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union, Dict
 import os
 import logging
 import datetime
@@ -30,7 +30,7 @@ def do_background_work(
 ):
     # uses POST
     queue = workType.queueName
-    handlerUri = workType.postHandlerUriSuffix
+    handlerUri = workType.postHandlerFullUri
 
     _create_task(queue, handlerUri, payload, in_seconds, taskName)
 
@@ -75,8 +75,8 @@ def _getPathPrefix(qPath: str) -> str:
 
 
 def _createTaskPayload(
-    handlerUri: str, payload: dict[str, Any], taskName: str = None
-) -> dict[str, Any]:
+    handlerUri: str, payload: Union[Dict[str, Any], str, None], taskName: str = None
+) -> dict[str, str]:
     #
     request_type = "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
     # request_type = "app_engine_http_request"
@@ -109,13 +109,13 @@ def _createTaskPayload(
 def _create_task(
     queue: str,
     handlerUri: str,
-    payload: map = None,
+    payload: Union[Dict[str, Any], str, None] = None,
     in_seconds: int = None,
     taskName: str = None,
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
-    task = _createTaskPayload(handlerUri, payload, taskName)
+    task: Dict[str, str] = _createTaskPayload(handlerUri, payload, taskName)
     if in_seconds is not None:
         d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
         timestamp = timestamp_pb2.Timestamp()
@@ -137,7 +137,7 @@ def _create_task_get(
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
-    task = _createTaskPayload(handlerUri, {}, taskName)
+    task: Dict[str, str] = _createTaskPayload(handlerUri, None, taskName)
     task["app_engine_http_request"]["http_method"] = "GET"
     task["app_engine_http_request"]["body"] = None
     task["app_engine_http_request"]["headers"] = None

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List, Tuple
 from enum import IntEnum, unique
 from datetime import datetime, timedelta
 import google.cloud.ndb as ndb
@@ -85,7 +86,7 @@ class PersonActivity(BaseNdbModel):  # ndb.model.Expando
         return ndb.Key("User", userIdStr, PersonActivity, personIdInt)
 
     @staticmethod
-    def loadAllUntouchedFor(days: int = 30):
+    def loadAllUntouchedFor(days: int = 30) -> List[Tuple]:
         # return list of tuple of (userId, prospectId)
         lastTouchDay = datetime.now() - timedelta(days=days)
         tdStart = lastTouchDay.replace(hour=0, minute=0, second=0)
@@ -95,6 +96,7 @@ class PersonActivity(BaseNdbModel):  # ndb.model.Expando
             PersonActivity.lastChngDtTm >= tdStart, PersonActivity.lastChngDtTm <= tdEnd
         )
         results = qry.fetch(12000, keys_only=True, offset=0)
+        # tup[0] is user id;  tup[1] is prospect id
         return [(key.parent().string_id(), key.integer_id()) for key in results]
 
     # def _pre_put_hook(self, future):

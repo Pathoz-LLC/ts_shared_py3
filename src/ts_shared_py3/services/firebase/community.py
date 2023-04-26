@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 from datetime import datetime, date
 from typing import Dict, Any
@@ -11,6 +12,7 @@ from ts_shared_py3.utils.date_conv import (
 )
 from ...config.behavior.load_yaml import BehaviorSourceSingleton
 from ...enums.activityType import ActivityType
+from ...enums.commitLevel import CommitLevel_Display
 from ...enums.sex import Sex
 
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
@@ -26,13 +28,15 @@ class CommContentInfo(object):
     """
 
     @staticmethod
-    def makeWithBehaviorCode(activityType, behCode):
+    def makeWithBehaviorCode(activityType: ActivityType, behCode: str):
         # behavior or feeling or value assessment
         contentInfo = CommContentInfo(activityType, behCode)
         return contentInfo
 
     @staticmethod
-    def makeWithCommitLevel(activityType, displayCommitLvlEnum):
+    def makeWithCommitLevel(
+        activityType: ActivityType, displayCommitLvlEnum: CommitLevel_Display
+    ):
         meta = displayCommitLvlEnum.asDict
         contentInfo = CommContentInfo(
             activityType, displayCommitLvlEnum.code, meta=meta
@@ -40,7 +44,7 @@ class CommContentInfo(object):
         return contentInfo
 
     @staticmethod
-    def makeWithIncident(activityType, incident):
+    def makeWithIncident(activityType: ActivityType, incident: Incident):
         days = incident.overlapDays
         # use meta to store more info if needed
         contentInfo = CommContentInfo(activityType, days, meta=None)
@@ -163,14 +167,14 @@ class CommunityFeedEvent(object):
     main news object posted to firebase for community data stream
     """
 
-    def __init__(self, userInfo, contentInfo):
+    def __init__(self: CommunityFeedEvent, userInfo, contentInfo):
         # all info needed to create a community newsfeed entry
         self.userInfo = userInfo  # describe person doing posting
         self.contentInfo = contentInfo
         self.dttm = datetime.now()  # when did this happen
 
     @property
-    def toDict(self):
+    def toDict(self) -> Dict[str, Any]:
         # print("toEpoch: %s" % self.dttm)
         # print("Converting CommunityFeedEvent to dict")
         return {
@@ -180,7 +184,7 @@ class CommunityFeedEvent(object):
         }
 
     @property
-    def activityType(self):  # what did they do
+    def activityType(self) -> ActivityType:  # what did they do
         return self.contentInfo.activityType
 
     @property
@@ -203,7 +207,7 @@ class CommunityFeedEvent(object):
         return "/commNews/{0}/{1}".format(rootPath, str(roundToEvenXMins))
 
     @property
-    def asJson(self):
+    def asJson(self) -> str:
         return json.dumps(self, cls=CommFeedEncoder)
 
     @staticmethod

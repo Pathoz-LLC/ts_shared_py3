@@ -1,4 +1,5 @@
 from random import randint
+from typing import Dict
 from collections import namedtuple
 import google.cloud.ndb as ndb
 
@@ -41,7 +42,9 @@ class PushNotifyTasks:
     """
 
     @staticmethod
-    def constructAndSendNotification(userID, notifyType, dataVals):
+    def constructAndSendNotification(
+        userID: str, notifyType: NotifyType, dataVals: Dict
+    ):
         """the main push method"""
         try:
             user = _loadUser(userID)
@@ -174,7 +177,6 @@ def _makeIOSPayload(notifyType, token, fullPayload):
 
 
 def _makeAndroidPayload(notifyType, token, fullPayload):
-
     # flutter requires this key
     fullPayload["click_action"] = "FLUTTER_NOTIFICATION_CLICK"
     customBody = _makeCustomBody(notifyType, fullPayload)
