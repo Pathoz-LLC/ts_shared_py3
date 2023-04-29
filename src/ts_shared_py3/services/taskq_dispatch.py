@@ -82,11 +82,12 @@ def _createTaskPayload(
     # request_type = "app_engine_http_request"
     uri_key = "url" if IS_RUNNING_LOCAL else "relative_uri"
 
-    converted_payload = (
-        None
-        if payload is None
-        else (dumps(payload) if isinstance(payload, dict) else payload)
-    )
+    converted_payload = payload
+    if isinstance(payload, dict):
+        converted_payload = dumps(payload)
+    elif isinstance(payload, object):
+        converted_payload = dumps(payload)
+
     converted_payload = (
         None if converted_payload is None else converted_payload.encode()
     )

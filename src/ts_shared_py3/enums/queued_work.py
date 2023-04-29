@@ -119,7 +119,7 @@ class QueuedWorkTyp(AutoName):
     @property
     def postHandlerFullUri(self: QueuedWorkTyp) -> str:
         # use in creating the task
-        return "queued/" + self.postHandlerUriSuffix
+        return "/queued/" + self.postHandlerUriSuffix
 
 
 class QwTypeSerialized(fields.Enum):
