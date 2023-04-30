@@ -11,6 +11,12 @@ class AutoName(Enum):
         return name
 
 
+# COMMUNITY_NEWSFORGE
+# TESTDEPLOY
+# STATS_MAKEFAKE
+# SEND_PUSH_NOTIFY
+
+
 @unique  # applies to int value, not the name
 class QueuedWorkTyp(AutoName):
     TRACK_CHECKFORINCIDENTS = auto()
@@ -110,6 +116,8 @@ class QueuedWorkTyp(AutoName):
             return "test/postToQueue"
         elif self is QueuedWorkTyp.STATS_MAKEFAKE:
             return "test/stats/fake"
+        elif self is QueuedWorkTyp.START_RESCORING:
+            return "/api/scoring/recalcPost"
         elif self is QueuedWorkTyp.SEND_PUSH_NOTIFY:
             # not a handler on its own
             return "pn/sent/by/parent/queued/work"
@@ -119,7 +127,7 @@ class QueuedWorkTyp(AutoName):
     @property
     def postHandlerFullUri(self: QueuedWorkTyp) -> str:
         # use in creating the task
-        return "queued/" + self.postHandlerUriSuffix
+        return "/queued/" + self.postHandlerUriSuffix
 
 
 class QwTypeSerialized(fields.Enum):
