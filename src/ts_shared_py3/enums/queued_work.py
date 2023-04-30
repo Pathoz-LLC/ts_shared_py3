@@ -117,7 +117,7 @@ class QueuedWorkTyp(AutoName):
         elif self is QueuedWorkTyp.STATS_MAKEFAKE:
             return "test/stats/fake"
         elif self is QueuedWorkTyp.START_RESCORING:
-            return "/api/scoring/recalcPost"
+            return "api/scoring/recalcPost"
         elif self is QueuedWorkTyp.SEND_PUSH_NOTIFY:
             # not a handler on its own
             return "pn/sent/by/parent/queued/work"
