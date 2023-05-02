@@ -1,12 +1,16 @@
-# from common.utils.singleton import Singleton
-# from common.firebase.community import CommunityFeedEvent, CommUserInfo
+from typing import Dict, Any
+
+from services.firebase.community import CommunityFeedEvent, CommUserInfo
 from .readWrite import firebase_post, firebase_put
+
+# IMPORT LOOP??
+
 
 # used in task service to respond to async work
 class CommNewsClient(object):
     # __metaclass__ = Singleton
     @staticmethod
-    def pushUserActivity(commFeedEvent):
+    def pushUserActivity(commFeedEvent: CommunityFeedEvent):
         # send a new row to firebase
         # print("partitionPath: {0}".format(commFeedEvent.partitionPath))
         firebase_post(commFeedEvent.partitionPath, commFeedEvent.toDict)
@@ -15,7 +19,7 @@ class CommNewsClient(object):
 # used in task service to respond to async work
 class DailyStatsClient(object):
     @staticmethod
-    def putDailyStats(path, stats):
+    def putDailyStats(path: str, stats: Dict[str, Any]):
         if path is None or stats is None:
             print("NONE STATS")
             return

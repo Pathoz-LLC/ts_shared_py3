@@ -6,9 +6,10 @@
 from .admin import tsFirebaseApp
 from firebase_admin import db
 
+
 # Memoize the authorized http, to avoid fetching new access tokens
 # @lru_cache()
-def _getDbRef(path):
+def _getDbRef(path: str):
     """Provides an authd http ref object."""
     # https://firebase.google.com/docs/reference/rest/database/user-auth
     # print("frDb path: {0}".format(path))
@@ -16,7 +17,7 @@ def _getDbRef(path):
 
 
 # [START rest_writing_data]
-def firebase_put(path, obj=None):
+def firebase_put(path: str, obj=None):
     """Writes data to Firebase.
     An HTTP PUT writes an entire object at the given database path. Updates to
     fields cannot be performed without overwriting the entire object
@@ -28,7 +29,7 @@ def firebase_put(path, obj=None):
     dbRef.set(obj)
 
 
-def firebase_patch(path, obj=None):
+def firebase_patch(path: str, obj=None):
     """Update specific children or fields
     An HTTP PATCH allows specific children or fields to be updated without
     overwriting the entire object.
@@ -40,7 +41,7 @@ def firebase_patch(path, obj=None):
     dbRef.update(obj)
 
 
-def firebase_post(path, obj=None):
+def firebase_post(path: str, obj=None):
     """Add an object to an existing list of data.
     An HTTP POST allows an object to be added to an existing list of data.
     A successful request will be indicated by a 200 OK HTTP status code. The
@@ -57,7 +58,7 @@ def firebase_post(path, obj=None):
 # [END rest_writing_data]
 
 
-def firebase_get(path):
+def firebase_get(path: str):
     """Read the data at the given path.
     An HTTP GET request allows reading of data at a particular path.
     A successful request will be indicated by a 200 OK HTTP status code.
@@ -69,7 +70,7 @@ def firebase_get(path):
     return dbRef.get()
 
 
-def firebase_delete(path):
+def firebase_delete(path: str):
     """Removes the data at a particular path.
     An HTTP DELETE removes the data at a particular path.  A successful request
     will be indicated by a 200 OK HTTP status code with a response containing
