@@ -22,7 +22,7 @@ from .activityType import ActivityType
 # )
 
 
-# DO NOT change init vals below
+# DO NOT change init vals below; and dont import CommitLvlApiMsg
 _CommitLevelMasterDict: map[str, CommitLevel_Display] = None  # key'd by code
 _CommitLevelListMessage: list[CommitLvlApiMsg] = None
 

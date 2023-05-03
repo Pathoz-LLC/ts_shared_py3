@@ -23,8 +23,10 @@ creds_path = OsPathInfo().get_credential_path(
 )
 # print("creds_path: {0}".format(creds_path))
 serviceCreds = credentials.Certificate(creds_path)
+# https://tsapi-stage2-default-rtdb.firebaseio.com/
+# https://tsapi-prod-default-rtdb.firebaseio.com/
 config = {
-    "databaseURL": "https://{0}.firebaseio.com/".format(PROJ_ID),
+    "databaseURL": "https://{0}-default-rtdb.firebaseio.com/".format(PROJ_ID),
     "projectId": PROJ_ID,
 }
 

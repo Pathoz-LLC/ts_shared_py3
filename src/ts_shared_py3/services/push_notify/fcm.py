@@ -2,13 +2,7 @@ from random import randint
 from typing import Dict
 from collections import namedtuple
 import google.cloud.ndb as ndb
-
-from ...models.user import DbUser
-from ...models.person import PersonLocal
-from .pn_exceptions import UserNotFoundErr, MissingReqFieldErr
-
-# FIXME
-from ..firebase.admin import tsFirebaseApp
+from firebase_admin import messaging
 
 # firebase api
 from firebase_admin.messaging import Message, send
@@ -16,11 +10,30 @@ from firebase_admin.messaging import ApsAlert, Aps, APNSConfig, APNSPayload
 from firebase_admin.messaging import AndroidConfig, AndroidNotification
 from firebase_admin.exceptions import FirebaseError, NotFoundError
 
+
+from ...models.user import DbUser
+from ...models.person import PersonLocal
+from .pn_exceptions import UserNotFoundErr, MissingReqFieldErr
+
+from ..firebase.admin import tsFirebaseApp
 from ...enums.pushNotifyType import NotifyType
 
 import logging
 
 log = logging.getLogger("values")
+
+
+# docs: https://github.com/firebase/firebase-admin-python/blob/master/firebase_admin/messaging.py
+# https://firebase.google.com/docs/reference/admin/python/firebase_admin.messaging.html#send
+
+
+# alertForAps = messaging.ApsAlert    # used to construct Aps
+# stdDataPayload = messaging.Aps  # used to construct APNSPayload
+# fullCustomPayload = messaging.APNSPayload   # used to construct a msg
+
+# configForMsg = messaging.APNSConfig
+# whatToInclude = messaging.Notification
+# whatToSend = messaging.Message
 
 
 """ Push Notification steps:
@@ -34,6 +47,11 @@ send msg
 
 # user vals from the DB
 UserPushConfig = namedtuple("UserPushConfig", ["userID", "token", "isIOS"])
+
+
+def sendPushMsg(msg):
+    """dispatch msg to FCM"""
+    return messaging.send(msg, app=tsFirebaseApp)
 
 
 class PushNotifyTasks:
@@ -90,7 +108,7 @@ class PushNotifyTasks:
 
         # now send msg thru FCM
         try:
-            pnMsgId = send(pushMsg, app=tsFirebaseApp)
+            pnMsgId = sendPushMsg(pushMsg)
             log.info(
                 "TsPn sent {0} to {1} as {2}".format(notifyType.name, userID, pnMsgId)
             )
@@ -132,12 +150,12 @@ class PushNotifyTasks:
         pass
 
 
-def _loadUser(userID):
+def _loadUser(userID: str) -> DbUser:
     return DbUser.loadByEmailOrId(None, userID)
     # return ndb.Key(User, userID).get()
 
 
-def _loadUserVals(u):
+def _loadUserVals(u: DbUser) -> UserPushConfig:
     if u == None:
         raise UserNotFoundErr
     elif u.pushNotifyRegToken in ["", None]:
@@ -155,7 +173,7 @@ def _makePushPayload(notifyType, token, isIOS, dataVals):
         return _makeAndroidPayload(notifyType, token, dataVals)
 
 
-def _makeIOSPayload(notifyType, token, fullPayload):
+def _makeIOSPayload(notifyType: NotifyType, token: str, fullPayload: Dict) -> Message:
     """construct custom APNS msg"""
 
     customBody = _makeCustomBody(notifyType, fullPayload)
@@ -176,7 +194,9 @@ def _makeIOSPayload(notifyType, token, fullPayload):
     return Message(apns=config, token=token)  # , topic=notifyType.topic
 
 
-def _makeAndroidPayload(notifyType, token, fullPayload):
+def _makeAndroidPayload(
+    notifyType: NotifyType, token: str, fullPayload: Dict
+) -> Message:
     # flutter requires this key
     fullPayload["click_action"] = "FLUTTER_NOTIFICATION_CLICK"
     customBody = _makeCustomBody(notifyType, fullPayload)
@@ -194,7 +214,7 @@ def _makeAndroidPayload(notifyType, token, fullPayload):
     return Message(android=config, token=token)  # , topic=notifyType.topic
 
 
-def _validateRequiredVals(notifyType, customPayload):
+def _validateRequiredVals(notifyType, customPayload) -> None:
     """only in place for testing
     disable at call point after all push notifications verified
     """
@@ -208,7 +228,7 @@ def _validateRequiredVals(notifyType, customPayload):
             raise MissingReqFieldErr
 
 
-def _makeCustomBody(notifyType, fullPayload):
+def _makeCustomBody(notifyType: NotifyType, fullPayload: Dict) -> str:
     """4 of the push bodies need user values inserted
     Args:
         notifyType:
@@ -236,8 +256,8 @@ def _makeCustomBody(notifyType, fullPayload):
     return bodyTempl.format(tmplVal)
 
 
-def _lookupProspectLocal(customDict):
+def _lookupProspectLocal(customDict) -> PersonLocal:
     personID = customDict.get("personID")
     userID = customDict.get("userID")
-    userKey = ndb.Key(User, userID)
+    userKey = ndb.Key(DbUser, userID)
     return PersonLocal.getById(userKey, personID)

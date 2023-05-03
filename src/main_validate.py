@@ -1,3 +1,5 @@
+import six
+from google.cloud.ndb import model
 from ts_shared_py3 import *
 from ts_shared_py3.models import *
 from ts_shared_py3.enums import *
