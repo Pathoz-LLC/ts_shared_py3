@@ -22,14 +22,15 @@ class FirDbPath(IntEnum):
     @property
     def urlPathTmpl(self: FirDbPath) -> str:
         if self == FirDbPath.DAILY_STATS_NEG:
-            return "dailyStatsNeg"
+            return "dailyStatsNeg/{catCode}"
         elif self == FirDbPath.DAILY_STATS_POS:
-            return "dailyStatsPos"
+            return "dailyStatsPos/{catCode}"
         elif self == FirDbPath.COMMUNITY_NEWS_PRIVATE:
-            return "_commNewsInternal"
+            # idx valid 0-5
+            return "_commNewsInternal/windows/{idx}"
         elif self == FirDbPath.COMMUNITY_NEWS:
-            return "commNews-activePaths"
+            return "commNews-activePaths/commNews/{cntryDt}/{refreshSecs}"
         elif self == FirDbPath.COMMIT_LVL_STATS:
-            return "clStats"
+            return "clStats/global/{commitLvlCode}"
         elif self == FirDbPath.BEHAVIOR_STATS:
-            return "behaviorStats"
+            return "behaviorStats/{behCode}"
