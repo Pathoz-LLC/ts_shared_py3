@@ -37,6 +37,9 @@ class CommContentInfo(object):
     def makeWithCommitLevel(
         activityType: ActivityType, displayCommitLvlEnum: CommitLevel_Display
     ):
+        displayCommitLvlEnum = displayCommitLvlEnum or CommitLevel_Display.random(
+            butNot=CommitLevel_Display.BROKENUP
+        )
         meta = displayCommitLvlEnum.asDict
         contentInfo = CommContentInfo(
             activityType, displayCommitLvlEnum.code, meta=meta
@@ -167,7 +170,9 @@ class CommunityFeedEvent(object):
     main news object posted to firebase for community data stream
     """
 
-    def __init__(self: CommunityFeedEvent, userInfo, contentInfo):
+    def __init__(
+        self: CommunityFeedEvent, userInfo: CommUserInfo, contentInfo: CommContentInfo
+    ):
         # all info needed to create a community newsfeed entry
         self.userInfo = userInfo  # describe person doing posting
         self.contentInfo = contentInfo
