@@ -97,7 +97,6 @@ def forRowInYaml(fullFilePath: str, funcToRun: Callable) -> list[BehCatNode]:
 
 @dataclass
 class BehCatNode(object):
-
     code: str
     parentCode: str
     text: str
@@ -193,7 +192,7 @@ class BehCatNode(object):
         # keywords must be string when we exit this function
         return bcn
 
-    def inheritParentVals(self: BehCatNode, masterDict: Dict[str, Any]):
+    def inheritParentVals(self: BehCatNode, masterDict: Dict[str, BehCatNode]):
         # only call this for leaf nodes (non categories)
         dirParentAkaSubcat = masterDict.get(self.parentCode)
         if dirParentAkaSubcat is None:
@@ -424,12 +423,6 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             return
 
         categoriesDict: dict[str, BehCatNode] = dict()
-
-        # import os
-
-        # dir_path = os.path.dirname(os.path.realpath(__file__))
-        # print(dir_path)
-
         # forRowInYaml returns a list which we can ignore here
         forRowInYaml(
             catPath,
@@ -519,12 +512,15 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # every behavior or subCat has a parent
         # we need a sorted list of every parent's child  codes
         # tempGraphDict first contains tuples & then converted to strings after sorting
-        tempGraphDict = dict()
-        beh: BehCatNode = ""
+        parentToChildrenDict: Dict[str, List[Tuple(str, int)]] = dict()
+        beh: BehCatNode = None
         for cd, beh in self.masterDict.items():
             # only need to process subCats & behaviors (parentCode filters out topLevelCats)
             if beh.parentCode not in ("", "root"):
-                tempGraphDict.setdefault(beh.parentCode, []).append((cd, beh.sort))
+                lstForTier2: List[Tuple(str, int)] = parentToChildrenDict.setdefault(
+                    beh.parentCode, []
+                )
+                lstForTier2.append((cd, beh.sort))
 
                 if (
                     not beh.isCategory
@@ -545,14 +541,14 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # if we subtract the TOTAL (bigger) list of category keys, we should get EMPTY set
         # some behaviors are hidden (only found by searching) & have no parent
         # allowed to have 1 (hidden) as a left over category code
-        leftoverKeys = set(tempGraphDict.keys()) - set(categoriesDict.keys())
+        leftoverKeys = set(parentToChildrenDict.keys()) - set(categoriesDict.keys())
         if len(leftoverKeys) > 1:
-            print("Warn:  left over category codes: {}".format(leftoverKeys))
+            print("Warn:  left over category codes: {0}".format(leftoverKeys))
 
         # now sort all sublists & build final graph
         # graph is a list of tuples where t.0 == catOrSubCatCode & t.1 == [behCodes]
-        graph = []
-        for catCode, lstOfCodeSortTup in tempGraphDict.items():
+        graph: List[Tuple(str, int)] = []
+        for catCode, lstOfCodeSortTup in parentToChildrenDict.items():
             behCodeOnlyList: list[str] = self.removeDupChildCodesThenSort(
                 lstOfCodeSortTup
             )
@@ -639,6 +635,17 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # serves all
         if self._behaviorListMsg is None:
             self._behaviorListMsg = self._toMsg()
+        if False:
+            from dataclasses import asdict
+
+            # print("NodeLst has {0} entries".format(333))
+            fst: NodeListMsg = self._behaviorListMsg.graph[4]
+            keys = fst.children.keys()
+            row = keys[0]
+            print(asdict(row))
+            # ch: List[str] = fst.children
+            # print("first NodeLst is {0} w {1} children".format(fst.code, "below"))
+            # pp.pprint(fst.children.items())
         return self._behaviorListMsg
 
     def _toMsg(self) -> FullBehaviorListMsg:
@@ -651,7 +658,12 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             for b in self.masterDict.values()
             if not b.code.startswith("feelingReport")
         ]
-        nodeList = [NodeListMsg(code=tup[0], children=tup[1]) for tup in self.graph]
+        # nodeList = [NodeListMsg(code=tup[0], children=tup[1]) for tup in self.graph]
+        nodeList: List[NodeListMsg] = []
+        for tup in self.graph:
+            lstChildCodes: List[str] = [cd for cd in tup[1]]
+            nodeList.append(NodeListMsg(code=tup[0], children=lstChildCodes))
+            print("{0} == {1}".format(tup[0], lstChildCodes))
         fbl = FullBehaviorListMsg(
             topCategoryCodes=self.topLevelCategoryCodes,
             graph=nodeList,
