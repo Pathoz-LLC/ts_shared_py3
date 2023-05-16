@@ -1,5 +1,6 @@
 # from datetime import datetime
 import google.cloud.ndb as ndb
+import pytz
 
 #
 from ..models.beh_entry import Entry
@@ -15,6 +16,7 @@ class BehaviorIO(object):
     def castMsgToEntry(msg: BehaviorRowMsg) -> Entry:
         # msg.feelingStrength arrives 1 <= fs <= 3
         # should make it abs() ??
+        # datetime utc on line 30
         assert (
             1 <= msg.feelingStrength <= 3
         ), "err: feel val {0} is out of range 1-3".format(msg.feelingStrength)
@@ -25,7 +27,7 @@ class BehaviorIO(object):
         behEntry.shareDetails = msg.shareDetails
         behEntry.comments = msg.comments
         behEntry.positive = msg.positive
-        behEntry.occurDateTime = msg.occurDateTime
+        behEntry.occurDateTime = msg.occurDateTime.replace(tzinfo=None)
         # below added 11/5/19 by dg
         behEntry.categoryCode = msg.categoryCode
         behEntry.shareDetails = msg.shareDetails

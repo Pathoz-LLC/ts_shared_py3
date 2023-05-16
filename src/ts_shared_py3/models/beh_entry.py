@@ -35,6 +35,7 @@ class Entry(BaseNdbModel):  # ndb.model.Expando
         indexed=False, default=""
     )  # as str: "F:kadkdfj;T:388844" share IDs from both FB & Twitter
     occurDateTime = ndb.DateTimeProperty(indexed=True)
+    # occurDateTime = ndb.DateTimeProperty(indexed=True)
     addDateTime = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     modifyDateTime = ndb.DateTimeProperty(indexed=False)
     categoryCode = ndb.StringProperty(

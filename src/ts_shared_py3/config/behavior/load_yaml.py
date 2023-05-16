@@ -635,17 +635,11 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # serves all
         if self._behaviorListMsg is None:
             self._behaviorListMsg = self._toMsg()
-        if False:
-            from dataclasses import asdict
+        # if False:
+        #     fst: NodeListMsg = self._behaviorListMsg.graph[4]
+        #     ch: List[str] = fst.children
+        #     print("first NodeLst is {0} w {1} children".format(fst.code, "below"))
 
-            # print("NodeLst has {0} entries".format(333))
-            fst: NodeListMsg = self._behaviorListMsg.graph[4]
-            keys = fst.children.keys()
-            row = keys[0]
-            print(asdict(row))
-            # ch: List[str] = fst.children
-            # print("first NodeLst is {0} w {1} children".format(fst.code, "below"))
-            # pp.pprint(fst.children.items())
         return self._behaviorListMsg
 
     def _toMsg(self) -> FullBehaviorListMsg:
@@ -663,7 +657,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         for tup in self.graph:
             lstChildCodes: List[str] = [cd for cd in tup[1]]
             nodeList.append(NodeListMsg(code=tup[0], children=lstChildCodes))
-            print("{0} == {1}".format(tup[0], lstChildCodes))
+            # print("{0} == {1}".format(tup[0], lstChildCodes))
         fbl = FullBehaviorListMsg(
             topCategoryCodes=self.topLevelCategoryCodes,
             graph=nodeList,
