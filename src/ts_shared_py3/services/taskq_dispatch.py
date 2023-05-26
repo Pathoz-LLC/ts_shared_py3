@@ -56,11 +56,14 @@ def _getProjId() -> str:
 def _getTaskClient() -> CloudTasksClient:  # CloudTasksAsyncClient
     global _ts_task_client
     if _ts_task_client is None:
+        _ts_task_client = CloudTasksClient()
         # _ts_task_client = CloudTasksClient(
         #     credentials=gcpCfg.GOOGLE_APPLICATION_CREDENTIALS
         # )
-        _ts_task_client = CloudTasksClient()
-        # _ts_task_client = CloudTasksAsyncClient(credentials=gcpCfg.GOOGLE_APPLICATION_CREDENTIALS)
+        # _ts_task_client = CloudTasksAsyncClient()
+        # _ts_task_client = CloudTasksAsyncClient(
+        #     credentials=gcpCfg.GOOGLE_APPLICATION_CREDENTIALS
+        # )
     return _ts_task_client
 
 

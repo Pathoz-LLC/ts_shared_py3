@@ -266,7 +266,7 @@ class PersonLocal(BaseNdbModel):
         check if he exists and update monitor status if he does
         """
         plKey = PersonLocal._makeKey(userKey.string_id(), personKey.integer_id())
-        rec = plKey.get()
+        rec: PersonLocal = plKey.get()
         if rec:
             rec._updateFromMsg(persFullLocalMsg)
             rec.put()
@@ -274,6 +274,9 @@ class PersonLocal(BaseNdbModel):
 
         pl = PersonLocal.fromFullMsg(persFullLocalMsg)
         pl.key = plKey
+        # pl.nickname = persFullLocalMsg.nickname
+        # pl.imagePath = persFullLocalMsg.imagePath
+        # pl.commitLevel = persFullLocalMsg.commitLevel
         pl.put()
 
         # clear user counts on values questions
