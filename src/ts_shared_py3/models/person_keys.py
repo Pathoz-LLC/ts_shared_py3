@@ -1,5 +1,6 @@
 from __future__ import annotations
-import string
+import re
+import phonenumbers as phnum
 from typing import Optional
 import google.cloud.ndb as ndb
 
@@ -8,25 +9,37 @@ import google.cloud.ndb as ndb
 from ..enums.keyType import KeyTypeEnum, NdbKeyTypeProp
 from .baseNdb_model import BaseNdbModel
 
+# phoneUtil = phnum.phonenumberutil.PhoneNumberUtil()
 
-# DELETE_CHARS is for regular string
-DELETE_CHARS = string.ascii_letters + string.punctuation + string.whitespace
-# NON_DIGITS_MAP is for unicode vals
-NON_DIGITS_MAP = dict(
-    (ord(char), None)
-    for char in string.ascii_letters + string.punctuation + string.whitespace
-)
+# # DELETE_CHARS is for regular string
+# DELETE_CHARS = string.ascii_letters + string.punctuation + string.whitespace
+# # NON_DIGITS_MAP is for unicode vals
+# NON_DIGITS_MAP = dict(
+#     (ord(char), None)
+#     for char in string.ascii_letters + string.punctuation + string.whitespace
+# )
 
 
-def stripNonDigits(value: str):
-    # remove non-digits
-    # print('searching Person by phone on %s  (%s)' % (value, type(value)) )
-    if isinstance(value, str):  # unicode string
-        return value.translate(DELETE_CHARS)  # NON_DIGITS_MAP
-    # elif isinstance(value, str):  # regular string
-    #     return value.translate(None, DELETE_CHARS)
-    else:  # unknown type
-        return str(value).translate(None, DELETE_CHARS)
+def normToIntlPhone(num: str) -> str:
+    try:
+        intlPn: phnum.PhoneNumber = phnum.parse(num, None)
+        if phnum.is_valid_number(intlPn):
+            return phnum.format_number(intlPn, phnum.PhoneNumberFormat.INTERNATIONAL)
+        return ""
+    except:
+        return ""
+
+
+# def _stripNonDigits(value: str):
+#     # remove non-digits
+#     # # print('searching Person by phone on %s  (%s)' % (value, type(value)) )
+#     # if isinstance(value, str):  # unicode string
+#     #     return value.translate(DELETE_CHARS)  # NON_DIGITS_MAP
+#     # # elif isinstance(value, str):  # regular string
+#     # #     return value.translate(None, DELETE_CHARS)
+#     # else:  # unknown type
+#     #     return str(value).translate(None, DELETE_CHARS)
+#     return re.sub(r"[^0-9]", "", value)
 
 
 class PersonKeys(BaseNdbModel):
@@ -37,30 +50,35 @@ class PersonKeys(BaseNdbModel):
 
     keyType = NdbKeyTypeProp(required=True, default=KeyTypeEnum.MBPHONE)
     value = ndb.StringProperty(required=True, indexed=True)
-    # from .person_model import Person     # get Person class
+    # from .person import Person  # get Person class
 
     @staticmethod
-    def storeMobileFor(person: Person, phone: str):
-        phone = stripNonDigits(phone)
+    def storeMobileFor(person: Person, phone: str) -> None:
         PersonKeys.attachFor(person, phone)
         # return
 
     @staticmethod
     def attachFor(
         personAsParent: Person, value: str, keyType: KeyTypeEnum = KeyTypeEnum.MBPHONE
-    ):
-        # if not keyType.isdigit():
-        #     keyType = KeyType.by_string(keyType)
+    ) -> None:
+        #
+        if len(value) < 1:
+            return
+
         assert isinstance(
             keyType, KeyTypeEnum
         ), "implement cast from string to KeyTypeEnum.Int if you need that"
+        if keyType.isPhone:
+            value = normToIntlPhone(value)
         # assert isinstance(parent, Person)
         pkey = PersonKeys(keyType=keyType, value=value, parent=personAsParent.key)
         pkey.put()
 
     @staticmethod
     def searchByPhone(phoneString: str) -> Optional[Person]:  # ndb.AND
-        phoneString = stripNonDigits(phoneString)
+        phoneString = normToIntlPhone(phoneString)
+        if len(phoneString) < 1:
+            return
         pkRec = PersonKeys.query(
             PersonKeys.value == phoneString, PersonKeys.keyType == KeyTypeEnum.MBPHONE
         ).get()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+from typing import List
 from datetime import datetime, date
 import google.cloud.ndb as ndb
 from typing import Optional, Iterable  # List
@@ -211,6 +212,25 @@ class Tracking(BaseNdbModel):
         # return Tracking.loadByKeys(userKey, personKey)
         key = Tracking.makeUserPersKey(userId, personId)
         return key.get()
+
+    @staticmethod
+    def createInitialFromDialog(
+        userId: str, personId: int, intervalList: List[Interval]
+    ):
+        # will update or create (& store) the record
+        userKey = ndb.Key("User", userId)
+        personKey = ndb.Key("Person", personId)
+        newTrackRec = Tracking.loadByKeys(userKey, personKey)
+        if not newTrackRec:
+            newTrackRec = Tracking(
+                enabled=True,
+                intervals=[],
+                lastCheckDateTime=datetime.now(),
+            )
+            newTrackRec.key = Tracking.makeUserPersKey(userId, personId)
+
+        newTrackRec.intervals = intervalList
+        return newTrackRec.put()
 
     def _pre_put_hook(self: Tracking):
         assert (

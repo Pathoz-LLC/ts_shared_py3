@@ -22,6 +22,11 @@ class KeyTypeEnum(IntEnum):
     PINTEREST = 23
     # SOMENEWSITE = 24
 
+    @property
+    def isPhone(self: KeyTypeEnum) -> bool:
+        # return self in [KeyTypeEnum.MBPHONE, KeyTypeEnum.HMPHONE, KeyTypeEnum.WKPHONE]
+        return self.value < 4
+
 
 #
 class NdbKeyTypeProp(ndb.IntegerProperty):

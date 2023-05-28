@@ -21,7 +21,7 @@ from .values_beh_cat import UserAnswerStats
 from ..enums.sex import Sex
 from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 from ..api_data_classes.person import PersonFullLocalRowDc, PersonLocalRowDc
-from .person_keys import PersonKeys, KeyTypeEnum
+from .person_keys import PersonKeys, KeyTypeEnum, normToIntlPhone
 from .user import DbUser
 
 # advanced filter building and usage
@@ -96,6 +96,23 @@ class Person(BaseNdbModel):
         # msg.nickname = msg.get_assigned_value('nickname') or ''
         # msg.devotionLevel = msg.get_assigned_value('devotionLevel') or ''
 
+    @staticmethod
+    def fromFullRow(flr: PersonFullLocalRowDc) -> Person:
+        p = Person(mobile=flr.mobile, first=flr.first, last=flr.last, email=flr.email)
+        p.city = flr.city
+        p.state = flr.state
+        p.zip = flr.zip
+        # p.tags = flr.tags
+        # p.xtra = flr.xtra
+        p.dob = flr.dob
+        p.alias = flr.alias
+        p.redFlagBits = 0
+        p.sex = flr.sex
+        p.addDateTime = datetime.now()
+        p.modDateTime = datetime.now()
+        p.put()
+        return p
+
     # def _save(person, isNew=False):
     #     # enforce model itegrity here
     #     # called by all below storage methods
@@ -122,7 +139,7 @@ class Person(BaseNdbModel):
         pf.monitorStatus = personLocalRec.monitorStatus
         return pf
 
-    def add_identifier(self, value, keyType):
+    def add_identifier(self, value: str, keyType: KeyTypeEnum):
         # actually stores the value
         assert isinstance(keyType, KeyTypeEnum), "must be a KeyTypeEnum"
         PersonKeys.attachFor(self, value, keyType)

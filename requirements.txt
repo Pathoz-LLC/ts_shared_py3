@@ -9,3 +9,4 @@ twilio==7.16.0
 google-cloud-ndb==2.1.0
 google-cloud-tasks==2.13.1
 six==1.16.0
+phonenumbers==8.13.11
