@@ -7,7 +7,7 @@ import marshmallow.fields as ma_fields
 from typing import Any, AnyStr
 
 #
-from .ndbkey_jwt import NdbKeyField
+# from .ndbkey_jwt import NdbKeyField
 from ..constants import (
     ISO_8601_DATE_FORMAT,
     ISO_8601_DATETIME_FORMAT,

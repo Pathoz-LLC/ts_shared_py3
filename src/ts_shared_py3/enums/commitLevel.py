@@ -169,7 +169,7 @@ class CommitLevel_Display(IntEnum):
     @property
     def asApiMsg(self: CommitLevel_Display):  # -> CommitLvlApiMsg:
         # raise Exception("missing schema CommitLvlApiMsg", "??")
-        from ..schemas.tracking import CommitLvlApiMsg
+        from ..api_data_classes.tracking import CommitLvlApiMsg
 
         return CommitLvlApiMsg(
             displayCode=self.code,
@@ -231,13 +231,12 @@ class CommitLevel_Display(IntEnum):
         return [cl.name for cl in CommitLevel_Display.masterList()]
 
     @staticmethod
-    def fromStr(str: str):  # -> CommitLevel_Display:
+    def fromStr(idxOrCode: str):  # -> CommitLevel_Display:
         # init instance from api msg value
         # should handle str or int
-        if isinstance(str, (int, float)):
-            return CommitLevel_Display(int(str))
-        upStr = str.upper()
-        return CommitLevel_Display[upStr]
+        if isinstance(idxOrCode, (int, float) or len(idxOrCode) < 2):
+            return CommitLevel_Display(int(idxOrCode))
+        return CommitLevel_Display.masterDict()[idxOrCode.upper()]
 
     @staticmethod
     def default() -> CommitLevel_Display:

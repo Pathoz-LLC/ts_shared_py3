@@ -4,7 +4,7 @@ import random
 import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
 
-from ..schemas.tracking import IntervalMessage, CommitLvlApiMsg
+from ..api_data_classes.tracking import IntervalMessage, CommitLvlApiMsg
 from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 from ..utils.date_conv import (
     calcOverlappingDays,
@@ -195,12 +195,22 @@ class Interval(BaseNdbModel):
         Returns:
             Interval
         """
-        from ts_shared_py3.api_data_classes.tracking import CommitLvlUpdateMsg
+        from ts_shared_py3.api_data_classes.tracking import (
+            CommitLvlApiMsg,
+            CommitLvlUpdateMsg,
+        )
 
         # print(im.commitLvl)
         # print("cmtLvl: {0}".format(im.commitLvl.displayCode))
         interval = Interval()
-        if isinstance(im.commitLvl, CommitLevel_Display):
+        print(
+            "new Ivl FromMsg {0}-{1}".format(
+                type(im.commitLvl), im.commitLvl.displayCode
+            )
+        )
+        if isinstance(im.commitLvl, CommitLvlApiMsg):
+            interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)
+        elif isinstance(im.commitLvl, CommitLevel_Display):
             interval.commitLevel = im.commitLvl
         elif isinstance(im.commitLvl, CommitLvlUpdateMsg):
             interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)

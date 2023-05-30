@@ -10,7 +10,7 @@ from .base import DataClassBaseSchema
     from common.schemas.tracking import *
 
     tracking & intervals
-    keep only msgs in here;  no logic
+    keep only schema defs in here;  no logic
     converters live on model objects
 
     chatbot sends list of IntervalMessage at end of dialog
@@ -18,7 +18,7 @@ from .base import DataClassBaseSchema
 """
 
 
-class CommitLvlApiMsg(DataClassBaseSchema):
+class CommitLvlApiMsgSchema(DataClassBaseSchema):
     # full descrip of a commitment level payload
     displayCode = fields.String()  # UI
     logicCode = fields.String()  # abstract code
@@ -26,7 +26,7 @@ class CommitLvlApiMsg(DataClassBaseSchema):
     displayValue = fields.String()
 
 
-class CommitLvlUpdateMsg(DataClassBaseSchema):
+class CommitLvlUpdateMsgSchema(DataClassBaseSchema):
     """used to update CommitLvl for in-active users"""
 
     persId = fields.Integer(required=True)
@@ -37,7 +37,7 @@ class CommitLvlUpdateMsg(DataClassBaseSchema):
     notificationId = fields.String(required=True, default="38248")
 
 
-class IntervalMessage(DataClassBaseSchema):
+class IntervalMessageSchema(DataClassBaseSchema):
     """used for add update delete
     oldStartDate is key for update/delete
     """
@@ -47,7 +47,7 @@ class IntervalMessage(DataClassBaseSchema):
     oldStartDate = fields.Date()
     startDate = fields.Date()
     endDate = fields.Date()
-    commitLvl = fields.Nested(CommitLvlApiMsg)
+    commitLvl = fields.Nested(CommitLvlApiMsgSchema)
 
 
 # class IntervalMessageCollection(ApiBaseSchema):
@@ -62,7 +62,7 @@ class IntervalMessage(DataClassBaseSchema):
 #     phases = fields.Nested(IntervalMessage(many=True))
 
 
-class IncidentRowMessage(DataClassBaseSchema):
+class IncidentRowMessageSchema(DataClassBaseSchema):
     """ """
 
     incidentId = fields.Integer(required=True)
@@ -75,8 +75,8 @@ class IncidentRowMessage(DataClassBaseSchema):
 
     overlapDays = fields.Integer()
     userIntervalRowNum = fields.Integer()
-    userInterval = fields.Nested(IntervalMessage, repeated=False)
-    reportingUserInterval = fields.Nested(IntervalMessage, repeated=False)
+    userInterval = fields.Nested(IntervalMessageSchema, repeated=False)
+    reportingUserInterval = fields.Nested(IntervalMessageSchema, repeated=False)
 
     # housekeeping
     # if reporting user changes their dates, store old vals here
@@ -91,10 +91,10 @@ class IncidentRowMessage(DataClassBaseSchema):
     reportingUserIncdSeqNum = fields.Integer(default=1)
 
 
-class IncidentDetailsMessage(DataClassBaseSchema):
+class IncidentDetailsMessageSchema(DataClassBaseSchema):
     persId = fields.Integer()
     asOfDate = fields.Date()
-    items = fields.Nested(IncidentRowMessage(many=True))
+    items = fields.Nested(IncidentRowMessageSchema(many=True))
     userOverlapCount = fields.Integer(default=1)
 
 
@@ -104,7 +104,7 @@ class IncidentTruthMessage(DataClassBaseSchema):
 
 
 class DevotionLevelListMessage(DataClassBaseSchema):
-    items = fields.Nested(CommitLvlApiMsg(many=True))
+    items = fields.Nested(CommitLvlApiMsgSchema(many=True))
 
 
 # class RelationshipStateOverviewMessage(fields.Message):

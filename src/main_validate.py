@@ -1,3 +1,9 @@
+# import os
+# import sys
+# google_path = os.path.join(directory, 'google')
+# google_module = sys.modules['google']
+# google_module.__path__.append(google_path)
+
 import six
 from google.cloud.ndb import model
 from ts_shared_py3 import *
@@ -5,7 +11,8 @@ from ts_shared_py3.models import *
 from ts_shared_py3.enums import *
 from ts_shared_py3.schemas import *
 from ts_shared_py3.wrappers import *
-from ts_shared_py3.scoring import commBehImpactConsenus
+
+# from ts_shared_py3.scoring import commBehImpactConsenus
 
 # from ts_shared_py3.scoring import *
 from ts_shared_py3.scoring import *
