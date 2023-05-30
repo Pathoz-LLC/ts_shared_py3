@@ -180,6 +180,7 @@ class CommitLevel_Display(IntEnum):
 
     @property
     def asDict(self: CommitLevel_Display) -> map[str, str]:
+        # why are keys named differently than asApiMsg?
         return dict(
             code=self.code,
             displayVal=self.displayVal,

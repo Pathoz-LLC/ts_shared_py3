@@ -4,7 +4,7 @@ import random
 import google.cloud.ndb as ndb
 from .baseNdb_model import BaseNdbModel
 
-from ..schemas.tracking import IntervalMessage
+from ..schemas.tracking import IntervalMessage, CommitLvlApiMsg
 from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 from ..utils.date_conv import (
     calcOverlappingDays,
@@ -42,7 +42,7 @@ class Interval(BaseNdbModel):
         required=True,
         default=CommitLevel_Display.CASUAL,
         indexed=False,
-        # choices=[cl.value for cl in CommitLevel_Display],
+        choices=[cl.value for cl in CommitLevel_Display.CASUAL.masterList()],
     )
 
     def __str__(self: Interval):
@@ -172,12 +172,18 @@ class Interval(BaseNdbModel):
         Returns:
             IntervalMessage
         """
+        cl = CommitLvlApiMsg()
+        cl.displayCode = self.commitLevel.code
+        cl.logicCode = self.commitLevel.logic.code
+        cl.iconName = self.commitLevel.iconName
+        cl.displayValue = self.commitLevel.displayVal
+
         im = IntervalMessage()
         im.persId = persId
         im.startDate = self.startDate
         im.endDate = self.endDate
         im.oldStartDate = im.startDate  # date_to_message(datetime.now())
-        im.commitLvl = self.commitLevel.name
+        im.commitLvl = cl
         return im
 
     @staticmethod

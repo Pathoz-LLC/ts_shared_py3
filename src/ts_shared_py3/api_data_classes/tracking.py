@@ -20,6 +20,11 @@ class CommitLvlApiMsg(BaseApiData):
     iconName: str = field(default="")
     displayValue: str = field(default="")
 
+    # displayCode: str = field(default="EXCLUSIVE_AS")
+    # logicCode: str = field(default="EXCLUSIVE")
+    # iconName: str = field(default="cl_exclusiveAssumed")
+    # displayValue: str = field(default="Exclusive Assumed")
+
     Schema: ClassVar[Type[Schema]] = Schema
 
 
@@ -47,9 +52,9 @@ class IntervalMessage(BaseApiData):
 
     # oldStartDate is key to find which row edited or deleted; ignored for Add
     oldStartDate: date = field()
-    startDate: date = field()
+    startDate: date = field(metadata=dict(required=True))
     endDate: date = field()
-    commitLvl: CommitLvlApiMsg = field()
+    commitLvl: CommitLvlApiMsg = field(metadata=dict(required=True))
     persId: int = field(default=0, metadata=dict(required=True))
 
     Schema: ClassVar[Type[Schema]] = Schema
