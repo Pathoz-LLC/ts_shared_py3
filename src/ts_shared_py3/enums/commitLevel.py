@@ -259,6 +259,7 @@ class CommitLevel_Display(IntEnum):
         # key'd by code
         global _CommitLevelMasterDict
         if _CommitLevelMasterDict is None:
+            _CommitLevelMasterDict = {}
             for rec in CommitLevel_Display.masterList():
                 _CommitLevelMasterDict[rec.code] = rec
         return _CommitLevelMasterDict

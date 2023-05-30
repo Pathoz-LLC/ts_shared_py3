@@ -42,7 +42,6 @@ class Interval(BaseNdbModel):
         required=True,
         default=CommitLevel_Display.CASUAL,
         indexed=False,
-        choices=[cl.value for cl in CommitLevel_Display.CASUAL.masterList()],
     )
 
     def __str__(self: Interval):
@@ -178,12 +177,18 @@ class Interval(BaseNdbModel):
         cl.iconName = self.commitLevel.iconName
         cl.displayValue = self.commitLevel.displayVal
 
-        im = IntervalMessage()
-        im.persId = persId
-        im.startDate = self.startDate
-        im.endDate = self.endDate
-        im.oldStartDate = im.startDate  # date_to_message(datetime.now())
-        im.commitLvl = cl
+        im = IntervalMessage(
+            persId=persId,
+            startDate=self.startDate,
+            endDate=self.endDate,
+            oldStartDate=self.startDate,
+            commitLvl=cl,
+        )
+        # im.persId = persId
+        # im.startDate = self.startDate
+        # im.endDate = self.endDate
+        # im.oldStartDate = im.startDate  # date_to_message(datetime.now())
+        # im.commitLvl = cl
         return im
 
     @staticmethod
