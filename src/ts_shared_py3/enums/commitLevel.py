@@ -113,13 +113,17 @@ class CommitLevel_Display(IntEnum):
 
     @property
     def displayVal(self: CommitLevel_Display) -> str:
+        """display value for client
+        these values should be mirrored in:
+        api_extensions/commit_lvl.dart
+        """
         val = self.value
         if val == 0:
             return "BrokenUp; On a Break"
         elif val == 1:
             return "Casual; Hooking Up"
         elif val == 2:
-            return "NonMonogamous; Dating"
+            return "Non Exclusive Dating"
         elif val == 3:
             return "Exclusive Assumed"
         elif val == 4:
