@@ -20,6 +20,7 @@ from .tracking import TrackingPayloadMsgDc
     those are no longer needed with marshmallow / py3
 """
 
+
 # example of validation
 @dataclass()
 class BehaviorKeysMessage(BaseApiData):
@@ -54,6 +55,7 @@ BehaviorStatsRequestMessage = make_dataclass(
         ("BehaviorStatsFilterMessage", BehaviorStatsFilterMessage),
     ],
 )
+
 
 # BehaviorRowMsg = model_message(Entry, exclude=('addDateTime', 'modifyDateTime') )
 @dataclass()
@@ -175,8 +177,8 @@ class BehaviorLogSummaryMessage(BaseApiData):
         default_factory=lambda: date.today(), metadata=dict(required=True)
     )
     count: int = field(default=0, metadata=dict(required=True))
-    entries: list[BehEntryWrapperMessage] = field(default_factory=lambda: [])
-    phaseHistory: list[TrackingPayloadMsgDc] = field(default_factory=lambda: [])
+    entries: list[BehEntryWrapperMessage] = field(default_factory=list)
+    phaseHistory: list[TrackingPayloadMsgDc] = field(default_factory=list)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -212,7 +214,7 @@ class BehOrCatMsg(BaseApiData):
 class NodeListMsg(BaseApiData):
     # embedded in FullBehaviorListMsg
     code: str = field(default="", metadata=dict(required=True))
-    children: list[str] = field(default_factory=lambda: [])
+    children: list[str] = field(default_factory=list)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -220,7 +222,7 @@ class NodeListMsg(BaseApiData):
 @dataclass()
 class FullBehaviorListMsg(BaseApiData):
     # top level msg returned to client
-    topCategoryCodes: list[str] = field(default_factory=lambda: [])
+    topCategoryCodes: list[str] = field(default_factory=list)
     masterList: list[BehOrCatMsg] = field(default_factory=lambda: [])
     graph: list[NodeListMsg] = field(default_factory=lambda: [])
     #
@@ -246,7 +248,7 @@ class CatCodeTextMsg(BaseApiData):
 @dataclass()
 class TopCategoriesMsg(BaseApiData):
     # list for client
-    items: list[CatCodeTextMsg] = field(default_factory=lambda: [])
+    items: list[CatCodeTextMsg] = field(default_factory=list)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -327,7 +329,6 @@ class BehVoteStatsMsg(BaseApiData):
 
 
 class BehVoteStatAdapter:
-
     #
 
     @staticmethod

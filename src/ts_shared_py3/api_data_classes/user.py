@@ -200,7 +200,7 @@ class UserLoginMsg(BaseApiData):
     email: str = field(default="", metadata=dict(required=True))
     name: str = field(default="", metadata=dict(required=True))
     phone: str = field(default="", metadata=dict(required=True))
-    imageURL: str = field(default="", metadata=dict(required=True))
+    imageURL: str = field(default="", metadata=dict(required=True, allow_none=True))
     provider: str = field(default="", metadata=dict(required=True))
     jwt: str = field(default="", metadata=dict(required=True))
     isNewUser: bool = field(default=False)

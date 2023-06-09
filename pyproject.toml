@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ts_shared_py3"
-version = "0.0.45"
+version = "0.0.46"
 authors = [
   { name="Dewey Gaedcke", email="dewey@pathoz.com" },
 ]

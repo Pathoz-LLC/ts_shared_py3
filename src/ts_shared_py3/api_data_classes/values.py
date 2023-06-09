@@ -68,7 +68,7 @@ class ValueRateMsg(BaseApiData):
     concernVote: int = field(default=2, metadata=dict(required=True))
     # send old answer so stats can be adjusted upon change (not yet implemented)
     origConcernVote: int = field(default=-1, metadata=dict(required=True))
-    frequencies: list[PersonFrequencyMsg] = field(default_factory=lambda x: [])
+    frequencies: list[PersonFrequencyMsg] = field(default_factory=list)
     changeDt: date = None
     # decrementQuota=False tells server that this is a catch-up frequency answer
     # not to count against daily quota
@@ -86,7 +86,7 @@ class BehaviorAssessMsg(BaseApiData):
 
     """
 
-    priorAnswer: ValueRateMsg = field()
+    priorAnswer: ValueRateMsg = field(metadata=dict(required=False, allow_none=True))
 
     behCode: str = field(metadata=dict(required=True))
     filterKeywords: str = field(metadata=dict(required=False))
