@@ -205,14 +205,9 @@ class Interval(BaseNdbModel):
             CommitLvlUpdateMsg,
         )
 
-        # print(im.commitLvl)
-        # print("cmtLvl: {0}".format(im.commitLvl.displayCode))
+        # dont print displayCode here;  it's not set yet based type in im.commitLvl
         interval = Interval()
-        print(
-            "new Ivl FromMsg {0}-{1}".format(
-                type(im.commitLvl), im.commitLvl.displayCode
-            )
-        )
+        print("new Ivl FromMsg {0}-{1}".format(type(im.commitLvl), im.commitLvl))
         if isinstance(im.commitLvl, CommitLvlApiMsg):
             interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)
         elif isinstance(im.commitLvl, CommitLevel_Display):

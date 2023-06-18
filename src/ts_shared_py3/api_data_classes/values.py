@@ -87,7 +87,6 @@ class BehaviorAssessMsg(BaseApiData):
     """
 
     priorAnswer: ValueRateMsg = field(metadata=dict(required=False, allow_none=True))
-
     behCode: str = field(metadata=dict(required=True))
     filterKeywords: str = field(metadata=dict(required=False))
     catCode: str = field(default="", metadata=dict(required=True))
@@ -95,7 +94,7 @@ class BehaviorAssessMsg(BaseApiData):
     text: str = field(default="")
     # prior answer
     hasPriorAnswer: bool = field(default=False)
-    categoryName: str = field(default="", metadata=dict(required=True))
+    categoryName: str = field(default="", metadata=dict(required=True, allow_none=True))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
@@ -107,7 +106,7 @@ class ValuesCollectionMsg(BaseApiData):
 
     availQuestCount: int = field(default=5, metadata=dict(required=True))
     # should be an entry in items for each behCode
-    items: list[BehaviorAssessMsg] = field(default_factory=lambda x: [])
+    items: list[BehaviorAssessMsg] = field(default_factory=list)
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
