@@ -104,8 +104,11 @@ def _createTaskPayload(
             },
         }
     }
-    if taskName is not None:
-        d["name"] = taskName
+
+    # disable sending taskName for now because sender is not correctly formatting it per:
+    # https://cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues.tasks#Task.FIELDS.name
+    # if taskName is not None:
+    #     d["name"] = taskName
 
     return d
 
