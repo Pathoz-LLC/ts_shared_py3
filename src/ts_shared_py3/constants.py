@@ -20,9 +20,13 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
     IS_RUNNING_LOCAL = False
 else:
     # running on localhost
-    # IS_RUNNING_LOCAL = True
-    pass
+    IS_RUNNING_LOCAL = True
+    # pass
 
+# when testing, use ngrok to expose localhost to the internet
+LOCAL_PUBLIC_URL = (
+    "https://df91-72-177-77-206.ngrok-free.app" if IS_RUNNING_LOCAL else None
+)
 
 # usage:
 # from common.scoring import constants as sc

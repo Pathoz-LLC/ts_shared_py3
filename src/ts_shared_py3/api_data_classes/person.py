@@ -5,7 +5,8 @@ from dataclasses import field
 from marshmallow_dataclass import dataclass, field_for_schema
 from marshmallow import Schema, fields
 
-from .base import BaseApiData
+#
+from .base import BaseApiData, DataClassBaseSchema
 from ..enums.sex import Sex
 from ..enums.commitLevel import CommitLvlSerializedMa, CommitLevel_Display
 from ..enums.redFlag import RedFlagType, RedFlagTypeSerializedMa

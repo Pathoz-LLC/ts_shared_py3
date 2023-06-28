@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Union
 from enum import Enum, unique, auto
 from marshmallow import fields, ValidationError
 
@@ -124,9 +125,12 @@ class QueuedWorkTyp(AutoName):
         else:
             return "undefined"
 
-    @property
-    def postHandlerFullUri(self: QueuedWorkTyp) -> str:
+    def postHandlerFullUri(
+        self: QueuedWorkTyp, non_gae_web_host: Union[str, None] = None
+    ) -> str:
         # use in creating the task
+        if non_gae_web_host is not None:
+            return non_gae_web_host + "/queued/" + self.postHandlerUriSuffix
         return "/queued/" + self.postHandlerUriSuffix
 
 

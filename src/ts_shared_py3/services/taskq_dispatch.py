@@ -5,11 +5,16 @@ import datetime
 from json import dumps
 from google.auth import default as authDefault
 from google.protobuf import timestamp_pb2
-from google.cloud.tasks_v2 import CloudTasksClient, CloudTasksAsyncClient, RetryConfig
+from google.cloud.tasks_v2 import (
+    Task,
+    CloudTasksClient,
+    CloudTasksAsyncClient,
+    RetryConfig,
+)
 
 #
 from ..config.all import GcpSvcsCfg
-from ..constants import IS_RUNNING_LOCAL
+from ..constants import IS_RUNNING_LOCAL, LOCAL_PUBLIC_URL
 from ..enums.queued_work import QueuedWorkTyp
 
 log = logging.getLogger("queue_dispatch")
@@ -30,7 +35,8 @@ def do_background_work(
 ):
     # uses POST
     queue = workType.queueName
-    handlerUri = workType.postHandlerFullUri
+    non_gae_web_host = LOCAL_PUBLIC_URL if IS_RUNNING_LOCAL else None
+    handlerUri = workType.postHandlerFullUri(non_gae_web_host=non_gae_web_host)
 
     _create_task(queue, handlerUri, payload, in_seconds, taskName)
 
@@ -85,7 +91,7 @@ def _createTaskPayload(
     # request_type = "app_engine_http_request"
     uri_key = "url" if IS_RUNNING_LOCAL else "relative_uri"
 
-    converted_payload = payload
+    converted_payload = payload  # Union[Dict[str, Any], str, None]
     if isinstance(payload, dict):
         converted_payload = dumps(payload)
     elif isinstance(payload, object):
@@ -122,18 +128,20 @@ def _create_task(
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
-    task: Dict[str, str] = _createTaskPayload(handlerUri, payload, taskName)
+    taskArgs: Dict[str, str] = _createTaskPayload(handlerUri, payload, taskName)
     if in_seconds is not None:
         d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(d)
-        task["schedule_time"] = timestamp
+        taskArgs["schedule_time"] = timestamp
 
     # send task from here:
     parent = _getQueuePath(queue)
-    queueAck = _getTaskClient().create_task(parent=parent, task=task)  #
-    logging.info("Created task {} --".format(queueAck.name))
-    logging.info(queueAck)
+    createdTask: Task = _getTaskClient().create_task(parent=parent, task=taskArgs)  #
+    logging.info("Created task at {0}".format(parent))
+    logging.info("web url: " + taskArgs.get("url", "NA"))
+    logging.info("gae uri: " + taskArgs.get("relative_uri", "NA"))
+    # logging.info(createdTask)
 
 
 def _create_task_get(

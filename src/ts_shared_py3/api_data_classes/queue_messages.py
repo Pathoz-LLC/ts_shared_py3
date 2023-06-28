@@ -7,7 +7,7 @@ from marshmallow_dataclass import dataclass
 from marshmallow import Schema, validate
 
 #
-from .base import BaseApiData
+from .base import *
 
 """Important Note:
     it is vital that you set the Schema.__model__
@@ -16,8 +16,9 @@ from .base import BaseApiData
     inside our endpoints
 """
 
-# example of validation
-@dataclass()
+
+# example of validation on priorMonthsToLoad below
+@dataclass(base_schema=DataClassBaseSchema)
 class CheckForIncidentMsg(BaseApiData):
     surveyId: int = field(default=2)
     personId: int = field(default=0, metadata=dict(required=True))
