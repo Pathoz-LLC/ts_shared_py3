@@ -49,37 +49,41 @@ class ActivityType(IntEnum):
         # return [0, 1, 2, 4, 5, 10, 11, 12, 20, 30, 40, 41, 50]
 
     @staticmethod
-    def random():
+    def random() -> ActivityType:
         randInt = randint(0, len(ActivityType.allIds()) - 1)
         typInt = ActivityType.allIds()[randInt]
         return ActivityType(typInt)
 
     @property
-    def isPublic(self):
+    def isPublic(self) -> bool:
         return self in [ActivityType.BEHAVIOR_SHARED, ActivityType.VALUE_SHARED]
 
     @property
-    def hasBehCode(self):
+    def hasBehCode(self) -> bool:
         # these two types should always be paired with behCode
         return self.appliesToBehavior or self.appliesToValues
 
     @property
-    def hasCommitLevel(self):
+    def hasCommitLevel(self) -> bool:
         # should always be paired with commitment level
         return self.appliesToProspect
 
     @property
-    def appliesToProspect(self):
+    def appliesToProspect(self) -> bool:
         return self.value < 20
 
     @property
-    def appliesToBehavior(self):
+    def appliesToBehavior(self) -> bool:
         # or self == ActivityType.FEELING_RECORDED
         return self.value > 19 and self.value < 39
 
     @property
-    def appliesToValues(self):
+    def appliesToValues(self) -> bool:
         return self.value > 39 and self.value < 50
+
+    @property
+    def isIncident(self) -> bool:
+        return self in [ActivityType.INCIDENT_OCCUREDD]
 
 
 class NdbActivityTypeProp(model.IntegerProperty):

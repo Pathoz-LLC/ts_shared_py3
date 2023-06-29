@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, ClassVar, Type
 from datetime import datetime, date
 import json
-from typing import ClassVar, Type
-from dataclasses import field  # , fields, make_dataclass
-from marshmallow_dataclass import dataclass
+
+# from dataclasses import field  # , fields, make_dataclass
+from marshmallow_dataclass import dataclass, field_for_schema
 from marshmallow import Schema
 
 #
@@ -26,6 +26,8 @@ behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 
 DEFAULT_USER_DOB = date(1998, 1, 9)  # if missing
 
+# field_for_schema = 123
+
 """_summary_
 {"userInfo": {"sex": 1, "province": "", "dob": 1685491200.0}, 
     "contentInfo": {"activityType": 20, "typeSpecificValue": "showedHealthyBoundWithEx",
@@ -35,134 +37,25 @@ DEFAULT_USER_DOB = date(1998, 1, 9)  # if missing
 """
 
 
-@dataclass(base_schema=DataClassBaseSchema, init=False)
-class CommContentInfo(BaseApiData):
-    """represents some user action that will feed community news
-    args are an enums.ActivityType, a string & optional context obj
-
-    good json encode and decode examples below
-    """
-
-    activityType: ActivityType = field(default=0, metadata=dict(required=True))
-    typeSpecificValue: Union[str, int, CommitLevel_Display] = field(
-        default="", metadata=dict(required=True)
-    )
-    meta: Dict[str, Any] = field(default_factory=lambda: {})
-
-    def __init__(
-        self: CommContentInfo,
-        activityType: ActivityType,
-        typeSpecificValue: Union[str, int, CommitLevel_Display],
-        meta: Dict[str, Any] = None,
-    ):
-        """typeSpecificValue is one of:
-            behCode or catCode
-            commitmentLevel
-
-        depending on activityType
-        meta is other values as {String:String}
-        """
-        assert isinstance(activityType, ActivityType), "invalid arg!"
-        # print("ActType: {0!r}".format(activityType))
-        self.activityType = activityType
-        self.typeSpecificValue = typeSpecificValue
-
-        # meta is for when typeSpecific values is more complex
-        # like it contains the behavior rec to which this activity applies
-        if isinstance(meta, dict):
-            self.meta = CommContentInfo._castMetaValsToStr(meta)
-        else:
-            self.meta = {}  # xtra vals depending upon activityType
-
-        if activityType.hasBehCode:
-            # typeSpecificValue should be a behCode
-            behNodeAsDict: Dict[str, Any] = behaviorDataShared.getBehAsDict(
-                typeSpecificValue
-            )
-            assert len(behNodeAsDict) > 2, "invalid behavior code %s" % (
-                typeSpecificValue
-            )
-            self.appendMeta(behNodeAsDict)
-
-        elif activityType.appliesToProspect:
-            """normally a change in commit-level or phase-dates
-            typeSpecificValue contains commitment level or other prospect info?
-            """
-            pass
-
-    @staticmethod
-    def makeWithBehaviorCode(activityType: ActivityType, behCode: str):
-        # behavior or feeling or value assessment
-        contentInfo = CommContentInfo(activityType, behCode)
-        return contentInfo
-
-    @staticmethod
-    def makeWithCommitLevel(
-        activityType: ActivityType, displayCommitLvlEnum: CommitLevel_Display
-    ):
-        displayCommitLvlEnum = displayCommitLvlEnum or CommitLevel_Display.random(
-            butNot=CommitLevel_Display.BROKENUP
-        )
-        meta = displayCommitLvlEnum.asDict
-        contentInfo = CommContentInfo(
-            activityType, displayCommitLvlEnum.code, meta=meta
-        )
-        return contentInfo
-
-    @staticmethod
-    def makeWithIncident(activityType: ActivityType, incident: Incident):
-        days: int = incident.overlapDays
-        # use meta to store more info if needed
-        contentInfo = CommContentInfo(activityType, days, meta=None)
-        return contentInfo
-
-    def appendMeta(self: CommContentInfo, meta: Dict[str, Any]):
-        """add extra payload depending on activityType"""
-        assert isinstance(meta, dict), "invalid arg to appendMeta (should be dict)"
-        # client expects all meta vals to be string
-        self.meta.update(CommContentInfo._castMetaValsToStr(meta))
-
-    @property
-    def commitmentLevel(self: CommContentInfo) -> CommitLevel_Display:
-        assert (self.activityType.hasCommitLevel, "invalid activityType")
-        return self.typeSpecificValue
-
-    @property
-    def isPublic(self: CommContentInfo):
-        return self.activityType.isPublic
-
-    @property
-    def toDict(self: CommContentInfo):
-        return {
-            "activityType": int(self.activityType.value),
-            "typeSpecificValue": self.typeSpecificValue,
-            "meta": self.meta,
-        }
-
-    @staticmethod
-    def _castMetaValsToStr(meta: Dict[str, Any]):
-        # client expects meta dict to be all string vals
-        for k, v in meta.items():
-            meta[k] = str(v)
-        return meta
-
-    @staticmethod
-    def fromDict(dct: Dict[str, Any]):
-        typ = ActivityType(dct.get("activityType", 1))
-        val = dct.get("typeSpecificValue", "")
-        meta = dct.get("meta", None)
-        return CommContentInfo(typ, val, meta=meta)
-
-
 @dataclass(base_schema=DataClassBaseSchema)
 class CommUserInfo(BaseApiData):
     """
     summarize who did the news event being reported
     """
 
-    sex: Sex = field(default=Sex.UNKNOWN, metadata=dict(required=True))
-    province: str = field(default=0, metadata=dict(required=True))
-    dob: date = field(default=DEFAULT_USER_DOB, metadata=dict(required=False))
+    sexInt: int = field_for_schema(
+        int, default=Sex.UNKNOWN.value, metadata=dict(required=True)
+    )
+    province: str = field_for_schema(str, default=0, metadata=dict(required=True))
+    dob: date = field_for_schema(
+        date, default=DEFAULT_USER_DOB, metadata=dict(required=False)
+    )
+
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
+
+    @property
+    def sex(self) -> Sex:
+        return Sex(self.sexInt)
 
     # def __init__(self, province, sex):
     #     self.province = province
@@ -170,32 +63,188 @@ class CommUserInfo(BaseApiData):
     #     self.dob = DEFAULT_USER_DOB
 
     @staticmethod
-    def fromUser(user: DbUser):
-        cui = CommUserInfo(user.city, user.sex)
+    def fromUser(user: DbUser) -> CommUserInfo:
+        cui = CommUserInfo(user.city, user.sex.value, user.dob)
         # assert user.dob, "DOB required"
-        if isinstance(user.dob, date):
-            cui.dob = user.dob
+        # if isinstance(user.dob, date):
+        #     cui.dob = user.dob
         return cui
 
     @property
-    def displaySex(self: CommUserInfo):
+    def displaySex(self: CommUserInfo) -> str:
         return self.sex.toDisplayVal
 
     @property
-    def toDict(self: CommUserInfo):
+    def toDict(self: CommUserInfo) -> dict:
         return {
-            "sex": int(self.sex.value),
+            "sex": self.sexInt,
             "province": self.province,
             "dob": date_to_epoch(self.dob),
         }
 
     @staticmethod
-    def fromDict(dct: Dict[str, Any]):
+    def fromDict(dct: Dict[str, Any]) -> CommUserInfo:
         prov = dct.get("province", "_unk")
         sex = Sex(dct.get("sex", 2))
         dob = date_from_epoch(dct.get("dob", 100))
         cui = CommUserInfo(prov, sex, dob)
         return cui
+
+
+@dataclass(base_schema=DataClassBaseSchema)
+class CommContentInfo(BaseApiData):
+    """represents some user action that will feed community news
+    args are an enums.ActivityType, a string & optional context obj
+
+    good json encode and decode examples below
+    """
+
+    activityTypeInt: int = field_for_schema(
+        int, default=ActivityType.FEELING_RECORDED.value, metadata=dict(required=True)
+    )
+    aTypSpecValStr: str = field_for_schema(
+        str, default="", metadata=dict(required=True)
+    )
+    aTypSpecValInt: int = field_for_schema(int, default=0, metadata=dict(required=True))
+
+    meta: Dict[str, Any] = field_for_schema(
+        Dict[str, Any],
+        metadata=dict(
+            default_factory=lambda x: {},
+        ),
+    )
+
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
+
+    @property
+    def activityType(self: CommContentInfo) -> ActivityType:
+        return ActivityType(self.activityTypeInt)
+
+    @property
+    def commitmentLevel(self: CommContentInfo) -> CommitLevel_Display:
+        assert self.activityType.hasCommitLevel, "invalid activityType"
+        return CommitLevel_Display(self.aTypSpecValInt)
+
+    @property
+    def lenIncidentInDays(self: CommContentInfo) -> int:
+        assert self.activityType.isIncident, "invalid activityType"
+        return self.aTypSpecValInt
+
+    def __post_init__(self: CommContentInfo) -> None:
+        """typeSpecificValue is one of:
+            behCode or catCode
+            commitmentLevel
+
+        depending on activityType
+        meta is other values as {String:String}
+
+                activityType: ActivityType,
+        typeSpecificValue: Union[str, int, CommitLevel_Display],
+        meta: Dict[str, Any] = None,
+        """
+        assert isinstance(self.activityType, ActivityType), "invalid arg!"
+        # print("ActType: {0!r}".format(activityType))
+
+        # meta is for when typeSpecific values is more complex
+        # like it contains the behavior rec to which this activity applies
+        if isinstance(self.meta, dict):
+            self._castMetaValsToStr()
+        else:
+            self.meta = {}  # xtra vals depending upon activityType
+
+        if self.activityType.hasBehCode:
+            # typeSpecificValue should be a behCode
+            behNodeAsDict: Dict[str, Any] = behaviorDataShared.getBehAsDict(
+                self.aTypSpecValStr
+            )
+            assert len(behNodeAsDict) > 2, "invalid behavior code {0}".format(
+                self.aTypSpecValStr
+            )
+            self.appendMeta(behNodeAsDict)
+
+        elif self.activityType.appliesToProspect:
+            """normally a change in commit-level or phase-dates
+            typeSpecificValue contains commitment level or other prospect info?
+            """
+            pass
+
+    @staticmethod
+    def makeWithBehaviorCode(
+        activityType: ActivityType, behCode: str
+    ) -> CommContentInfo:
+        # behavior or feeling or value assessment
+        contentInfo = CommContentInfo(activityType, behCode, 0)
+        return contentInfo
+
+    @staticmethod
+    def makeWithCommitLevel(
+        activityType: ActivityType, displayCommitLvlEnum: CommitLevel_Display
+    ) -> CommContentInfo:
+        displayCommitLvlEnum = displayCommitLvlEnum or CommitLevel_Display.random(
+            butNot=CommitLevel_Display.BROKENUP
+        )
+        meta = displayCommitLvlEnum.asDict
+        contentInfo = CommContentInfo(
+            activityType, displayCommitLvlEnum.code, 0, meta=meta
+        )
+        return contentInfo
+
+    @staticmethod
+    def makeWithIncident(
+        activityType: ActivityType, incident: Incident
+    ) -> CommContentInfo:
+        days: int = incident.overlapDays
+        # use meta to store more info if needed
+        contentInfo = CommContentInfo(activityType, "", days, meta=None)
+        return contentInfo
+
+    def appendMeta(self: CommContentInfo, meta: Dict[str, Any]) -> None:
+        """add extra payload depending on activityType"""
+        assert isinstance(meta, dict), "invalid arg to appendMeta (should be dict)"
+        # client expects all meta vals to be string
+        self.meta.update(CommContentInfo._castMetaValsToStr(meta))
+
+    @property
+    def typeValueDynamicAsStr(self: CommContentInfo) -> str:
+        if self.activityType.hasCommitLevel:
+            return self.commitmentLevel.code
+        elif self.activityType.hasBehCode:
+            return self.aTypSpecValStr
+        elif self.activityType.appliesToValues:
+            return self.aTypSpecValStr
+        elif self.activityType.isIncident:
+            # probably an incident report showing overlap days
+            return str(self.aTypSpecValInt)
+        else:
+            return self.aTypSpecValStr
+
+    @property
+    def isPublic(self: CommContentInfo) -> bool:
+        return self.activityType.isPublic
+
+    @property
+    def toDict(self: CommContentInfo) -> Dict:
+        return {
+            "activityType": self.activityTypeInt,
+            "typeSpecificValue": self.typeValueDynamicAsStr,
+            "meta": self.meta,
+        }
+
+    def _castMetaValsToStr(self: CommContentInfo) -> None:
+        # client expects meta dict to be all string vals
+        for k, v in self.meta.items():
+            self.meta[k] = str(v)
+
+    @staticmethod
+    def fromDict(dct: Dict[str, Any]) -> CommContentInfo:
+        typInt: int = dct.get("activityType", 1)
+        typ = ActivityType(typInt)
+
+        val: str = dct.get("typeSpecificValue", "")
+        valStr = val if typ.hasBehCode or typ.appliesToProspect else None
+        valInt = int(val) if typ.isIncident or typ.hasCommitLevel else None
+        meta = dct.get("meta", None)
+        return CommContentInfo(typ, valStr, valInt, meta=meta)
 
 
 @dataclass(base_schema=DataClassBaseSchema, eq=False)
@@ -204,11 +253,17 @@ class CommunityFeedEvent(BaseApiData):
     main news object posted to firebase for community data stream
     """
 
-    userInfo: CommUserInfo = field(metadata=dict(required=True))
-    contentInfo: CommContentInfo = field(metadata=dict(required=True))
-    dttm: date = field(
-        default_factory=lambda: date.today(), metadata=dict(required=True)
+    userInfo: CommUserInfo = field_for_schema(
+        CommUserInfo, metadata=dict(required=True)
     )
+    contentInfo: CommContentInfo = field_for_schema(
+        CommContentInfo, metadata=dict(required=True)
+    )
+    dttm: date = field_for_schema(
+        date, default_factory=lambda: date.today(), metadata=dict(required=True)
+    )
+
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
     # def __init__(
     #     self: CommunityFeedEvent, userInfo: CommUserInfo, contentInfo: CommContentInfo
@@ -233,7 +288,9 @@ class CommunityFeedEvent(BaseApiData):
         return self.contentInfo.activityType
 
     @property
-    def partitionPath(self):  # aka timeWindow in which to store this record
+    def partitionPath(
+        self: CommunityFeedEvent,
+    ) -> str:  # aka timeWindow in which to store this record
         """return discrete str key for firebase data partition
         may partition further by user-region in a future version
         """
@@ -256,29 +313,18 @@ class CommunityFeedEvent(BaseApiData):
         return json.dumps(self.toDict)
 
     @staticmethod
-    def fromJson(data):
+    def fromJson(data) -> CommunityFeedEvent:
         return json.loads(data, cls=CommFeedDecoder)
 
-    def __eq__(self: CommunityFeedEvent, other: CommunityFeedEvent):
+    def __eq__(self: CommunityFeedEvent, other: CommunityFeedEvent) -> bool:
         """for comparison using encode/decode tests"""
         if isinstance(other, CommunityFeedEvent):
             return (
                 self.userInfo.province == other.userInfo.province
                 and self.contentInfo.activityType == other.contentInfo.activityType
-                and self.contentInfo.typeSpecificValue
-                == other.contentInfo.typeSpecificValue
+                and self.contentInfo.aTypSpecValStr == other.contentInfo.aTypSpecValStr
             )
         return False
-
-
-# class CommFeedEncoder(json.JSONEncoder):
-#     """convert a CommunityFeedEvent instance to a dict for JSON"""
-
-#     def default(self, cfe):
-#         if isinstance(cfe, CommunityFeedEvent):
-#             return cfe.toDict
-#         else:
-#             super(CommFeedEncoder, self).default(cfe)
 
 
 class CommFeedDecoder(json.JSONDecoder):
@@ -299,3 +345,17 @@ class CommFeedDecoder(json.JSONDecoder):
             cf.dttm = dateTime_from_epoch(dct.get("dttm"))
             return cf
         return dct
+
+
+CommUserInfo.Schema.__model__ = CommUserInfo
+CommContentInfo.Schema.__model__ = CommContentInfo
+CommunityFeedEvent.Schema.__model__ = CommunityFeedEvent
+
+# class CommFeedEncoder(json.JSONEncoder):
+#     """convert a CommunityFeedEvent instance to a dict for JSON"""
+
+#     def default(self, cfe):
+#         if isinstance(cfe, CommunityFeedEvent):
+#             return cfe.toDict
+#         else:
+#             super(CommFeedEncoder, self).default(cfe)
