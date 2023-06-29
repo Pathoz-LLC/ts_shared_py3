@@ -260,18 +260,10 @@ class CommunityFeedEvent(BaseApiData):
         CommContentInfo, metadata=dict(required=True)
     )
     dttm: date = field_for_schema(
-        date, default_factory=lambda: date.today(), metadata=dict(required=True)
+        date, metadata=dict(required=True, default_factory=lambda x: date.today())
     )
 
-    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
-
-    # def __init__(
-    #     self: CommunityFeedEvent, userInfo: CommUserInfo, contentInfo: CommContentInfo
-    # ):
-    #     # all info needed to create a community newsfeed entry
-    #     self.userInfo = userInfo  # describe person doing posting
-    #     self.contentInfo = contentInfo
-    #     self.dttm = datetime.now()  # when did this happen
+    Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema
 
     @property
     def toDict(self: CommunityFeedEvent) -> Dict[str, Any]:
