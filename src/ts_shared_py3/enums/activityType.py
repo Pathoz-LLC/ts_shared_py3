@@ -28,7 +28,7 @@ class ActivityType(IntEnum):
 
     # behavior
     BEHAVIOR_REPORTED = 20
-    # BEHAVIOR_SHARED = 21
+    BEHAVIOR_SHARED = 21
 
     FEELING_RECORDED = 30
 

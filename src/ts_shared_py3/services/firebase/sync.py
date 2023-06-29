@@ -1,6 +1,6 @@
 from typing import Dict, Any
 
-from .community import CommunityFeedEvent, CommUserInfo
+from ...api_data_classes.community import CommunityFeedEvent, CommUserInfo
 from .readWrite import firebase_post, firebase_put
 
 # IMPORT LOOP??
