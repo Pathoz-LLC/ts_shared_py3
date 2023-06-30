@@ -8,15 +8,18 @@ from marshmallow_dataclass import dataclass, field_for_schema
 from marshmallow import Schema
 
 #
-from .base import BaseApiData
-from ..models.user import DbUser
-from ..schemas.base import DataClassBaseSchema
 from ts_shared_py3.utils.date_conv import (
     dateTime_to_epoch,
     dateTime_from_epoch,
     date_to_epoch,
     date_from_epoch,
 )
+
+#
+from .base import BaseApiData
+from ..models.user import DbUser
+from ..models.incident import Incident
+from ..schemas.base import DataClassBaseSchema
 from ..config.behavior.load_yaml import BehaviorSourceSingleton
 from ..enums.activityType import ActivityType
 from ..enums.commitLevel import CommitLevel_Display
@@ -43,10 +46,10 @@ class CommUserInfo(BaseApiData):
     summarize who did the news event being reported
     """
 
+    province: str = field_for_schema(str, default="", metadata=dict(required=True))
     sexInt: int = field_for_schema(
         int, default=Sex.UNKNOWN.value, metadata=dict(required=True)
     )
-    province: str = field_for_schema(str, default=0, metadata=dict(required=True))
     dob: date = field_for_schema(
         date, default=DEFAULT_USER_DOB, metadata=dict(required=False)
     )
@@ -54,13 +57,8 @@ class CommUserInfo(BaseApiData):
     Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
     @property
-    def sex(self) -> Sex:
+    def sex(self: CommUserInfo) -> Sex:
         return Sex(self.sexInt)
-
-    # def __init__(self, province, sex):
-    #     self.province = province
-    #     self._sex = sex
-    #     self.dob = DEFAULT_USER_DOB
 
     @staticmethod
     def fromUser(user: DbUser) -> CommUserInfo:
@@ -75,7 +73,7 @@ class CommUserInfo(BaseApiData):
         return self.sex.toDisplayVal
 
     @property
-    def toDict(self: CommUserInfo) -> dict:
+    def toDict(self: CommUserInfo) -> Dict:
         return {
             "sex": self.sexInt,
             "province": self.province,
@@ -86,7 +84,7 @@ class CommUserInfo(BaseApiData):
     def fromDict(dct: Dict[str, Any]) -> CommUserInfo:
         prov = dct.get("province", "_unk")
         sex = Sex(dct.get("sex", 2))
-        dob = date_from_epoch(dct.get("dob", 100))
+        dob = date_from_epoch(dct.get("dob", 100000.0))
         cui = CommUserInfo(prov, sex, dob)
         return cui
 
@@ -102,13 +100,16 @@ class CommContentInfo(BaseApiData):
     activityTypeInt: int = field_for_schema(
         int, default=ActivityType.FEELING_RECORDED.value, metadata=dict(required=True)
     )
+    # custom types based on activityTypeInt
     aTypSpecValStr: str = field_for_schema(
-        str, default="", metadata=dict(required=True)
+        str, default="", metadata=dict(required=False)
     )
-    aTypSpecValInt: int = field_for_schema(int, default=0, metadata=dict(required=True))
+    aTypSpecValInt: int = field_for_schema(
+        int, default=0, metadata=dict(required=False)
+    )
 
     meta: Dict[str, Any] = field_for_schema(
-        Dict[str, Any],
+        dict[str, Any],
         metadata=dict(
             default_factory=lambda x: {},
         ),
@@ -202,7 +203,7 @@ class CommContentInfo(BaseApiData):
         """add extra payload depending on activityType"""
         assert isinstance(meta, dict), "invalid arg to appendMeta (should be dict)"
         # client expects all meta vals to be string
-        self.meta.update(CommContentInfo._castMetaValsToStr(meta))
+        self.meta.update(self._castMetaValsToStr(meta))
 
     @property
     def typeValueDynamicAsStr(self: CommContentInfo) -> str:
@@ -244,7 +245,7 @@ class CommContentInfo(BaseApiData):
         valStr = val if typ.hasBehCode or typ.appliesToProspect else None
         valInt = int(val) if typ.isIncident or typ.hasCommitLevel else None
         meta = dct.get("meta", None)
-        return CommContentInfo(typ, valStr, valInt, meta=meta)
+        return CommContentInfo(typInt, valStr, valInt, meta=meta)
 
 
 @dataclass(base_schema=DataClassBaseSchema, eq=False)
@@ -259,14 +260,14 @@ class CommunityFeedEvent(BaseApiData):
     contentInfo: CommContentInfo = field_for_schema(
         CommContentInfo, metadata=dict(required=True)
     )
-    dttm: date = field_for_schema(
-        date, metadata=dict(required=True, default_factory=lambda x: date.today())
+    dttm: datetime = field_for_schema(
+        datetime, metadata=dict(required=True, default_factory=lambda x: datetime.now())
     )
 
     Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema
 
     @property
-    def toDict(self: CommunityFeedEvent) -> Dict[str, Any]:
+    def toDict(self: CommunityFeedEvent) -> Dict[str, Union[Dict[str, Any], int]]:
         # print("toEpoch: %s" % self.dttm)
         # print("Converting CommunityFeedEvent to dict")
         return {
@@ -328,8 +329,8 @@ class CommFeedDecoder(json.JSONDecoder):
     def object_hook(self: CommFeedDecoder, dct: Dict[str, Any]):
         if "contentInfo" not in dct:
             return dct
-        userInfoDct = dct.get("userInfo")
-        contentInfoDct = dct.get("contentInfo")
+        userInfoDct: Dict[str, Any] = dct.get("userInfo")
+        contentInfoDct: Dict[str, Any] = dct.get("contentInfo")
         if userInfoDct is not None and contentInfoDct is not None:
             userInfo = CommUserInfo.fromDict(userInfoDct)
             ctxInfo = CommContentInfo.fromDict(contentInfoDct)

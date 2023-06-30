@@ -1,3 +1,4 @@
+from typing import Union
 from datetime import datetime, timedelta, date
 
 #
@@ -19,7 +20,7 @@ EPOCH = datetime(1970, 1, 1, 0, 0, 0)
 #     # return DateMsgConverter.to_message(None, None, None, _date)
 
 
-def dateTime_to_epoch(dt: date = None) -> int:
+def dateTime_to_epoch(dt: Union[date, datetime] = None) -> int:
     """return all date time values as secs since 1970"""
     if dt is None:
         dt = datetime.now()
@@ -30,26 +31,27 @@ def dateTime_to_epoch(dt: date = None) -> int:
     return (dt - EPOCH).total_seconds()
 
 
-def date_from_epoch(flt: int) -> date:
+def date_to_epoch(dt: date = None) -> int:
+    """return all date time values as secs since 1970"""
+    # if dt is None:
+    #     dt = date.today()
+    # return (dt - EPOCH.date()).total_seconds()
+    return dateTime_to_epoch(dt)
+
+
+def date_from_epoch(flt: float) -> date:
     # print("flt == %s" % flt)
     return date.fromtimestamp(flt)
 
 
-def date_to_epoch(dt: date = None) -> int:
-    """return all date time values as secs since 1970"""
-    if dt is None:
-        dt = date.today()
-    return (dt - EPOCH.date()).total_seconds()
-
-
-def dateTime_from_epoch(flt: str) -> date:
+def dateTime_from_epoch(flt: float) -> date:
     return datetime.fromtimestamp(flt)
 
 
 def dateToShortString(dateObj: date) -> str:
     assert isinstance(dateObj, datetime) or isinstance(
         dateObj, date
-    ), "Arg to xx was not Date/Time obj"
+    ), "Arg to dateToShortString was not Date/Time obj"
     return dateObj.strftime("%m/%d/%Y")
 
 
