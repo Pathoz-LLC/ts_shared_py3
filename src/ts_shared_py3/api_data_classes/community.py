@@ -2,10 +2,9 @@ from __future__ import annotations
 from typing import Dict, Any, Union, ClassVar, Type
 from datetime import datetime, date
 import json
-
-# from dataclasses import field  # , fields, make_dataclass
 from marshmallow_dataclass import dataclass, field_for_schema
 from marshmallow import Schema
+from marshmallow import fields as ma_fields
 
 #
 from ts_shared_py3.utils.date_conv import (
@@ -17,13 +16,13 @@ from ts_shared_py3.utils.date_conv import (
 
 #
 from .base import BaseApiData
+from ..schemas.base import DataClassBaseSchema
 from ..models.user import DbUser
 from ..models.incident import Incident
-from ..schemas.base import DataClassBaseSchema
-from ..config.behavior.load_yaml import BehaviorSourceSingleton
 from ..enums.activityType import ActivityType
 from ..enums.commitLevel import CommitLevel_Display
 from ..enums.sex import Sex
+from ..config.behavior.load_yaml import BehaviorSourceSingleton
 
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 
@@ -46,12 +45,14 @@ class CommUserInfo(BaseApiData):
     summarize who did the news event being reported
     """
 
-    province: str = field_for_schema(str, default="", metadata=dict(required=True))
+    province: str = field_for_schema(
+        ma_fields.Str, default="", metadata=dict(required=True)
+    )
     sexInt: int = field_for_schema(
-        int, default=Sex.UNKNOWN.value, metadata=dict(required=True)
+        ma_fields.Int, default=Sex.UNKNOWN.value, metadata=dict(required=True)
     )
     dob: date = field_for_schema(
-        date, default=DEFAULT_USER_DOB, metadata=dict(required=False)
+        ma_fields.Date, default=DEFAULT_USER_DOB, metadata=dict(required=False)
     )
 
     Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
@@ -62,7 +63,7 @@ class CommUserInfo(BaseApiData):
 
     @staticmethod
     def fromUser(user: DbUser) -> CommUserInfo:
-        cui = CommUserInfo(user.city, user.sex.value, user.dob)
+        cui = CommUserInfo(user.city, user.sex.value, user.dob.date())
         # assert user.dob, "DOB required"
         # if isinstance(user.dob, date):
         #     cui.dob = user.dob
@@ -98,18 +99,20 @@ class CommContentInfo(BaseApiData):
     """
 
     activityTypeInt: int = field_for_schema(
-        int, default=ActivityType.FEELING_RECORDED.value, metadata=dict(required=True)
+        ma_fields.Int,
+        default=ActivityType.FEELING_RECORDED.value,
+        metadata=dict(required=True),
     )
     # custom types based on activityTypeInt
     aTypSpecValStr: str = field_for_schema(
-        str, default="", metadata=dict(required=False)
+        ma_fields.Str, default="", metadata=dict(required=False)
     )
     aTypSpecValInt: int = field_for_schema(
-        int, default=0, metadata=dict(required=False)
+        ma_fields.Int, default=0, metadata=dict(required=False)
     )
 
     meta: Dict[str, Any] = field_for_schema(
-        dict[str, Any],
+        ma_fields.Dict,
         metadata=dict(
             default_factory=lambda x: {},
         ),
@@ -255,13 +258,16 @@ class CommunityFeedEvent(BaseApiData):
     """
 
     userInfo: CommUserInfo = field_for_schema(
-        CommUserInfo, metadata=dict(required=True)
+        ma_fields.Nested(CommUserInfo.Schema),
+        # metadata=dict(required=True),
     )
     contentInfo: CommContentInfo = field_for_schema(
-        CommContentInfo, metadata=dict(required=True)
+        ma_fields.Nested(CommContentInfo.Schema),
+        # metadata=dict(required=True),
     )
     dttm: datetime = field_for_schema(
-        datetime, metadata=dict(required=True, default_factory=lambda x: datetime.now())
+        ma_fields.DateTime,
+        metadata=dict(required=True, default_factory=lambda x: datetime.now()),
     )
 
     Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema

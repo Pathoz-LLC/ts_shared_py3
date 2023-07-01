@@ -11,6 +11,7 @@ or if you want it editable:
     pip install -e /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3 --force-reinstall
     pip uninstall ts_shared_py3
     pip install /Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3 --force-reinstall
+    python3 -m venv --upgrade tsCoreEnv
 
 
 
