@@ -2,9 +2,14 @@ from __future__ import annotations
 from typing import Dict, Any, Union, ClassVar, Type
 from datetime import datetime, date
 import json
-from marshmallow_dataclass import dataclass, field_for_schema, add_schema
+
+#
+from dataclasses import dataclass, field
 from marshmallow import Schema
-from marshmallow import fields as ma_fields
+import marshmallow_dataclass as mdc
+
+# from marshmallow_dataclass import dataclass, field_for_schema, add_schema
+# from marshmallow import fields as ma_fields
 
 #
 from ts_shared_py3.utils.date_conv import (
@@ -39,27 +44,23 @@ DEFAULT_USER_DOB = date(1998, 1, 9)  # if missing
 """
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass
 class CommUserInfo(BaseApiData):
     """
     summarize who did the news event being reported
     """
 
-    province: str = field_for_schema(
-        str, metadata=dict(marshmallow_field=ma_fields.Str(), required=True)
-    )  # default="",
-    sexInt: int = field_for_schema(
-        int,
-        # default=1,  # Sex.UNKNOWN.value
-        metadata=dict(marshmallow_field=ma_fields.Int(), required=True),
+    province: str = field(default="", metadata=dict(required=True))
+    sexInt: int = field(
+        default=Sex.UNKNOWN.value,
+        metadata=dict(required=True),
     )
-    dob: date = field_for_schema(
-        date,
-        # default=DEFAULT_USER_DOB,
-        metadata=dict(marshmallow_field=ma_fields.Date(), required=False),
+    dob: date = field(
+        default=DEFAULT_USER_DOB,
+        metadata=dict(required=False),
     )
 
-    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
+    # Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
     @property
     def sex(self: CommUserInfo) -> Sex:
@@ -94,7 +95,7 @@ class CommUserInfo(BaseApiData):
         return cui
 
 
-@dataclass(base_schema=DataClassBaseSchema)
+@dataclass
 class CommContentInfo(BaseApiData):
     """represents some user action that will feed community news
     args are an enums.ActivityType, a string & optional context obj
@@ -102,32 +103,25 @@ class CommContentInfo(BaseApiData):
     good json encode and decode examples below
     """
 
-    activityTypeInt: int = field_for_schema(
-        int,
+    activityTypeInt: int = field(
         # default=ActivityType.FEELING_RECORDED.value,
-        metadata=dict(marshmallow_field=ma_fields.Int(), required=True),
+        metadata=dict(required=True),
     )
     # custom types based on activityTypeInt
-    aTypSpecValStr: str = field_for_schema(
-        str,
+    aTypSpecValStr: str = field(
         default="",
-        metadata=dict(marshmallow_field=ma_fields.Str(), required=False),
+        metadata=dict(required=False),
     )
-    aTypSpecValInt: int = field_for_schema(
-        int, default=0, metadata=dict(marshmallow_field=ma_fields.Int(), required=False)
-    )
+    aTypSpecValInt: int = field(default=0, metadata=dict(required=False))
 
-    meta: Dict[str, Any] = field_for_schema(
-        dict,
+    meta: dict[str, Any] = field(
+        default_factory=lambda x: {},  # d
         metadata=dict(
-            marshmallow_field=ma_fields.Dict(
-                keys=ma_fields.Str(), values=ma_fields.Inferred()
-            ),
             default_factory=lambda x: {},
         ),
     )
 
-    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
+    # Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
     @property
     def activityType(self: CommContentInfo) -> ActivityType:
@@ -260,34 +254,31 @@ class CommContentInfo(BaseApiData):
         return CommContentInfo(typInt, valStr, valInt, meta=meta)
 
 
-@dataclass(base_schema=DataClassBaseSchema, eq=False)
+@dataclass
 class CommunityFeedEvent(BaseApiData):
     """
     main news object posted to firebase for community data stream
     """
 
-    userInfo: CommUserInfo = field_for_schema(
-        CommUserInfo,
+    userInfo: CommUserInfo = field(
         metadata=dict(
             required=True
         ),  # marshmallow_field=ma_fields.Nested(CommUserInfo.Schema),
     )
-    contentInfo: CommContentInfo = field_for_schema(
-        CommContentInfo,
+    contentInfo: CommContentInfo = field(
         metadata=dict(
             required=True
         ),  # marshmallow_field=ma_fields.Nested(CommContentInfo.Schema),
     )
-    dttm: datetime = field_for_schema(
-        datetime,
+    dttm: datetime = field(
         metadata=dict(
-            marshmallow_field=ma_fields.DateTime(),
+            # marshmallow_field=ma_fields.DateTime(),
             required=True,
             default_factory=lambda x: datetime.now(),
         ),
     )
 
-    Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema
+    # Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema
 
     @property
     def toDict(self: CommunityFeedEvent) -> Dict[str, Union[Dict[str, Any], int]]:
@@ -363,6 +354,16 @@ class CommFeedDecoder(json.JSONDecoder):
         return dct
 
 
+# first create all schema
+CommUserInfo.Schema = mdc.class_schema(CommUserInfo, base_schema=DataClassBaseSchema)
+CommContentInfo.Schema = mdc.class_schema(
+    CommContentInfo, base_schema=DataClassBaseSchema
+)
+CommunityFeedEvent.Schema = mdc.class_schema(
+    CommunityFeedEvent, base_schema=DataClassBaseSchema
+)
+
+# now attach model to schema
 CommUserInfo.Schema.__model__ = CommUserInfo
 CommContentInfo.Schema.__model__ = CommContentInfo
 CommunityFeedEvent.Schema.__model__ = CommunityFeedEvent
