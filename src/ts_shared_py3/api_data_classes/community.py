@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Dict, Any, Union, ClassVar, Type
 from datetime import datetime, date
 import json
-from marshmallow_dataclass import dataclass, field_for_schema
+from marshmallow_dataclass import dataclass, field_for_schema, add_schema
 from marshmallow import Schema
 from marshmallow import fields as ma_fields
 
@@ -46,13 +46,17 @@ class CommUserInfo(BaseApiData):
     """
 
     province: str = field_for_schema(
-        ma_fields.Str, default="", metadata=dict(required=True)
-    )
+        str, metadata=dict(marshmallow_field=ma_fields.Str(), required=True)
+    )  # default="",
     sexInt: int = field_for_schema(
-        ma_fields.Int, default=Sex.UNKNOWN.value, metadata=dict(required=True)
+        int,
+        # default=1,  # Sex.UNKNOWN.value
+        metadata=dict(marshmallow_field=ma_fields.Int(), required=True),
     )
     dob: date = field_for_schema(
-        ma_fields.Date, default=DEFAULT_USER_DOB, metadata=dict(required=False)
+        date,
+        # default=DEFAULT_USER_DOB,
+        metadata=dict(marshmallow_field=ma_fields.Date(), required=False),
     )
 
     Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
@@ -63,7 +67,7 @@ class CommUserInfo(BaseApiData):
 
     @staticmethod
     def fromUser(user: DbUser) -> CommUserInfo:
-        cui = CommUserInfo(user.city, user.sex.value, user.dob.date())
+        cui = CommUserInfo(user.city, user.sex, user.dob.date())
         # assert user.dob, "DOB required"
         # if isinstance(user.dob, date):
         #     cui.dob = user.dob
@@ -99,21 +103,26 @@ class CommContentInfo(BaseApiData):
     """
 
     activityTypeInt: int = field_for_schema(
-        ma_fields.Int,
-        default=ActivityType.FEELING_RECORDED.value,
-        metadata=dict(required=True),
+        int,
+        # default=ActivityType.FEELING_RECORDED.value,
+        metadata=dict(marshmallow_field=ma_fields.Int(), required=True),
     )
     # custom types based on activityTypeInt
     aTypSpecValStr: str = field_for_schema(
-        ma_fields.Str, default="", metadata=dict(required=False)
+        str,
+        default="",
+        metadata=dict(marshmallow_field=ma_fields.Str(), required=False),
     )
     aTypSpecValInt: int = field_for_schema(
-        ma_fields.Int, default=0, metadata=dict(required=False)
+        int, default=0, metadata=dict(marshmallow_field=ma_fields.Int(), required=False)
     )
 
     meta: Dict[str, Any] = field_for_schema(
-        ma_fields.Dict,
+        dict,
         metadata=dict(
+            marshmallow_field=ma_fields.Dict(
+                keys=ma_fields.Str(), values=ma_fields.Inferred()
+            ),
             default_factory=lambda x: {},
         ),
     )
@@ -197,7 +206,7 @@ class CommContentInfo(BaseApiData):
     def makeWithIncident(
         activityType: ActivityType, incident: Incident
     ) -> CommContentInfo:
-        days: int = incident.overlapDays
+        days: int = int(incident.overlapDays)
         # use meta to store more info if needed
         contentInfo = CommContentInfo(activityType, "", days, meta=None)
         return contentInfo
@@ -258,16 +267,24 @@ class CommunityFeedEvent(BaseApiData):
     """
 
     userInfo: CommUserInfo = field_for_schema(
-        ma_fields.Nested(CommUserInfo.Schema),
-        # metadata=dict(required=True),
+        CommUserInfo,
+        metadata=dict(
+            required=True
+        ),  # marshmallow_field=ma_fields.Nested(CommUserInfo.Schema),
     )
     contentInfo: CommContentInfo = field_for_schema(
-        ma_fields.Nested(CommContentInfo.Schema),
-        # metadata=dict(required=True),
+        CommContentInfo,
+        metadata=dict(
+            required=True
+        ),  # marshmallow_field=ma_fields.Nested(CommContentInfo.Schema),
     )
     dttm: datetime = field_for_schema(
-        ma_fields.DateTime,
-        metadata=dict(required=True, default_factory=lambda x: datetime.now()),
+        datetime,
+        metadata=dict(
+            marshmallow_field=ma_fields.DateTime(),
+            required=True,
+            default_factory=lambda x: datetime.now(),
+        ),
     )
 
     Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema
