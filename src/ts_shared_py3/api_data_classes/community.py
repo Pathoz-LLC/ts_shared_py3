@@ -5,8 +5,9 @@ import json
 
 #
 from dataclasses import dataclass, field
-from marshmallow import Schema
 import marshmallow_dataclass as mdc
+
+# from marshmallow import Schema
 
 # from marshmallow_dataclass import dataclass, field_for_schema, add_schema
 # from marshmallow import fields as ma_fields
@@ -68,7 +69,7 @@ class CommUserInfo(BaseApiData):
 
     @staticmethod
     def fromUser(user: DbUser) -> CommUserInfo:
-        cui = CommUserInfo(user.city, user.sex, user.dob.date())
+        cui = CommUserInfo(user.city, user.sex, user.dob)
         # assert user.dob, "DOB required"
         # if isinstance(user.dob, date):
         #     cui.dob = user.dob
