@@ -115,8 +115,9 @@ class CommContentInfo(BaseApiData):
     )
     aTypSpecValInt: int = field(default=0, metadata=dict(required=False))
 
+    # default must be set here!
     meta: dict[str, Any] = field(
-        default_factory=lambda x: {},  # d
+        default=None,
         metadata=dict(
             default_factory=lambda x: {},
         ),
@@ -181,7 +182,7 @@ class CommContentInfo(BaseApiData):
         activityType: ActivityType, behCode: str
     ) -> CommContentInfo:
         # behavior or feeling or value assessment
-        contentInfo = CommContentInfo(activityType, behCode, 0)
+        contentInfo = CommContentInfo(activityType.value, behCode, 0)
         return contentInfo
 
     @staticmethod
@@ -210,7 +211,8 @@ class CommContentInfo(BaseApiData):
         """add extra payload depending on activityType"""
         assert isinstance(meta, dict), "invalid arg to appendMeta (should be dict)"
         # client expects all meta vals to be string
-        self.meta.update(self._castMetaValsToStr(meta))
+        self.meta.update(meta)
+        self._castMetaValsToStr()
 
     @property
     def typeValueDynamicAsStr(self: CommContentInfo) -> str:
