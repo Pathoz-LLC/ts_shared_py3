@@ -24,6 +24,7 @@ from ts_shared_py3.utils.date_conv import (
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
 from ..models.user import DbUser
+
 from ..models.incident import Incident
 from ..enums.activityType import ActivityType
 from ..enums.commitLevel import CommitLevel_Display
@@ -82,17 +83,17 @@ class CommUserInfo(BaseApiData):
     @property
     def toDict(self: CommUserInfo) -> Dict:
         return {
-            "sex": self.sexInt,
             "province": self.province,
-            "dob": date_to_epoch(self.dob),
+            "sexInt": self.sexInt,
+            "dob": self.dob.isoformat(),
         }
 
     @staticmethod
     def fromDict(dct: Dict[str, Any]) -> CommUserInfo:
         prov = dct.get("province", "_unk")
-        sex = Sex(dct.get("sex", 2))
+        sexInt = dct.get("sexInt", 2)
         dob = date_from_epoch(dct.get("dob", 100000.0))
-        cui = CommUserInfo(prov, sex, dob)
+        cui = CommUserInfo(prov, sexInt, dob)
         return cui
 
 
@@ -235,8 +236,9 @@ class CommContentInfo(BaseApiData):
     @property
     def toDict(self: CommContentInfo) -> Dict:
         return {
-            "activityType": self.activityTypeInt,
-            "typeSpecificValue": self.typeValueDynamicAsStr,
+            "activityTypeInt": self.activityTypeInt,
+            "aTypSpecValStr": self.aTypSpecValStr,
+            "aTypSpecValInt": self.aTypSpecValInt,
             "meta": self.meta,
         }
 
@@ -247,12 +249,12 @@ class CommContentInfo(BaseApiData):
 
     @staticmethod
     def fromDict(dct: Dict[str, Any]) -> CommContentInfo:
-        typInt: int = dct.get("activityType", 1)
-        typ = ActivityType(typInt)
-
-        val: str = dct.get("typeSpecificValue", "")
-        valStr = val if typ.hasBehCode or typ.appliesToProspect else None
-        valInt = int(val) if typ.isIncident or typ.hasCommitLevel else None
+        typInt: int = dct.get("activityTypeInt", 1)
+        # typ = ActivityType(typInt)
+        # valStr = val if typ.hasBehCode or typ.appliesToProspect else None
+        # valInt = int(val) if typ.isIncident or typ.hasCommitLevel else None
+        valStr: str = dct.get("aTypSpecValStr", "")
+        valInt: int = dct.get("aTypSpecValInt", 0)
         meta = dct.get("meta", None)
         return CommContentInfo(typInt, valStr, valInt, meta=meta)
 
@@ -290,7 +292,7 @@ class CommunityFeedEvent(BaseApiData):
         return {
             "userInfo": self.userInfo.toDict,
             "contentInfo": self.contentInfo.toDict,
-            "dttm": dateTime_to_epoch(self.dttm),
+            "dttm": self.dttm.isoformat(),
         }
 
     @property
@@ -335,6 +337,14 @@ class CommunityFeedEvent(BaseApiData):
                 and self.contentInfo.aTypSpecValStr == other.contentInfo.aTypSpecValStr
             )
         return False
+
+    @staticmethod
+    def testDefault() -> CommunityFeedEvent:
+        """return a default instance for testing"""
+        userInfo = CommUserInfo("CA", 1, date(1998, 1, 9))
+        contentInfo = CommContentInfo(1, "behCode", 0)
+        cfe = CommunityFeedEvent(userInfo, contentInfo, datetime.now())
+        return cfe
 
 
 class CommFeedDecoder(json.JSONDecoder):

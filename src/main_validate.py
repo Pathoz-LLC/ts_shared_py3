@@ -1,4 +1,5 @@
-# import os
+import json
+
 # import sys
 # google_path = os.path.join(directory, 'google')
 # google_module = sys.modules['google']
@@ -8,6 +9,7 @@
 # from google.cloud.ndb import model
 from ts_shared_py3 import *
 from ts_shared_py3.api_data_classes import *
+from ts_shared_py3.api_data_classes.community import *
 from ts_shared_py3.models import *
 from ts_shared_py3.enums import *
 from ts_shared_py3.schemas import *
@@ -30,3 +32,13 @@ from ts_shared_py3.config.behavior.load_yaml import *
 # print(schemas)
 # print(utils)
 # print(scoring)
+
+cfe1 = CommunityFeedEvent.testDefault()
+
+jsonData = cfe1.toJson
+
+cfe2 = CommunityFeedEvent.Schema().loads(jsonData)
+
+print("cfe hydrated:")
+print(type(cfe2))
+print(cfe2)

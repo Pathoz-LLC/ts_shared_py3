@@ -7,6 +7,13 @@ from marshmallow import Schema
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
 
+"""
+in theory, these classes should not need:
+Schema: ClassVar[Type[Schema]] = Schema
+
+because its on the superclass
+"""
+
 
 @dataclass(base_schema=DataClassBaseSchema)
 class CommStatsMsg(BaseApiData):

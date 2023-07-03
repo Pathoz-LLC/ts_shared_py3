@@ -408,8 +408,8 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
     def __init__(
         self: BehaviorSourceSingleton,
-        catPath: str = "static/data/category.yaml",
-        behPath: str = "static/data/behaviors.yaml",
+        catPath: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/config/behavior/niu_category.yaml",
+        behPath: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/config/behavior/niu_behaviors.yaml",
     ):
         """initialize the full object graph & also create master dict by code
 

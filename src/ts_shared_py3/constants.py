@@ -25,7 +25,7 @@ else:
 
 # when testing, use ngrok to expose localhost to the internet
 LOCAL_PUBLIC_URL = (
-    "https://df91-72-177-77-206.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://45a4-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 
 # usage:
