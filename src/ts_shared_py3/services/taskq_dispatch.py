@@ -1,5 +1,6 @@
-from typing import Any, Union, Dict
 import os
+import base64
+from typing import Any, Union, Dict
 import logging
 import datetime
 from json import dumps
@@ -87,18 +88,22 @@ def _createTaskPayload(
     handlerUri: str, payload: Union[Dict[str, Any], str, None], taskName: str = None
 ) -> dict[str, str]:
     #
-    request_type = "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
     # request_type = "app_engine_http_request"
-    uri_key = "url" if IS_RUNNING_LOCAL else "relative_uri"
+    request_type: str = (
+        "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
+    )
+    uri_key: str = "url" if IS_RUNNING_LOCAL else "relative_uri"
 
-    converted_payload = payload  # Union[Dict[str, Any], str, None]
+    converted_payload: str = payload  # Union[Dict[str, Any], str, None]
     if isinstance(payload, dict):
         converted_payload = dumps(payload)
     elif isinstance(payload, object):
         converted_payload = dumps(payload)
 
     converted_payload = (
-        None if converted_payload is None else converted_payload.encode()
+        None
+        if converted_payload is None
+        else base64.b64encode(converted_payload.encode("ascii"))
     )
     d: dict[str, Any] = {
         request_type: {
