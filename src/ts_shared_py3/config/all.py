@@ -25,6 +25,7 @@ from .env_vars import EnvVarVals, ThirdPtSvcType, OsPathInfo
 _envVars: EnvVarVals = EnvVarVals()
 _list_env_var_names: list[str] = _envVars.list_prop_names()
 
+
 # std interface to all config objs
 class CfgBaseIfc(object):
     #
@@ -185,12 +186,12 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
 
 @dataclass(frozen=False)
 class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
-    fir_db_url: str = "https://tsapi-stage2.firebaseio.com"
+    fir_db_url: str = "https://tsapi-stage2-default-rtdb.firebaseio.com/"
     firebase_admin_credential: str = "auth/stage/ts-firebase-adminsdk.json"
 
     apiKey: str = ""
     authDomain: str = "https://accounts.google.com/o/oauth2/auth"
-    databaseURL: str = "https://tsapi-stage2.firebaseio.com/"
+    databaseURL: str = "https://tsapi-stage2-default-rtdb.firebaseio.com/"
     projectId: str = "tsapi-stage2"
     storageBucket: str = "tsapi-stage2.appspot.com"
     messagingSenderId: str = "115850684003"
@@ -204,7 +205,7 @@ class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
         return {
             "apiKey": "",
             "authDomain": "https://accounts.google.com/o/oauth2/auth",
-            "databaseURL": "https://tsapi-stage2.firebaseio.com/",
+            "databaseURL": "https://tsapi-stage2-default-rtdb.firebaseio.com/",
             "projectId": "tsapi-stage2",
             "storageBucket": "tsapi-stage2.appspot.com",
             "messagingSenderId": "115850684003",

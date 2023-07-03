@@ -21,6 +21,11 @@ from ts_shared_py3.scoring import *
 from ts_shared_py3.scoring import *
 from ts_shared_py3.services import *
 from ts_shared_py3.config.behavior.load_yaml import *
+from ts_shared_py3.services.firebase.client_admin import (
+    firebase_post,
+    firebase_put,
+    firebase_patch,
+)
 
 # to look for errors or import probs, run this:
 #  python src/main_validate.py
@@ -42,3 +47,6 @@ cfe2 = CommunityFeedEvent.Schema().loads(jsonData)
 print("cfe hydrated:")
 print(type(cfe2))
 print(cfe2)
+
+
+firebase_post("commNews/usa-2023-07-2", cfe2.toDict)

@@ -15,7 +15,7 @@ from ...models.user import DbUser
 from ...models.person import PersonLocal
 from .pn_exceptions import UserNotFoundErr, MissingReqFieldErr
 
-from ..firebase.admin import tsFirebaseApp
+from ..firebase.client_admin import tsFirebaseApp
 from ...enums.pushNotifyType import NotifyType
 
 import logging

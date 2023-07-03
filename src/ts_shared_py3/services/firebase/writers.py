@@ -1,9 +1,7 @@
 from typing import Dict, Any
 
 from ...api_data_classes.community import CommunityFeedEvent, CommUserInfo
-from .readWrite import firebase_post, firebase_put
-
-# IMPORT LOOP??
+from .client_admin import firebase_post, firebase_put
 
 
 # used in task service to respond to async work

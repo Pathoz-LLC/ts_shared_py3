@@ -133,7 +133,7 @@ class EnvVarVals(metaclass=Singleton):
     @property
     def FIR_DB_URL(self: EnvVarVals) -> str:
         return os.environ.get(
-            "FIR_DB_URL_SUFFIX", "https://tsapi-stage2.firebaseio.com"
+            "FIR_DB_URL_SUFFIX", "https://tsapi-stage2-default-rtdb.firebaseio.com/"
         )
 
     @property
