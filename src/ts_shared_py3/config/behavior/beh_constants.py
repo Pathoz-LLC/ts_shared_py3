@@ -5,7 +5,7 @@ from common.behavior.constants import DECEPTION_STATS_NODE, GENERATE_TEST_BEH_ST
 STATS_RELOAD_INTERVAL_HOURS, MIN_BEHAVE_ENTRIES_TO_CALC_STATS
 """
 
-from datetime import datetime, date, time, timedelta
+from datetime import date, datetime, time, timedelta
 
 # names of the Firebase DB nodes follow:
 BEHAVIOR_STATS_NODE = "behaviorStats"

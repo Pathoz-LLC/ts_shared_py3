@@ -1,12 +1,12 @@
 import os
 from datetime import date
 
-PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "tsapi-stage2")
-BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "tsapi-stage2.appspot.com/")
-FIR_CREDS_FILENAME = os.environ.get(
-    "FIREBASE_ADMIN_CREDENTIAL",
-    "auth/stage/ts-firebase-adminsdk.json",
-)
+# PROJ_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "tsapi-stage2")
+# BASE_URL_SUFFIX = os.environ.get("BASE_URL_SUFFIX", "tsapi-stage2.appspot.com/")
+# FIR_CREDS_FILENAME = os.environ.get(
+#     "FIREBASE_ADMIN_CREDENTIAL",
+#     "auth/stage/ts-firebase-adminsdk.json",
+# )
 
 # END DATE for latest Interval/Phase that has not ended
 DISTANT_FUTURE_DATE = date(4000, 12, 31)
@@ -23,7 +23,7 @@ else:
     IS_RUNNING_LOCAL = True
     # pass
 
-# when testing, use ngrok to expose localhost to the internet
+# when testing, use ngrok to expose localhost to the GCP task queue
 LOCAL_PUBLIC_URL = (
     "https://45a4-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )

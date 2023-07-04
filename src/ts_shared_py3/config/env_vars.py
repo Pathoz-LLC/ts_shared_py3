@@ -17,7 +17,7 @@ from ..utils.singleton import Singleton
 
 """
 
-_ROOT_PATH_PREFIX = None
+_ROOT_PATH_PREFIX: str = None
 
 
 @unique
@@ -47,34 +47,32 @@ class CurrentEnvEnum(IntEnum):
 class OsPathInfo(metaclass=Singleton):
     """used to find path to security & credential files for 3rd pty svcs"""
 
-    @staticmethod
-    def get_credential_path(thirdPtSvc: ThirdPtSvcType, cred_file_name: str) -> str:
-        return cred_file_name
-        # global _ROOT_PATH_PREFIX
-        # if _ROOT_PATH_PREFIX is None:
-        #     _ROOT_PATH_PREFIX = _get_root_path()
+    def set_proj_root(self: OsPathInfo, proj_root: str) -> None:
+        global _ROOT_PATH_PREFIX
+        assert _ROOT_PATH_PREFIX is None, "proj_root already set to {0}".format(
+            _ROOT_PATH_PREFIX
+        )
+        _ROOT_PATH_PREFIX = proj_root
+
+    def get_path_rel_proj_root(self: OsPathInfo, cred_file_name: str) -> str:
+        # return cred_file_name
+        global _ROOT_PATH_PREFIX
+        assert _ROOT_PATH_PREFIX is not None, "proj_root not set"
         # mid_path = _get_mid_path(thirdPtSvc)
-        # return _ROOT_PATH_PREFIX + mid_path + "/" + cred_file_name
+        return _ROOT_PATH_PREFIX + cred_file_name
 
 
-def _get_root_path() -> str:
-    # config root is folder above this file
-    config_dir_path = Path(__file__).absolute().parent
-    assert config_dir_path.is_dir, "oops--config should be a directory"
-    return config_dir_path.as_posix() + "/"
-
-
-def _get_mid_path(svc_type: ThirdPtSvcType) -> str:
-    mid_dir_name = "/auth/prod" if CURRENT_ENV == CurrentEnvEnum.PROD else "/auth/stage"
-    if svc_type == ThirdPtSvcType.FIR_USER:
-        # file_name = _env_vars.FIREBASE_ADMIN_CREDENTIAL
-        return mid_dir_name  # + "/" + file_name
-    elif svc_type == ThirdPtSvcType.FIR_ADMIN:
-        return mid_dir_name
-    elif svc_type == ThirdPtSvcType.GCP_APIS:
-        return mid_dir_name
-    elif svc_type == ThirdPtSvcType.EMAIL:
-        return mid_dir_name
+# def _get_mid_path(svc_type: ThirdPtSvcType) -> str:
+#     mid_dir_name = "/auth/prod" if CURRENT_ENV == CurrentEnvEnum.PROD else "/auth/stage"
+#     if svc_type == ThirdPtSvcType.FIR_USER:
+#         # file_name = _env_vars.FIREBASE_ADMIN_CREDENTIAL
+#         return mid_dir_name  # + "/" + file_name
+#     elif svc_type == ThirdPtSvcType.FIR_ADMIN:
+#         return mid_dir_name
+#     elif svc_type == ThirdPtSvcType.GCP_APIS:
+#         return mid_dir_name
+#     elif svc_type == ThirdPtSvcType.EMAIL:
+#         return mid_dir_name
 
 
 class EnvVarVals(metaclass=Singleton):
@@ -133,7 +131,7 @@ class EnvVarVals(metaclass=Singleton):
     @property
     def FIR_DB_URL(self: EnvVarVals) -> str:
         return os.environ.get(
-            "FIR_DB_URL_SUFFIX", "https://tsapi-stage2-default-rtdb.firebaseio.com/"
+            "FIR_DB_URL", "https://tsapi-stage2-default-rtdb.firebaseio.com/"
         )
 
     @property

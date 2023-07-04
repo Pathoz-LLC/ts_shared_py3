@@ -266,24 +266,17 @@ class CommunityFeedEvent(BaseApiData):
     """
 
     userInfo: CommUserInfo = field(
-        metadata=dict(
-            required=True
-        ),  # marshmallow_field=ma_fields.Nested(CommUserInfo.Schema),
+        metadata=dict(required=True),
     )
     contentInfo: CommContentInfo = field(
-        metadata=dict(
-            required=True
-        ),  # marshmallow_field=ma_fields.Nested(CommContentInfo.Schema),
+        metadata=dict(required=True),
     )
     dttm: datetime = field(
         metadata=dict(
-            # marshmallow_field=ma_fields.DateTime(),
             required=True,
             default_factory=lambda x: datetime.now(),
         ),
     )
-
-    # Schema: ClassVar[Type[DataClassBaseSchema]] = DataClassBaseSchema
 
     @property
     def toDict(self: CommunityFeedEvent) -> Dict[str, Union[Dict[str, Any], int]]:

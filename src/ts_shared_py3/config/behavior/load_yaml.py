@@ -35,7 +35,8 @@ from ...constants import (
     FEELING_CD_PREFIX,
 )
 
-from ts_shared_py3.api_data_classes.behavior import FullBehaviorListMsg, NodeListMsg
+from ...config.env_vars import OsPathInfo
+from ...api_data_classes.behavior import FullBehaviorListMsg, NodeListMsg
 from ...utils.singleton import Singleton
 from .beh_constants import (
     SHOWALL_CAT_LABEL,
@@ -396,20 +397,8 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             graph   dict as tree of codes
     """
 
-    # @staticmethod
-    # def loadAll(catPath: str, behPath: str) -> BehaviorSourceSingleton:
-    #     #
-    #     # categoriesDict = dict()
-    #     # # forRowInYaml returns a list which we can ignore here
-    #     # forRowInYaml(projRoot + 'common/behavior/category.yaml', makePerRowFunc(Category, categoriesDict))
-    #     # behaviorsDict = dict()  # behavior
-    #     # forRowInYaml(projRoot + 'common/behavior/behaviors.yaml', makePerRowFunc(BehaviorRowYaml, behaviorsDict))
-    #     return BehaviorSourceSingleton(catPath, behPath)
-
     def __init__(
         self: BehaviorSourceSingleton,
-        catPath: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/config/behavior/niu_category.yaml",
-        behPath: str = "/Users/dgaedcke/dev/Touchstone/Server/ts_shared_py3/src/ts_shared_py3/config/behavior/niu_behaviors.yaml",
     ):
         """initialize the full object graph & also create master dict by code
 
@@ -419,6 +408,9 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
         NOTE: hidden behaviors may be a problem for showing parent category on Behavior stats
         """
+        catPath: str = OsPathInfo().get_path_rel_proj_root("static/data/category.yaml")
+        behPath: str = OsPathInfo().get_path_rel_proj_root("static/data/behaviors.yaml")
+
         if self.init_completed:
             return
 

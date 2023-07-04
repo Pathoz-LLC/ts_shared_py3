@@ -168,7 +168,7 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
         on this obj & also in ENV memory
         """
 
-        path_to_cred_file = OsPathInfo().get_credential_path(
+        path_to_cred_file = OsPathInfo().get_path_rel_proj_root(
             thirdPtSvc=ThirdPtSvcType.GCP_APIS,
             cred_file_name=self.GOOGLE_APPLICATION_CREDENTIALS,
         )
