@@ -112,6 +112,9 @@ class OpenApiCfg(CfgBaseIfc, metaclass=Singleton):
             {
                 "url": "http://127.0.0.1",
             },
+            {
+                "url": _envVars.HOST_URL,
+            },
         ]
     )
 
@@ -129,89 +132,50 @@ class OpenApiCfg(CfgBaseIfc, metaclass=Singleton):
         }
     )
 
-    # @staticmethod
-    # def _spec_factory(_):
-    #     return {
-    #     "host": "http://http://127.0.0.1",
-    #     "info": {
-    #         # "title": "required",
-    #         # "version": "required",
-    #         "description": "Touchstone API server",
-    #         "termsOfService": "http://pathoz.com/terms/",
-    #         "contact": {"email": "dewey@pathoz.com"},
-    #         "license": {
-    #             "name": "MIT License",
-    #             "url": "https://fr.wikipedia.org/wiki/Licence_MIT",
-    #         },
-    #     },
-    # }
-
 
 @dataclass(frozen=False)
 class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
     """defaults only;  most in ENV vars"""
 
-    PROJ_ID: str = "tsapi-stage2"
-    APP_ID: str = "com.pathoz.touchstone.stage"
-    STORAGE_BUCKET_ROOT_PATH: str = "tsapi-stage2.appspot.com"
-    GOOGLE_APPLICATION_CREDENTIALS: str = "auth/stage/ts-gae-admin.json"
+    PROJ_ID: str = _envVars.PROJ_ID
+    APP_ID: str = _envVars.APP_ID
+    STORAGE_BUCKET_ROOT_PATH: str = _envVars.STORAGE_BUCKET_ROOT_PATH
+    GOOGLE_APPLICATION_CREDENTIALS: str = _envVars.GOOGLE_APPLICATION_CREDENTIALS
 
     # @property
     def GOOGLE_CRED_CERT(self: GcpSvcsCfg) -> credentials.Certificate:
         return credentials.Certificate(self.GOOGLE_APPLICATION_CREDENTIALS)
 
-    def __post_init__(self: GcpSvcsCfg):
-        self._set_gcp_creds_path()
-
-    def _set_gcp_creds_path(self: GcpSvcsCfg) -> None:
-        """update GOOGLE_APPLICATION_CREDENTIALS
-        on this obj & also in ENV memory
-        """
-
-        path_to_cred_file = OsPathInfo().get_path_rel_proj_root(
-            thirdPtSvc=ThirdPtSvcType.GCP_APIS,
-            cred_file_name=self.GOOGLE_APPLICATION_CREDENTIALS,
-        )
-        # mid_dir_name = "/prod" if CURRENT_ENV == CurrentEnvEnum.PROD else "/stage"
-        # to_this_file: Path = Path(__file__).absolute()
-        # to_config_dir: Path = to_this_file.parent
-
-        # to_env_dir: Path = to_config_dir.as_posix() + "/auth" + mid_dir_name
-        # path_to_cred_file = to_env_dir + "/" + self.GOOGLE_APPLICATION_CREDENTIALS
-        # # print("path_to_cred_file:  {0}".format(path_to_cred_file))
-        self.GOOGLE_APPLICATION_CREDENTIALS = path_to_cred_file
-        GcpSvcsCfg.GOOGLE_APPLICATION_CREDENTIALS = path_to_cred_file
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path_to_cred_file
-
 
 @dataclass(frozen=False)
 class FirebaseCfg(CfgBaseIfc, metaclass=Singleton):
-    fir_db_url: str = "https://tsapi-stage2-default-rtdb.firebaseio.com/"
-    firebase_admin_credential: str = "auth/stage/ts-firebase-adminsdk.json"
+    # fir_db_url: str = "https://tsapi-stage2-default-rtdb.firebaseio.com/"
+    fir_db_url: str = _envVars.FIR_DB_URL
+    firebase_admin_credential: str = _envVars.FIREBASE_ADMIN_CREDENTIAL
 
     apiKey: str = ""
     authDomain: str = "https://accounts.google.com/o/oauth2/auth"
-    databaseURL: str = "https://tsapi-stage2-default-rtdb.firebaseio.com/"
-    projectId: str = "tsapi-stage2"
-    storageBucket: str = "tsapi-stage2.appspot.com"
+    databaseURL: str = _envVars.FIR_DB_URL
+    projectId: str = _envVars.PROJ_ID
+    storageBucket: str = _envVars.STORAGE_BUCKET_ROOT_PATH
     messagingSenderId: str = "115850684003"
-    appId: str = "com.pathoz.touchstone.stage"
+    appId: str = _envVars.APP_ID
     measurementId: str = "YOUR_MEASUREMENT_ID"
-    serviceAccount: str = "auth/stage/ts-firebase-adminsdk.json"
+    serviceAccount: str = _envVars.FIREBASE_ADMIN_CREDENTIAL
 
     @property
     def hardcoded_dict(self: FirebaseCfg) -> dict[str, str]:
         # web key: ""
         return {
-            "apiKey": "",
-            "authDomain": "https://accounts.google.com/o/oauth2/auth",
-            "databaseURL": "https://tsapi-stage2-default-rtdb.firebaseio.com/",
-            "projectId": "tsapi-stage2",
-            "storageBucket": "tsapi-stage2.appspot.com",
-            "messagingSenderId": "115850684003",
-            "appId": "com.pathoz.touchstone.stage",
-            "measurementId": "YOUR_MEASUREMENT_ID",
-            "serviceAccount": "auth/stage/ts-firebase-adminsdk.json",
+            "apiKey": self.apiKey,
+            "authDomain": self.authDomain,
+            "databaseURL": self.databaseURL,
+            "projectId": self.projectId,
+            "storageBucket": self.storageBucket,
+            "messagingSenderId": self.messagingSenderId,
+            "appId": self.appId,
+            "measurementId": self.measurementId,
+            "serviceAccount": self.serviceAccount,
         }
 
     # @property

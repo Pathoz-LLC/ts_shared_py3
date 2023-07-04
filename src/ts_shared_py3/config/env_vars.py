@@ -52,7 +52,8 @@ class OsPathInfo(metaclass=Singleton):
         assert _ROOT_PATH_PREFIX is None, "proj_root already set to {0}".format(
             _ROOT_PATH_PREFIX
         )
-        _ROOT_PATH_PREFIX = proj_root
+        trail_slash_if_missing = "" if proj_root.endswith("/") else "/"
+        _ROOT_PATH_PREFIX = proj_root + trail_slash_if_missing
 
     def get_path_rel_proj_root(self: OsPathInfo, cred_file_name: str) -> str:
         # return cred_file_name
