@@ -41,13 +41,18 @@ from ts_shared_py3.services.firebase.client_admin import (
 # print(utils)
 # print(scoring)
 
+cfeSchema = CommunityFeedEvent.Schema()
+
 cfe1 = CommunityFeedEvent.testDefault()
 
-jsonData = cfe1.toJson
+jsonData1 = cfe1.toJson
+jsonData2 = cfeSchema.dumps(cfe1)
 
-cfe2 = CommunityFeedEvent.Schema().loads(jsonData)
+cfe2: CommunityFeedEvent = cfeSchema.loads(jsonData1)
+cfe3: CommunityFeedEvent = cfeSchema.loads(jsonData2)
 
 assert isinstance(cfe2, CommunityFeedEvent)
+assert isinstance(cfe3, CommunityFeedEvent)
 # print(type(cfe2))
 print("cfe hydrated:")
 print(cfe2.toDict)

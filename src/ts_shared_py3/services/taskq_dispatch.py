@@ -3,26 +3,27 @@ import base64
 from typing import Any, Union, Dict
 import logging
 import datetime
-from json import dumps
+from json import dumps as json_dumps
 from google.auth import default as authDefault
 from google.protobuf import timestamp_pb2
+import google.cloud.tasks_v2 as tasks_v2
 from google.cloud.tasks_v2 import (
     Task,
     CloudTasksClient,
+    CreateTaskRequest,
     CloudTasksAsyncClient,
     RetryConfig,
 )
 
 #
-from ..config.all import GcpSvcsCfg
+from ..config.all import EnvVarVals, GcpSvcsCfg
 from ..constants import IS_RUNNING_LOCAL, LOCAL_PUBLIC_URL
 from ..enums.queued_work import QueuedWorkTyp
 
 log = logging.getLogger("queue_dispatch")
 
-REGION_ID: str = "us-central1"
-PROJECT_ID: str = None
-gcpCfg: GcpSvcsCfg = GcpSvcsCfg()
+
+# gcpCfg: GcpSvcsCfg = GcpSvcsCfg()
 _ts_task_client: CloudTasksClient = None
 # _retryConfig: RetryConfig = RetryConfig(dict(max_attempts=2))
 
@@ -52,14 +53,6 @@ def do_background_work_get(
     _create_task_get(queueName, handlerUri, in_seconds, taskName)
 
 
-def _getProjId() -> str:
-    global PROJECT_ID
-    if PROJECT_ID is None:
-        # _, PROJECT_ID = authDefault()
-        PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "tsapi-stage2")
-    return PROJECT_ID
-
-
 def _getTaskClient() -> CloudTasksClient:  # CloudTasksAsyncClient
     global _ts_task_client
     if _ts_task_client is None:
@@ -74,10 +67,10 @@ def _getTaskClient() -> CloudTasksClient:  # CloudTasksAsyncClient
     return _ts_task_client
 
 
-def _getQueuePath(queueName: str, *, regionId: str = REGION_ID) -> str:
+def _getQueuePath(queueName: str) -> str:
     ctc = _getTaskClient()
-    projId: str = _getProjId()
-    return ctc.queue_path(projId, regionId, queueName)
+    ev = EnvVarVals()  # regionId: str = "us-central1"
+    return ctc.queue_path(ev.PROJ_ID, ev.REGION_ID, queueName)
 
 
 def _getPathPrefix(qPath: str) -> str:
@@ -94,22 +87,20 @@ def _createTaskPayload(
     )
     uri_key: str = "url" if IS_RUNNING_LOCAL else "relative_uri"
 
-    converted_payload: str = payload  # Union[Dict[str, Any], str, None]
+    encoded_payload: str = payload  # Union[Dict[str, Any], str, None]
     if isinstance(payload, dict):
-        converted_payload = dumps(payload)
+        encoded_payload = json_dumps(payload)
     elif isinstance(payload, object):
-        converted_payload = dumps(payload)
+        encoded_payload = json_dumps(payload)
 
-    converted_payload = (
-        None
-        if converted_payload is None
-        else base64.b64encode(converted_payload.encode("ascii"))
+    encoded_payload = (
+        "_empty".encode() if encoded_payload is None else encoded_payload.encode()
     )
     d: dict[str, Any] = {
         request_type: {
             uri_key: handlerUri,
             "http_method": "POST",
-            "body": converted_payload,
+            "body": encoded_payload,
             "headers": {
                 "Content-Type": "application/json",
             },
@@ -142,8 +133,14 @@ def _create_task(
 
     # send task from here:
     parent = _getQueuePath(queue)
-    createdTask: Task = _getTaskClient().create_task(parent=parent, task=taskArgs)  #
-    logging.info("Created task at {0}".format(parent))
+    request = CreateTaskRequest(
+        parent=parent,
+        task=Task(taskArgs),
+    )
+
+    createdTask: Task = _getTaskClient().create_task(request=request)
+    # createdTask: Task = _getTaskClient().create_task(parent=parent, task=taskArgs)  #
+    logging.info("Created task at {0}--{1}".format(parent, createdTask))
     logging.info("web url: " + taskArgs.get("url", "NA"))
     logging.info("gae uri: " + taskArgs.get("relative_uri", "NA"))
     # logging.info(createdTask)

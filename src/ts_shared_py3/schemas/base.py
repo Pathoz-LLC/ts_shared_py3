@@ -1,18 +1,24 @@
 from __future__ import annotations
 import decimal
+from typing import Any, Dict, Optional, Union, AnyStr
 from datetime import datetime, date, time, timedelta
 from marshmallow_dataclass import dataclass
-from marshmallow import Schema, post_load, SchemaOpts
+from marshmallow import (
+    Schema,
+    post_load,
+    SchemaOpts,
+    validates_schema,
+    EXCLUDE,
+    INCLUDE,
+)
 import marshmallow.fields as ma_fields
-from typing import Any, AnyStr
 
 #
-# from .ndbkey_jwt import NdbKeyField
-from ..constants import (
-    ISO_8601_DATE_FORMAT,
-    ISO_8601_DATETIME_FORMAT,
-    ISO_8601_TIME_FORMAT,
-)
+# from ..constants import (
+#     ISO_8601_DATE_FORMAT,
+#     ISO_8601_DATETIME_FORMAT,
+#     ISO_8601_TIME_FORMAT,
+# )
 from ..enums.sex import Sex, SexSerializedMa
 from ..enums.accountType import AccountType, AcctTypeSerialized
 from ..enums.activityType import ActivityType, ActivTypeSerialized
@@ -35,7 +41,9 @@ class SchemaMetaOpts(SchemaOpts):
     "plural_name" options for enveloping.
     """
 
-    def __init__(self, meta, **kwargs):
+    def __init__(self: SchemaMetaOpts, meta, **kwargs):
+        # print("SchemaMetaOpts")
+        # print(meta.__name__)
         SchemaOpts.__init__(self, meta, **kwargs)
         # self.dateformat = ISO_8601_DATE_FORMAT  # "%Y-%m-%d"
         # self.datetimeformat = ISO_8601_DATETIME_FORMAT
@@ -61,12 +69,15 @@ class DataClassBaseSchema(Schema):
     an instance of the model class
     """
 
+    # class Meta:
+    #     # omit unknown schema fields
+    #     unknown = EXCLUDE
+
     __model__ = _ReplaceWithRealDataClass
     OPTIONS_CLASS = SchemaMetaOpts
     TYPE_MAPPING = {
         str: ma_fields.String,
         bytes: ma_fields.String,
-        datetime: ma_fields.DateTime,
         float: ma_fields.Float,
         bool: ma_fields.Boolean,
         tuple: ma_fields.Raw,
@@ -74,8 +85,9 @@ class DataClassBaseSchema(Schema):
         set: ma_fields.Raw,
         int: ma_fields.Integer,
         # uuid.UUID: ma_fields.UUID,
-        time: ma_fields.Time,
+        datetime: ma_fields.DateTime,
         date: ma_fields.Date,
+        time: ma_fields.Time,
         timedelta: ma_fields.TimeDelta,
         decimal.Decimal: ma_fields.Decimal,
         # custom ENUMS below
@@ -92,14 +104,14 @@ class DataClassBaseSchema(Schema):
         VoteType: VoteTypeSerializedMa,
     }
 
-    # @post_load
-    # def _makeModelObj(
-    #     self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
-    # ):
-    #     # print("Dewey 6677")
-    #     # print(type(loadedDataAsDict))
-    #     # return self.__model__(**loadedDataAsDict)
-    #     return loadedDataAsDict
+    @post_load
+    def _makeModelObj(
+        self: DataClassBaseSchema, loadedDataAsDict: dict[AnyStr, Any], **kwargs
+    ):
+        # print("Dewey 333444")
+        # print(type(loadedDataAsDict))
+        return self.__model__(**loadedDataAsDict)
+        # return loadedDataAsDict
 
     # def handle_error(self: DataClassBaseSchema, exc, data: dict[AnyStr, Any], **kwargs):
     #     """Log and raise our custom exception when (de)serialization fails."""
@@ -108,10 +120,10 @@ class DataClassBaseSchema(Schema):
     #     print("{0} received:".format(__class__.__name__))
     #     print(data)
 
-    # @validates_schema
-    # def print_incoming(self: DataClassBaseSchema, data: dict[str, Any], **kwargs):
-    #     print("{0} received:".format(__class__.__name__))
-    #     print(data)
+    @validates_schema
+    def print_incoming(self: DataClassBaseSchema, data: dict[str, Any], **kwargs):
+        print("{0} received:".format(__class__.__name__))
+        print(data)
 
 
 #

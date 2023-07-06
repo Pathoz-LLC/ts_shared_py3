@@ -122,6 +122,10 @@ class EnvVarVals(metaclass=Singleton):
         return os.environ.get("PROJ_ID", "tsapi-stage2")
 
     @property
+    def REGION_ID(self: EnvVarVals) -> str:
+        return os.environ.get("REGION_ID", "us-central1")
+
+    @property
     def HOST_URL(self: EnvVarVals) -> str:
         return os.environ.get("HOST_URL", "localhost")
 

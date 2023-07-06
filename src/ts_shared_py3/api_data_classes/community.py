@@ -4,13 +4,10 @@ from datetime import datetime, date
 import json
 
 #
-from dataclasses import dataclass, field
+from dataclasses import field
+from marshmallow import fields as ma_fields
+from marshmallow_dataclass import dataclass
 import marshmallow_dataclass as mdc
-
-# from marshmallow import Schema
-
-# from marshmallow_dataclass import dataclass, field_for_schema, add_schema
-# from marshmallow import fields as ma_fields
 
 #
 from ts_shared_py3.utils.date_conv import (
@@ -52,7 +49,7 @@ class CommUserInfo(BaseApiData):
     summarize who did the news event being reported
     """
 
-    province: str = field(default="", metadata=dict(required=True))
+    province: str = field(default="usa", metadata=dict(required=True))
     sexInt: int = field(
         default=Sex.UNKNOWN.value,
         metadata=dict(required=True),
@@ -70,7 +67,8 @@ class CommUserInfo(BaseApiData):
 
     @staticmethod
     def fromUser(user: DbUser) -> CommUserInfo:
-        cui = CommUserInfo(user.city, user.sex, user.dob)
+        province = user.city if user.city else "usa"
+        cui = CommUserInfo(province, user.sex, user.dob)
         # assert user.dob, "DOB required"
         # if isinstance(user.dob, date):
         #     cui.dob = user.dob
@@ -106,7 +104,7 @@ class CommContentInfo(BaseApiData):
     """
 
     activityTypeInt: int = field(
-        # default=ActivityType.FEELING_RECORDED.value,
+        default=ActivityType.FEELING_RECORDED.value,
         metadata=dict(required=True),
     )
     # custom types based on activityTypeInt
@@ -335,7 +333,11 @@ class CommunityFeedEvent(BaseApiData):
     def testDefault() -> CommunityFeedEvent:
         """return a default instance for testing"""
         userInfo = CommUserInfo("CA", 1, date(1998, 1, 9))
-        contentInfo = CommContentInfo(1, "behCode", 0)
+        meta = {
+            "code": "showedHealthyBoundWithEx",
+            "text": "had good boundaries with ex",
+        }
+        contentInfo = CommContentInfo(1, "behCode", 0, meta=meta)
         cfe = CommunityFeedEvent(userInfo, contentInfo, datetime.now())
         return cfe
 
@@ -347,27 +349,53 @@ class CommFeedDecoder(json.JSONDecoder):
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
     def object_hook(self: CommFeedDecoder, dct: Dict[str, Any]):
-        if "contentInfo" not in dct:
+        assert isinstance(dct, dict), "invalid arg to object_hook"
+        contentInfoDct: Dict[str, Any] = dct.get("contentInfo")
+        if contentInfoDct is None:
             return dct
         userInfoDct: Dict[str, Any] = dct.get("userInfo")
-        contentInfoDct: Dict[str, Any] = dct.get("contentInfo")
         if userInfoDct is not None and contentInfoDct is not None:
             userInfo = CommUserInfo.fromDict(userInfoDct)
             ctxInfo = CommContentInfo.fromDict(contentInfoDct)
-            cf = CommunityFeedEvent(userInfo, ctxInfo)
-            cf.dttm = dateTime_from_epoch(dct.get("dttm"))
+            dttm = dateTime_from_epoch(dct.get("dttm"))
+            cf = CommunityFeedEvent(userInfo, ctxInfo, dttm)
             return cf
         return dct
 
 
 # first create all schema
-CommUserInfo.Schema = mdc.class_schema(CommUserInfo, base_schema=DataClassBaseSchema)
-CommContentInfo.Schema = mdc.class_schema(
-    CommContentInfo, base_schema=DataClassBaseSchema
-)
-CommunityFeedEvent.Schema = mdc.class_schema(
-    CommunityFeedEvent, base_schema=DataClassBaseSchema
-)
+# CommUserInfo.Schema = mdc.class_schema(CommUserInfo, base_schema=DataClassBaseSchema)
+# CommContentInfo.Schema = mdc.class_schema(
+#     CommContentInfo, base_schema=DataClassBaseSchema
+# )
+# CommunityFeedEvent.Schema = mdc.class_schema(
+#     CommunityFeedEvent, base_schema=DataClassBaseSchema
+# )
+
+
+class CommUserInfoSchema(DataClassBaseSchema):
+    province = ma_fields.String()
+    sexInt = ma_fields.Integer()
+    dob = ma_fields.Date()
+
+
+class CommContentInfoSchema(DataClassBaseSchema):
+    activityTypeInt = ma_fields.Integer()
+    aTypSpecValStr = ma_fields.String()
+    aTypSpecValInt = ma_fields.Integer()
+    meta = ma_fields.Dict()
+
+
+class CommunityFeedEventSchema(DataClassBaseSchema):
+    userInfo = ma_fields.Nested(CommUserInfoSchema)
+    contentInfo = ma_fields.Nested(CommContentInfoSchema)
+    dttm = ma_fields.DateTime()
+
+
+CommUserInfo.Schema = CommUserInfoSchema
+CommContentInfo.Schema = CommContentInfoSchema
+CommunityFeedEvent.Schema = CommunityFeedEventSchema
+
 
 # now attach model to schema
 CommUserInfo.Schema.__model__ = CommUserInfo
