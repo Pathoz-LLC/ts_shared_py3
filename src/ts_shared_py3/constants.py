@@ -19,11 +19,13 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
     # Production/Stage in the standard environment
     IS_RUNNING_LOCAL = False
 else:
-    # running on localhost
-    IS_RUNNING_LOCAL = True
-    # pass
+    # prob running on localhost
+    IS_RUNNING_LOCAL = os.getenv("ENV", "STAGE") == "LOCAL"
 
 # when testing, use ngrok to expose localhost to the GCP task queue
+# https://medium.com/google-cloud/develop-your-cloud-tasks-pipeline-locally-with-ngrok-5bee3693600f
+# > ngrok http 8080
+# copy url below
 LOCAL_PUBLIC_URL = (
     "https://45a4-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )

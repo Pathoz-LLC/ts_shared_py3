@@ -121,10 +121,11 @@ class DataClassBaseSchema(Schema):
     #     print(data)
 
     @validates_schema
-    def print_incoming(self: DataClassBaseSchema, data: dict[str, Any], **kwargs):
-        pass
-        # print("{0} received:".format(__class__.__name__))
-        # print(data)
+    def print_incoming(
+        self: DataClassBaseSchema, mapFromStrViaSchemaLoads: dict[str, Any], **kwargs
+    ):
+        print("payload being validated for {0}".format(__class__.__name__))
+        # print(mapFromStrViaSchemaLoads)
 
 
 #
