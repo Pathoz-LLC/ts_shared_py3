@@ -83,14 +83,15 @@ def _createTaskPayload(
     handlerUri: str, payload: str, taskName: str = None
 ) -> tasks_v2.AppEngineHttpRequest:  # dict[str, str]:
     #
-    print("typ payload: {0}".format(type(payload)))
-    assert isinstance(payload, str), "payload must be a string"
+    # print("task payload type: {0}".format(type(payload)))
+    # assert isinstance(payload, str), "payload must be a string"
     request_type: str = (
         "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
     )
     uri_key: str = "url" if IS_RUNNING_LOCAL else "relative_uri"
 
     encoded_payload: str = payload  # Union[Dict[str, Any], str, None]
+    # branch below was source of many errors
     # if isinstance(payload, dict):
     #     encoded_payload = json_dumps(payload)
     # elif isinstance(payload, object):

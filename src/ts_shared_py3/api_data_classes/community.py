@@ -3,8 +3,8 @@ import json
 from typing import Dict, Any, Union, ClassVar, Type
 from datetime import datetime, date
 from dataclasses import field
-from marshmallow import fields as ma_fields
-from marshmallow import ValidationError
+
+# from marshmallow import fields as ma_fields
 from marshmallow_dataclass import dataclass
 import marshmallow_dataclass as mdc
 
@@ -149,7 +149,7 @@ class CommContentInfo(BaseApiData):
         meta: Dict[str, Any] = None,
         """
         # assert isinstance(self.activityType, ActivityType), "invalid arg!"
-        print("ActType: {0!r} in CommContentInfo".format(self.activityType))
+        # print("ActType: {0!r} in CommContentInfo".format(self.activityType))
 
         # meta is for when typeSpecific values is more complex
         # like it contains the behavior rec to which this activity applies
@@ -365,17 +365,6 @@ class CommFeedDecoder(json.JSONDecoder):
 CommUserInfo.Schema.__model__ = CommUserInfo
 CommContentInfo.Schema.__model__ = CommContentInfo
 CommunityFeedEvent.Schema.__model__ = CommunityFeedEvent
-
-
-def handle_error(self, error: ValidationError, data: Any, *, many: bool, **kwargs):
-    """Handle marshmallow validation error"""
-    # raise ValidationError(error.messages, data=data)
-    print("err msgs: ", error.messages)
-    print("err data as {0}\n{1}: ".format(type(data), data))
-    print("err kwargs: ", kwargs)
-
-
-CommunityFeedEvent.Schema.handle_error = handle_error
 
 
 # class CommFeedEncoder(json.JSONEncoder):

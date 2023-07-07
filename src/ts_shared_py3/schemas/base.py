@@ -2,6 +2,7 @@ from __future__ import annotations
 import decimal
 from typing import Any, Dict, Optional, Union, AnyStr
 from datetime import datetime, date, time, timedelta
+from marshmallow import ValidationError
 from marshmallow_dataclass import dataclass
 from marshmallow import (
     Schema,
@@ -113,26 +114,27 @@ class DataClassBaseSchema(Schema):
         return self.__model__(**loadedDataAsDict)
         # return loadedDataAsDict
 
-    # def handle_error(self: DataClassBaseSchema, exc, data: dict[AnyStr, Any], **kwargs):
-    #     """Log and raise our custom exception when (de)serialization fails."""
-    #     # logging.error(exc.messages)
-    #     # raise AppError("An error occurred with input: {0}".format(data))
-    #     print("{0} received:".format(__class__.__name__))
-    #     print(data)
+    # @validates_schema(pass_original=False, skip_on_field_errors=True)
+    # def validate_whole_schema(
+    #     self: DataClassBaseSchema, mapFromStrViaSchemaLoads: dict[str, Any], **kwargs
+    # ):
+    #     # runs after all fields have been validated
+    #     print("payload being validated for {0}".format(__class__.__name__))
 
-    @validates_schema
-    def print_incoming(
-        self: DataClassBaseSchema, mapFromStrViaSchemaLoads: dict[str, Any], **kwargs
+    def handle_error(
+        self: DataClassBaseSchema,
+        error: ValidationError,
+        mapFromStrViaSchemaLoads: dict[AnyStr, Any],
+        *,
+        many: bool,
+        **kwargs,
     ):
-        print("payload being validated for {0}".format(__class__.__name__))
-        # print(mapFromStrViaSchemaLoads)
-
-
-#
-#
-#
-#
-#
+        """Log and raise our custom exception when (de)serialization fails."""
+        # logging.error(exc.messages)
+        # raise AppError("An error occurred with input: {0}".format(data))
+        print("{0} had parse error {1} on:".format(__class__.__name__, error.messages))
+        print(mapFromStrViaSchemaLoads)
+        raise error
 
 
 # class NdbBaseSchemaWithKey(DataClassBaseSchema):
