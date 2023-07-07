@@ -122,8 +122,9 @@ class DataClassBaseSchema(Schema):
 
     @validates_schema
     def print_incoming(self: DataClassBaseSchema, data: dict[str, Any], **kwargs):
-        print("{0} received:".format(__class__.__name__))
-        print(data)
+        pass
+        # print("{0} received:".format(__class__.__name__))
+        # print(data)
 
 
 #

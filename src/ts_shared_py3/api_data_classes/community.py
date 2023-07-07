@@ -1,20 +1,19 @@
 from __future__ import annotations
+import json
 from typing import Dict, Any, Union, ClassVar, Type
 from datetime import datetime, date
-import json
-
-#
 from dataclasses import field
 from marshmallow import fields as ma_fields
+from marshmallow import ValidationError
 from marshmallow_dataclass import dataclass
 import marshmallow_dataclass as mdc
 
 #
 from ts_shared_py3.utils.date_conv import (
-    dateTime_to_epoch,
     dateTime_from_epoch,
-    date_to_epoch,
     date_from_epoch,
+    dateTime_to_epoch,
+    date_to_epoch,
 )
 
 #
@@ -34,12 +33,11 @@ DEFAULT_USER_DOB = date(1998, 1, 9)  # if missing
 
 # field_for_schema = 123
 
-"""_summary_
-{"userInfo": {"sex": 1, "province": "", "dob": 1685491200.0}, 
-    "contentInfo": {"activityType": 20, "typeSpecificValue": "showedHealthyBoundWithEx",
-    "meta": {"code": "showedHealthyBoundWithEx", "parentCode": "respSensitivePos", "text": "had good boundaries with ex",
-    "catCode": "respectPos", "pos": "True", "parentDescription": "Good Boundaries", "impact": "0.4444", "catName": "Respect"}},
-"dttm": 1687910400.0}
+"""
+{'contentInfo': CommContentInfo(activityTypeInt=20, aTypSpecValStr='showedHealthyBoundWithEx', aTypSpecValInt=0,
+meta={'code': 'showedHealthyBoundWithEx', 'parentCode': 'respSensitivePos', 'text': 'had good boundaries with ex',
+'catCode': 'respectPos', 'pos': 'True', 'parentDescription': 'Good Boundaries', 'impact': '0.4444', 'catName': 'Respect'}),
+'dttm': datetime.datetime(2023, 7, 7, 14, 9, 9, 662094), 'userInfo': CommUserInfo(province='usa', sexInt=1, dob=datetime.date(2023, 5, 31))}
 """
 
 
@@ -150,8 +148,8 @@ class CommContentInfo(BaseApiData):
         typeSpecificValue: Union[str, int, CommitLevel_Display],
         meta: Dict[str, Any] = None,
         """
-        assert isinstance(self.activityType, ActivityType), "invalid arg!"
-        # print("ActType: {0!r}".format(activityType))
+        # assert isinstance(self.activityType, ActivityType), "invalid arg!"
+        print("ActType: {0!r} in CommContentInfo".format(self.activityType))
 
         # meta is for when typeSpecific values is more complex
         # like it contains the behavior rec to which this activity applies
@@ -363,44 +361,22 @@ class CommFeedDecoder(json.JSONDecoder):
         return dct
 
 
-# first create all schema
-# CommUserInfo.Schema = mdc.class_schema(CommUserInfo, base_schema=DataClassBaseSchema)
-# CommContentInfo.Schema = mdc.class_schema(
-#     CommContentInfo, base_schema=DataClassBaseSchema
-# )
-# CommunityFeedEvent.Schema = mdc.class_schema(
-#     CommunityFeedEvent, base_schema=DataClassBaseSchema
-# )
-
-
-class CommUserInfoSchema(DataClassBaseSchema):
-    province = ma_fields.String()
-    sexInt = ma_fields.Integer()
-    dob = ma_fields.Date()
-
-
-class CommContentInfoSchema(DataClassBaseSchema):
-    activityTypeInt = ma_fields.Integer()
-    aTypSpecValStr = ma_fields.String()
-    aTypSpecValInt = ma_fields.Integer()
-    meta = ma_fields.Dict()
-
-
-class CommunityFeedEventSchema(DataClassBaseSchema):
-    userInfo = ma_fields.Nested(CommUserInfoSchema)
-    contentInfo = ma_fields.Nested(CommContentInfoSchema)
-    dttm = ma_fields.DateTime()
-
-
-CommUserInfo.Schema = CommUserInfoSchema
-CommContentInfo.Schema = CommContentInfoSchema
-CommunityFeedEvent.Schema = CommunityFeedEventSchema
-
-
 # now attach model to schema
 CommUserInfo.Schema.__model__ = CommUserInfo
 CommContentInfo.Schema.__model__ = CommContentInfo
 CommunityFeedEvent.Schema.__model__ = CommunityFeedEvent
+
+
+def handle_error(self, error: ValidationError, data: Any, *, many: bool, **kwargs):
+    """Handle marshmallow validation error"""
+    # raise ValidationError(error.messages, data=data)
+    print("err msgs: ", error.messages)
+    print("err data as {0}\n{1}: ".format(type(data), data))
+    print("err kwargs: ", kwargs)
+
+
+CommunityFeedEvent.Schema.handle_error = handle_error
+
 
 # class CommFeedEncoder(json.JSONEncoder):
 #     """convert a CommunityFeedEvent instance to a dict for JSON"""
@@ -410,3 +386,38 @@ CommunityFeedEvent.Schema.__model__ = CommunityFeedEvent
 #             return cfe.toDict
 #         else:
 #             super(CommFeedEncoder, self).default(cfe)
+
+
+# first create all schema explicitly
+# another way to create all schema, is to use the marshmallow_dataclass "dataclass" decorator from above
+# CommUserInfo.Schema = mdc.class_schema(CommUserInfo, base_schema=DataClassBaseSchema)
+# CommContentInfo.Schema = mdc.class_schema(
+#     CommContentInfo, base_schema=DataClassBaseSchema
+# )
+# CommunityFeedEvent.Schema = mdc.class_schema(
+#     CommunityFeedEvent, base_schema=DataClassBaseSchema
+# )
+
+
+# class CommUserInfoSchema(DataClassBaseSchema):
+#     province = ma_fields.String()
+#     sexInt = ma_fields.Integer()
+#     dob = ma_fields.Date()
+
+
+# class CommContentInfoSchema(DataClassBaseSchema):
+#     activityTypeInt = ma_fields.Integer()
+#     aTypSpecValStr = ma_fields.String()
+#     aTypSpecValInt = ma_fields.Integer()
+#     meta = ma_fields.Dict()
+
+
+# class CommunityFeedEventSchema(DataClassBaseSchema):
+#     userInfo = ma_fields.Nested(CommUserInfoSchema)
+#     contentInfo = ma_fields.Nested(CommContentInfoSchema)
+#     dttm = ma_fields.DateTime()
+
+
+# CommUserInfo.Schema = CommUserInfoSchema
+# CommContentInfo.Schema = CommContentInfoSchema
+# CommunityFeedEvent.Schema = CommunityFeedEventSchema

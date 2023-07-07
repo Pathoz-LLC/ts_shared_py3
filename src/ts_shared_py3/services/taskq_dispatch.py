@@ -40,7 +40,7 @@ def do_background_work(
     non_gae_web_host = LOCAL_PUBLIC_URL if IS_RUNNING_LOCAL else None
     handlerUri = workType.postHandlerFullUri(non_gae_web_host=non_gae_web_host)
 
-    _create_task(queue, handlerUri, payload, in_seconds, taskName)
+    _create_task_post(queue, handlerUri, payload, in_seconds, taskName)
 
 
 def do_background_work_get(
@@ -74,37 +74,38 @@ def _getQueuePath(queueName: str) -> str:
 
 
 def _getPathPrefix(qPath: str) -> str:
+    # used only for creating new queues
+    # method conflicts with queue.yaml approach for creating queues
     return qPath.rsplit("/", 2)[0]
 
 
 def _createTaskPayload(
-    handlerUri: str, payload: Union[Dict[str, Any], str, None], taskName: str = None
-) -> dict[str, str]:
+    handlerUri: str, payload: str, taskName: str = None
+) -> tasks_v2.AppEngineHttpRequest:  # dict[str, str]:
     #
-    # request_type = "app_engine_http_request"
+    print("typ payload: {0}".format(type(payload)))
+    assert isinstance(payload, str), "payload must be a string"
     request_type: str = (
         "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
     )
     uri_key: str = "url" if IS_RUNNING_LOCAL else "relative_uri"
 
     encoded_payload: str = payload  # Union[Dict[str, Any], str, None]
-    if isinstance(payload, dict):
-        encoded_payload = json_dumps(payload)
-    elif isinstance(payload, object):
-        encoded_payload = json_dumps(payload)
+    # if isinstance(payload, dict):
+    #     encoded_payload = json_dumps(payload)
+    # elif isinstance(payload, object):
+    #     encoded_payload = json_dumps(payload)
 
     encoded_payload = (
         "_empty".encode() if encoded_payload is None else encoded_payload.encode()
     )
     d: dict[str, Any] = {
-        request_type: {
-            uri_key: handlerUri,
-            "http_method": "POST",
-            "body": encoded_payload,
-            "headers": {
-                "Content-Type": "application/json",
-            },
-        }
+        uri_key: handlerUri,
+        "http_method": "POST",
+        "body": encoded_payload,
+        "headers": {
+            "Content-Type": "application/json",
+        },
     }
 
     # disable sending taskName for now because sender is not correctly formatting it per:
@@ -112,10 +113,15 @@ def _createTaskPayload(
     # if taskName is not None:
     #     d["name"] = taskName
 
-    return d
+    if IS_RUNNING_LOCAL:
+        # hit local web server
+        return tasks_v2.HttpRequest(d)
+    else:
+        # hit GAE
+        return tasks_v2.AppEngineHttpRequest(d)
 
 
-def _create_task(
+def _create_task_post(
     queue: str,
     handlerUri: str,
     payload: Union[Dict[str, Any], str, None] = None,
@@ -124,25 +130,32 @@ def _create_task(
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
-    taskArgs: Dict[str, str] = _createTaskPayload(handlerUri, payload, taskName)
+    requestObj = _createTaskPayload(handlerUri, payload, taskName)  # : Dict[str, str]
     if in_seconds is not None:
         d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(d)
-        taskArgs["schedule_time"] = timestamp
+        # requestObj is no longer a dict/map, but a protobuf object; below won't work
+        # requestObj["schedule_time"] = timestamp
 
     # send task from here:
-    parent = _getQueuePath(queue)
-    request = CreateTaskRequest(
+    parent: str = _getQueuePath(queue)
+    t: Task = None
+    if IS_RUNNING_LOCAL:
+        t = tasks_v2.Task(http_request=requestObj)
+    else:
+        t = tasks_v2.Task(app_engine_http_request=requestObj)
+
+    taskRequest = CreateTaskRequest(
         parent=parent,
-        task=Task(taskArgs),
+        task=t,
     )
 
-    createdTask: Task = _getTaskClient().create_task(request=request)
+    createdTask: Task = _getTaskClient().create_task(request=taskRequest)
     # createdTask: Task = _getTaskClient().create_task(parent=parent, task=taskArgs)  #
     logging.info("Created task at {0}--{1}".format(parent, createdTask))
-    logging.info("web url: " + taskArgs.get("url", "NA"))
-    logging.info("gae uri: " + taskArgs.get("relative_uri", "NA"))
+    # logging.info("web url: " + requestObj)
+    # logging.info("gae uri: " + requestObj)
     # logging.info(createdTask)
 
 
@@ -178,7 +191,7 @@ def test_create_task(
     payload: map = None,
     in_seconds: int = None,
 ):
-    _create_task(queue, handlerUri, payload, in_seconds)
+    _create_task_post(queue, handlerUri, payload, in_seconds)
 
 
 # You can change DOCUMENT_ID with USER_ID or something to identify the task
