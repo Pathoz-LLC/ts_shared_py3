@@ -1,8 +1,11 @@
+from __future__ import annotations
 from datetime import date
-from typing import ClassVar, Type
-from dataclasses import field, fields, make_dataclass
-from marshmallow_dataclass import dataclass
-from marshmallow import Schema, validate
+from typing import ClassVar, Type, List
+from dataclasses import field, make_dataclass
+
+from marshmallow_dataclass import dataclass, field_for_schema
+from marshmallow import Schema, fields
+import marshmallow as ma
 
 from .base import BaseApiData
 from ..schemas.base import DataClassBaseSchema
@@ -20,7 +23,7 @@ class StatusMessage(BaseApiData):
     msg: str = field(default="")
     detail: str = field(default="")
 
-    Schema: ClassVar[Type[Schema]] = Schema
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
 
 @dataclass(base_schema=DataClassBaseSchema)
@@ -28,7 +31,7 @@ class JsonMessage(BaseApiData):
     # used when Void msg is too uninformative
     json: str = field(default="")
 
-    Schema: ClassVar[Type[Schema]] = Schema
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
 
 @dataclass(base_schema=DataClassBaseSchema)
@@ -38,14 +41,26 @@ class FilterMessage(BaseApiData):
     propertyValue: str = field(default="active")
     queryOp: str = field(default="==")
 
-    Schema: ClassVar[Type[Schema]] = Schema
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
 
 @dataclass(base_schema=DataClassBaseSchema)
-class FilterMessageCollectionMsg(BaseApiData):
-    items: list[FilterMessage] = field(default_factory=lambda: [])
+class FilterMessageCollectionMsg(BaseApiData):  # default_factory=lambda: [],
+    #
+    # throwing an error when used on person/loadFollowed
+    # so iv'e stopped using it on server side
+    items: list[FilterMessage] = field(
+        metadata=dict(
+            default_factory=lambda: [],
+            marshmallow_field=fields.Nested(FilterMessage.Schema, many=True),
+        ),
+    )
 
-    Schema: ClassVar[Type[Schema]] = Schema
+    # def bs():
+    #     a = ma.fields.List(fields.Nested(FilterMessage.Schema))
+    #     return FilterMessageCollectionMsg(items=[])
+
+    Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 
 
 StatusMessage.Schema.__model__ = StatusMessage

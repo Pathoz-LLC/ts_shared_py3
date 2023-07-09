@@ -12,20 +12,21 @@ from ..schemas.base import DataClassBaseSchema
 # IPv4 = NewType('IPv4', str, validate=validate.Regexp(r'^([0-9]{1,3}\.){3}[0-9]{1,3}$'))
 
 
-# @dataclass(base_schema=DataClassBaseSchema)
+@dataclass(base_schema=DataClassBaseSchema)
 class BaseApiData:
     """simple dict of data-types from JSON payload"""
 
-    def __init__(self: BaseApiData, **kwargs: dict[str, Any]) -> None:
-        # print("Dewey 3344:")
-        # print(type(kwargs))
-        # print(len(kwargs))
-        if len(kwargs) > 0:
-            self._updateAttsFromDict(kwargs)
+    # def __init__(self: BaseApiData, **kwargs: dict[str, Any]) -> None:
+    #     pass
+    # print("Dewey 3344:")
+    # print(type(kwargs))
+    # print(len(kwargs))
+    # if len(kwargs) > 0:
+    #     self._updateAttsFromDict(kwargs)
 
-    def _updateAttsFromDict(self: BaseApiData, kwargs: dict[str, Any]) -> None:  #
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+    # def _updateAttsFromDict(self: BaseApiData, kwargs: dict[str, Any]) -> None:  #
+    #     for key, value in kwargs.items():
+    #         setattr(self, key, value)
 
     # class var here is used by marshmallow_dataclass
     Schema: ClassVar[Type[Schema]] = DataClassBaseSchema

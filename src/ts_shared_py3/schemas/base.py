@@ -111,8 +111,10 @@ class DataClassBaseSchema(Schema):
     ):
         # print("Dewey 333444")
         # print(type(loadedDataAsDict))
-        return self.__model__(**loadedDataAsDict)
-        # return loadedDataAsDict
+        if isinstance(loadedDataAsDict, dict):
+            return self.__model__(**loadedDataAsDict)
+        else:
+            return self.__model__(loadedDataAsDict)
 
     # @validates_schema(pass_original=False, skip_on_field_errors=True)
     # def validate_whole_schema(
