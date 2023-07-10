@@ -20,7 +20,7 @@ class StatsTasks:
     def updateDailyStatsTask(stats: Dict[str, Any]):
         # put arguements into json format for queue.
 
-        do_background_work(QueuedWorkTyp.STATS_DAILY, stats)
+        do_background_work(QueuedWorkTyp.STATS_DAILY, json.dumps(stats))
 
         # try:
         #     _ = ts_task_client.create_task(
@@ -46,7 +46,7 @@ class StatsTasks:
             "votesPerMinute": forgeStatsMsg.votesPerMinute,
         }
 
-        do_background_work(QueuedWorkTyp.STATS_DAILYFORGE, args)
+        do_background_work(QueuedWorkTyp.STATS_DAILYFORGE, json.dumps(args))
 
         # data = json.dumps(args)
 

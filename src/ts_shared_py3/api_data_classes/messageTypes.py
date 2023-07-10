@@ -52,13 +52,11 @@ class FilterMessageCollectionMsg(BaseApiData):  # default_factory=lambda: [],
     items: list[FilterMessage] = field(
         metadata=dict(
             default_factory=lambda: [],
-            marshmallow_field=fields.Nested(FilterMessage.Schema, many=True),
+            marshmallow_field=fields.Nested(
+                FilterMessage.Schema, allow_none=True, many=True
+            ),
         ),
     )
-
-    # def bs():
-    #     a = ma.fields.List(fields.Nested(FilterMessage.Schema))
-    #     return FilterMessageCollectionMsg(items=[])
 
     Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
 

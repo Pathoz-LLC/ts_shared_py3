@@ -17,7 +17,7 @@ from google.cloud.tasks_v2 import (
 
 #
 from ..config.all import EnvVarVals, GcpSvcsCfg
-from ..constants import IS_RUNNING_LOCAL, LOCAL_PUBLIC_URL
+from ..constants import IS_RUNNING_LOCAL, LOCAL_PUBLIC_URL_DEFAULT
 from ..enums.queued_work import QueuedWorkTyp
 
 log = logging.getLogger("queue_dispatch")
@@ -31,13 +31,13 @@ _ts_task_client: CloudTasksClient = None
 # main export;  primary funciton
 def do_background_work(
     workType: QueuedWorkTyp,
-    payload: map = None,
+    payload: str = None,
     in_seconds: int = None,
     taskName: str = None,
 ):
     # uses POST
     queue = workType.queueName
-    non_gae_web_host = LOCAL_PUBLIC_URL if IS_RUNNING_LOCAL else None
+    non_gae_web_host = LOCAL_PUBLIC_URL_DEFAULT if IS_RUNNING_LOCAL else None
     handlerUri = workType.postHandlerFullUri(non_gae_web_host=non_gae_web_host)
 
     _create_task_post(queue, handlerUri, payload, in_seconds, taskName)
@@ -125,7 +125,7 @@ def _createTaskPayload(
 def _create_task_post(
     queue: str,
     handlerUri: str,
-    payload: Union[Dict[str, Any], str, None] = None,
+    payload: Union[str, None] = None,
     in_seconds: int = None,
     taskName: str = None,
 ):
@@ -168,20 +168,36 @@ def _create_task_get(
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
-    task: Dict[str, str] = _createTaskPayload(handlerUri, None, taskName)
-    task["app_engine_http_request"]["http_method"] = "GET"
-    task["app_engine_http_request"]["body"] = None
-    task["app_engine_http_request"]["headers"] = None
+    taskRequest: Union[
+        tasks_v2.AppEngineHttpRequest, tasks_v2.HttpRequest
+    ] = _createTaskPayload(handlerUri, None, taskName)
+    taskRequest.http_method = "GET"
+    taskRequest.body = None
+    taskRequest.headers = None
+    # task["app_engine_http_request"]["http_method"] = "GET"
+    # task["app_engine_http_request"]["body"] = None
+    # task["app_engine_http_request"]["headers"] = None
 
     if in_seconds is not None:
         d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(d)
-        task["schedule_time"] = timestamp
+        # TODO:  fixme
+        # task.schedule_time = timestamp
 
     # send task from here:
     parent = _getQueuePath(queue)
-    queueAck = _getTaskClient().create_task(parent=parent, task=task)  #
+    t: Task = None
+    if IS_RUNNING_LOCAL:
+        t = tasks_v2.Task(http_request=taskRequest)
+    else:
+        t = tasks_v2.Task(app_engine_http_request=taskRequest)
+
+    taskRequest = CreateTaskRequest(
+        parent=parent,
+        task=t,
+    )
+    queueAck = _getTaskClient().create_task(request=taskRequest)  #
     logging.info("Created task {} --".format(queueAck.name))
     logging.info(queueAck)
 

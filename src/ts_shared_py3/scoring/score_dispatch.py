@@ -1,18 +1,20 @@
 import logging
 from random import randint
+from typing import Type
 from datetime import datetime, timedelta
-from google.cloud.tasks_v2 import HttpMethod
 
+# from google.cloud.tasks_v2 import HttpMethod
+#
+from ..models.beh_entry import Entry as BehEntry
 from ..models.input_entry_adapter import InputEntryAdapter
 from ..services.taskq_dispatch import do_background_work, do_background_work_get
 
-# FIX BELOW
-# from ...constants import GAEQ_FOR_SCORING, SCORING_SERVICE_NAME
-GAEQ_FOR_SCORING = "scoring-queue"
-SCORING_SERVICE_NAME = "ts-scoring"
-
-
-# scoringRetryConfig = taskqueue.TaskRetryOptions(task_retry_limit=6)
+from ..constants import (
+    IS_RUNNING_LOCAL,
+    LOCAL_PUBLIC_URL_DEFAULT,
+    GAEQ_FOR_SCORING,
+    # SCORING_SERVICE_NAME,
+)
 
 
 class ScoreDispatchHelper(object):
@@ -25,52 +27,16 @@ class ScoreDispatchHelper(object):
     """
 
     @classmethod
-    def _dispatchScoreTask(cls, userId, prospectId, dtTmEta):
-        taskName = "{0}-{1}".format(userId, prospectId)
-        url = "/rescore/{0}/{1}".format(userId, prospectId)
-
-        # # try:
-        # #     scoreQueue = taskqueue.Queue(name=GAEQ_FOR_SCORING)
-        # #     scoreQueue.delete_tasks_by_name(taskName)
-        # # except:
-        # #     pass
-        # # Construct the fully qualified queue name.
-        # task_queue_name = getFullQueuePath(GAEQ_FOR_SCORING)
-
-        # # Construct the request body.
-        # task = {
-        #     "name": taskName,
-        #     "app_engine_http_request": {  # Specify the type of request.
-        #         "http_method": HttpMethod.GET,
-        #         "relative_uri": url,
-        #         # "body": encoded_payload,
-        #     },
-        # }
-
-        try:
-            # _ = ts_task_client.create_task(parent=task_queue_name, task=task)
-            do_background_work_get(url, GAEQ_FOR_SCORING, None, taskName)
-            # _ = taskqueue.add(
-            #     queue_name=GAEQ_FOR_SCORING,
-            #     target=SCORING_SERVICE_NAME,
-            #     name=taskName,
-            #     url=url,
-            #     eta=dtTmEta,
-            #     retry_options=scoringRetryConfig,
-            # )
-        # except taskqueue.TaskAlreadyExistsError as e:
-        #     logging.error("Err...task {0} couldnt be deleted".format(taskName))
-        # except taskqueue.DuplicateTaskNameError as e:
-        #     logging.warning(
-        #         "scoringQueue.DuplicateTaskNameError on {0} & {1}".format(e, taskName)
-        #     )
-        except Exception as e:
-            logging.error("scoringQueue.Error: %s (FIXME)" % e)
-            if False:
-                raise
+    def _dispatchScoreTask(cls: Type, userId: str, prospectId: int, dtTmEta: datetime):
+        taskName = "rescore-{0}-{1}".format(userId, prospectId)
+        httpServerHost = LOCAL_PUBLIC_URL_DEFAULT if IS_RUNNING_LOCAL else ""
+        url = httpServerHost + "/rescore/{0}/{1}".format(userId, prospectId)
+        do_background_work_get(url, GAEQ_FOR_SCORING, None, taskName)
 
     @classmethod
-    def storeFeelingOrBehavior(cls, userId, prospectId, beh, isFreeUser=True):
+    def storeFeelingOrBehavior(
+        cls: Type, userId: str, prospectId: int, beh: BehEntry, isFreeUser: bool = True
+    ):
         iea = InputEntryAdapter.fromBehavior(beh)
         iea.setKeyProperties(userId, prospectId)
         iea.save()
@@ -79,14 +45,14 @@ class ScoreDispatchHelper(object):
 
     @classmethod
     def storeValueAssessment(
-        cls,
-        userId,
-        prospectId,
-        behCode,
-        concernVote,
-        freqVote,
-        changeDt,
-        isFreeUser=True,
+        cls: Type,
+        userId: str,
+        prospectId: int,
+        behCode: str,
+        concernVote: int,
+        freqVote: int,
+        changeDt: datetime,
+        isFreeUser: bool = True,
     ):
         iea = InputEntryAdapter.fromValueAssessment(
             behCode, concernVote, freqVote, changeDt
@@ -116,7 +82,7 @@ class ScoreDispatchHelper(object):
         cls._dispatchScoreTask(userId, prospectId, eta)
 
 
-def _deriveRescoreTime(isFreeUser):
+def _deriveRescoreTime(isFreeUser: bool) -> datetime:
     # returns datetime for when rescore task should execute
     if isFreeUser:
         mins = randint(0, 59)
@@ -125,3 +91,46 @@ def _deriveRescoreTime(isFreeUser):
         now = datetime.now()
         now += timedelta(minutes=3)
         return now
+
+
+# TODO: delete below
+
+# # try:
+# #     scoreQueue = taskqueue.Queue(name=GAEQ_FOR_SCORING)
+# #     scoreQueue.delete_tasks_by_name(taskName)
+# # except:
+# #     pass
+# # Construct the fully qualified queue name.
+# task_queue_name = getFullQueuePath(GAEQ_FOR_SCORING)
+
+# # Construct the request body.
+# task = {
+#     "name": taskName,
+#     "app_engine_http_request": {  # Specify the type of request.
+#         "http_method": HttpMethod.GET,
+#         "relative_uri": url,
+#         # "body": encoded_payload,
+#     },
+# }
+
+# try:
+#     # _ = ts_task_client.create_task(parent=task_queue_name, task=task)
+#     do_background_work_get(url, GAEQ_FOR_SCORING, None, taskName)
+#     # _ = taskqueue.add(
+#     #     queue_name=GAEQ_FOR_SCORING,
+#     #     target=SCORING_SERVICE_NAME,
+#     #     name=taskName,
+#     #     url=url,
+#     #     eta=dtTmEta,
+#     #     retry_options=scoringRetryConfig,
+#     # )
+# # except taskqueue.TaskAlreadyExistsError as e:
+# #     logging.error("Err...task {0} couldnt be deleted".format(taskName))
+# # except taskqueue.DuplicateTaskNameError as e:
+# #     logging.warning(
+# #         "scoringQueue.DuplicateTaskNameError on {0} & {1}".format(e, taskName)
+# #     )
+# except Exception as e:
+#     logging.error("scoringQueue.Error: %s (FIXME)" % e)
+#     if False:
+#         raise
