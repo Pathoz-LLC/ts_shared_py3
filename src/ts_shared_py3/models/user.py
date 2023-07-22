@@ -176,6 +176,10 @@ class DbUser(WaUser):  # BaseUserExpando
     # 0==IOS;  1==Android, 2==Web
     pushNotifyDeviceType = ndb.IntegerProperty(indexed=False, default=0)
 
+    @property
+    def id(self: DbUser) -> str:
+        return self.get_id()
+
     @classmethod
     def createFromProfileMsg(
         cls, msg: UserProfileMsg, firUserAsDict

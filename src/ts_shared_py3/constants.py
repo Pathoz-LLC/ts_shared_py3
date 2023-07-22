@@ -27,10 +27,10 @@ else:
 # > ngrok http 8080
 # copy url below
 LOCAL_PUBLIC_URL_DEFAULT = (
-    "https://45a4-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://0962-70-114-197-58.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 LOCAL_PUBLIC_URL_SCORING = (
-    "https://45a4-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://0962-70-114-197-58.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 
 # usage:
