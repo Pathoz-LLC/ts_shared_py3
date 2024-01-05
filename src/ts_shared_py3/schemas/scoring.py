@@ -49,11 +49,11 @@ class RequRelationshipOverviewSchema(ma.Schema):
         self: RequRelationshipOverviewSchema, dDict: dict[str, str], **kwargs
     ) -> ScoringDataClasses.RequRelationshipOverviewData:
         # construct a DataClasses.RequRelationshipOverviewData() & return
-        rec = self.__model__()
+        rec: ScoringDataClasses.RequRelationshipOverviewData = self.__model__()
         assert isinstance(
             rec, self.__model__
         ), "could not create valid RequRelationshipOverviewData from data sent by RequRelationshipOverviewSchema?"
-        rec._updateAttsFromDict(dDict)
+        rec.updateAttsFromDict(dDict)
         return rec
 
 

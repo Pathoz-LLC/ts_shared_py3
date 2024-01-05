@@ -24,9 +24,10 @@ class BaseApiData:
     # if len(kwargs) > 0:
     #     self._updateAttsFromDict(kwargs)
 
-    # def _updateAttsFromDict(self: BaseApiData, kwargs: dict[str, Any]) -> None:  #
-    #     for key, value in kwargs.items():
-    #         setattr(self, key, value)
+    def updateAttsFromDict(self: BaseApiData, kwargs: dict[str, Any]) -> None:  #
+        # scoring svc needs this
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     # class var here is used by marshmallow_dataclass
     Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
