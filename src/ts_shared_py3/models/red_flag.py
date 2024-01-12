@@ -83,4 +83,4 @@ class RedFlagReport(BaseNdbModel):  # ndb.model.Expando
         if isinstance(flagType, RedFlagType):
             flagType = flagType.value
         persKey = ndb.Key(Person, personID)  # top ancestor; makes loading all easy
-        return ndb.Key("FlagType", flagType, parent=persKey)
+        return ndb.Key(RedFlagReport, flagType, parent=persKey)
