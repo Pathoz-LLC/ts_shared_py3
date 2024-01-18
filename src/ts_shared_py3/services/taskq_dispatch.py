@@ -85,21 +85,14 @@ def _createTaskPayload(
     #
     # print("task payload type: {0}".format(type(payload)))
     # assert isinstance(payload, str), "payload must be a string"
-    request_type: str = (
-        "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
-    )
+    # request_type: str = (
+    #     "http_request" if IS_RUNNING_LOCAL else "app_engine_http_request"
+    # )
     uri_key: str = "url" if IS_RUNNING_LOCAL else "relative_uri"
-
-    encoded_payload: str = payload  # Union[Dict[str, Any], str, None]
-    # branch below was source of many errors
-    # if isinstance(payload, dict):
-    #     encoded_payload = json_dumps(payload)
-    # elif isinstance(payload, object):
-    #     encoded_payload = json_dumps(payload)
-
-    encoded_payload = (
-        "_empty".encode() if encoded_payload is None else encoded_payload.encode()
-    )
+    assert (
+        isinstance(payload, str) or payload is None
+    ), "payload must be a string or none"
+    encoded_payload: str = "_empty".encode() if payload is None else payload.encode()
     d: dict[str, Any] = {
         uri_key: handlerUri,
         "http_method": "POST",
@@ -125,11 +118,13 @@ def _createTaskPayload(
 def _create_task_post(
     queue: str,
     handlerUri: str,
-    payload: Union[str, None] = None,
+    payload: Union[str, dict, None] = "",
     in_seconds: int = None,
     taskName: str = None,
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
+    if isinstance(payload, dict):
+        payload = json_dumps(payload)
 
     requestObj = _createTaskPayload(handlerUri, payload, taskName)  # : Dict[str, str]
     if in_seconds is not None:
@@ -170,7 +165,7 @@ def _create_task_get(
 
     taskRequest: Union[
         tasks_v2.AppEngineHttpRequest, tasks_v2.HttpRequest
-    ] = _createTaskPayload(handlerUri, None, taskName)
+    ] = _createTaskPayload(handlerUri, "", taskName)
     taskRequest.http_method = "GET"
     taskRequest.body = None
     taskRequest.headers = None

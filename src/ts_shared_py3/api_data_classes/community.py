@@ -114,10 +114,10 @@ class CommContentInfo(BaseApiData):
 
     # default must be set here!
     meta: dict[str, Any] = field(
-        default=None,
-        metadata=dict(
-            default_factory=lambda x: {},
-        ),
+        default_factory=lambda: {},
+        # metadata=dict(
+        #     default_factory=lambda x: {},
+        # ),
     )
 
     # Schema: ClassVar[Type[Schema]] = DataClassBaseSchema
@@ -268,9 +268,10 @@ class CommunityFeedEvent(BaseApiData):
         metadata=dict(required=True),
     )
     dttm: datetime = field(
+        init=False,
+        default_factory=lambda: datetime.now(),
         metadata=dict(
             required=True,
-            default_factory=lambda x: datetime.now(),
         ),
     )
 
