@@ -176,7 +176,7 @@ class CommitStats(ndb.Model):
         return [r for r in allRecs if r is not None]
 
     @staticmethod
-    def _all_keys(region: str = None):
+    def _all_keys(region: str = GLOBAL_REGION):
         """Returns all possible keys for the counter name given the config.
         Returns:
             The full list of ndb.Key values corresponding to all the possible
@@ -199,7 +199,8 @@ class CommitStats(ndb.Model):
 
 def _makeCommitStatsShardKey(region: str, instanceID: int):
     assert instanceID > 0, "invalid ID"
-    return ndb.Key("Region", region, CommitStats, instanceID)
+    str_id = "{0}-{1}".format(region, instanceID)
+    return ndb.Key(CommitStats, str_id)
 
 
 # def _updateFirebase(self):

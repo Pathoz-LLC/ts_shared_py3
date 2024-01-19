@@ -27,6 +27,12 @@ from ..enums.commitLevel import CommitLevel_Display
 from ..enums.sex import Sex
 from ..config.behavior.load_yaml import BehaviorSourceSingleton
 
+from ..constants import (
+    ISO_8601_DATE_FORMAT,
+    ISO_8601_DATETIME_FORMAT,
+    ISO_8601_TIME_FORMAT,
+)
+
 behaviorDataShared = BehaviorSourceSingleton()  # read only singleton
 
 DEFAULT_USER_DOB = date(1998, 1, 9)  # if missing
@@ -41,7 +47,7 @@ meta={'code': 'showedHealthyBoundWithEx', 'parentCode': 'respSensitivePos', 'tex
 """
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class CommUserInfo(BaseApiData):
     """
     summarize who did the news event being reported
@@ -81,19 +87,19 @@ class CommUserInfo(BaseApiData):
         return {
             "province": self.province,
             "sexInt": self.sexInt,
-            "dob": self.dob.isoformat(),
+            "dob": self.dob.strftime(ISO_8601_DATE_FORMAT),
         }
 
     @staticmethod
     def fromDict(dct: Dict[str, Any]) -> CommUserInfo:
         prov = dct.get("province", "_unk")
         sexInt = dct.get("sexInt", 2)
-        dob = date_from_epoch(dct.get("dob", 100000.0))
+        dob = datetime.strptime(dct.get("dob"), ISO_8601_DATE_FORMAT).date()
         cui = CommUserInfo(prov, sexInt, dob)
         return cui
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class CommContentInfo(BaseApiData):
     """represents some user action that will feed community news
     args are an enums.ActivityType, a string & optional context obj
@@ -255,7 +261,7 @@ class CommContentInfo(BaseApiData):
         return CommContentInfo(typInt, valStr, valInt, meta=meta)
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class CommunityFeedEvent(BaseApiData):
     """
     main news object posted to firebase for community data stream
@@ -268,7 +274,6 @@ class CommunityFeedEvent(BaseApiData):
         metadata=dict(required=True),
     )
     dttm: datetime = field(
-        init=False,
         default_factory=lambda: datetime.now(),
         metadata=dict(
             required=True,
@@ -282,7 +287,7 @@ class CommunityFeedEvent(BaseApiData):
         return {
             "userInfo": self.userInfo.toDict,
             "contentInfo": self.contentInfo.toDict,
-            "dttm": self.dttm.isoformat(),
+            "dttm": self.dttm.strftime(ISO_8601_DATETIME_FORMAT),
         }
 
     @property
@@ -356,7 +361,7 @@ class CommFeedDecoder(json.JSONDecoder):
         if userInfoDct is not None and contentInfoDct is not None:
             userInfo = CommUserInfo.fromDict(userInfoDct)
             ctxInfo = CommContentInfo.fromDict(contentInfoDct)
-            dttm = dateTime_from_epoch(dct.get("dttm"))
+            dttm = datetime.strptime(dct.get("dttm"), ISO_8601_DATETIME_FORMAT)
             cf = CommunityFeedEvent(userInfo, ctxInfo, dttm)
             return cf
         return dct

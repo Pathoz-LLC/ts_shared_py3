@@ -126,6 +126,9 @@ def _create_task_post(
     if isinstance(payload, dict):
         payload = json_dumps(payload)
 
+    # print("create_task_post:  {0}".format(type(payload)))
+    # print(payload)
+
     requestObj = _createTaskPayload(handlerUri, payload, taskName)  # : Dict[str, str]
     if in_seconds is not None:
         d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
