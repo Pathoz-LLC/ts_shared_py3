@@ -55,6 +55,10 @@ class QueuedWorkTyp(AutoName):
         return cls[name]
 
     @property
+    def forScoringService(self) -> bool:
+        return True if self in [QueuedWorkTyp.START_RESCORING] else False
+
+    @property
     def queueName(self) -> str:
         # tracking-queue
         # push-notify-queue
@@ -118,7 +122,7 @@ class QueuedWorkTyp(AutoName):
         elif self is QueuedWorkTyp.STATS_MAKEFAKE:
             return "test/stats/fake"
         elif self is QueuedWorkTyp.START_RESCORING:
-            return "api/scoring/recalcPost"
+            return "scoring/recalcPost"
         elif self is QueuedWorkTyp.SEND_PUSH_NOTIFY:
             # not a handler on its own
             return "pn/sent/by/parent/queued/work"
@@ -128,10 +132,13 @@ class QueuedWorkTyp(AutoName):
     def postHandlerFullUri(
         self: QueuedWorkTyp, non_gae_web_host: Union[str, None] = None
     ) -> str:
-        # use in creating the task
+        # use in creating the task;  handle uri for both local (full URL) and deployed (svc relative)
+        suffix = self.postHandlerUriSuffix
+        if not self.forScoringService:
+            suffix = "/queued/" + suffix
         if non_gae_web_host is not None:
-            return non_gae_web_host + "/queued/" + self.postHandlerUriSuffix
-        return "/queued/" + self.postHandlerUriSuffix
+            return non_gae_web_host + suffix
+        return suffix
 
 
 class QwTypeSerialized(fields.Enum):

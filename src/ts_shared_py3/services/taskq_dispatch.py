@@ -17,7 +17,11 @@ from google.cloud.tasks_v2 import (
 
 #
 from ..config.all import EnvVarVals, GcpSvcsCfg
-from ..constants import IS_RUNNING_LOCAL, LOCAL_PUBLIC_URL_DEFAULT
+from ..constants import (
+    IS_RUNNING_LOCAL,
+    LOCAL_PUBLIC_URL_DEFAULT,
+    LOCAL_PUBLIC_URL_SCORING,
+)
 from ..enums.queued_work import QueuedWorkTyp
 
 log = logging.getLogger("queue_dispatch")
@@ -38,6 +42,8 @@ def do_background_work(
     # uses POST
     queue = workType.queueName
     non_gae_web_host = LOCAL_PUBLIC_URL_DEFAULT if IS_RUNNING_LOCAL else None
+    if workType.forScoringService:
+        non_gae_web_host = LOCAL_PUBLIC_URL_SCORING if IS_RUNNING_LOCAL else None
     handlerUri = workType.postHandlerFullUri(non_gae_web_host=non_gae_web_host)
 
     _create_task_post(queue, handlerUri, payload, in_seconds, taskName)

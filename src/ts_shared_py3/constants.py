@@ -24,15 +24,13 @@ else:
 
 # when testing, use ngrok to expose localhost to the GCP task queue
 # https://medium.com/google-cloud/develop-your-cloud-tasks-pipeline-locally-with-ngrok-5bee3693600f
-# > ngrok http 8080
+# > ngrok start tsapi tsscoring
 # copy url below
 LOCAL_PUBLIC_URL_DEFAULT = (
-    "https://ee0f-2600-1700-f0-8b30-44f2-7c6a-b8e6-9434.ngrok-free.app"
-    if IS_RUNNING_LOCAL
-    else None
+    "https://505c-136-62-38-91.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 LOCAL_PUBLIC_URL_SCORING = (
-    "https://0962-70-114-197-58.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://08fa-136-62-38-91.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 
 # usage:

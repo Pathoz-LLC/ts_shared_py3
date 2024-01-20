@@ -6,9 +6,10 @@ from marshmallow_dataclass import dataclass
 
 #
 from .base import BaseApiData
+from ..schemas.base import DataClassBaseSchema
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class RecalcScoringStart(BaseApiData):
     userId: str = field(default="0")
     persId: int = field(default=0)
@@ -16,7 +17,7 @@ class RecalcScoringStart(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class RequRelationshipOverviewData(BaseApiData):
     """
     used by client to request score data
@@ -38,7 +39,7 @@ class RequRelationshipOverviewData(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class OneWindowScoreData(BaseApiData):
     """
     A single point on the relationship trends graph
@@ -73,7 +74,7 @@ class OneWindowScoreData(BaseApiData):
     # valuesAssessCounts = field(default=0)
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class CurPhaseRelStateData(BaseApiData):
     """includes text descriptions of each score
     to go with CurPhaseRelState Message
@@ -93,7 +94,7 @@ class CurPhaseRelStateData(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class ScoreMetadataData(BaseApiData):
     """
     carries dates of the scores being returned
@@ -109,7 +110,7 @@ class ScoreMetadataData(BaseApiData):
     Schema: ClassVar[Type[Schema]] = Schema
 
 
-@dataclass
+@dataclass(base_schema=DataClassBaseSchema)
 class ProspectScoreData(BaseApiData):
     # ProspectScoreMsg; rolls together current score with prior-period scores
     curPeriodDetails: CurPhaseRelStateData = field()
@@ -131,4 +132,4 @@ OneWindowScoreData.Schema.__model__ = OneWindowScoreData
 CurPhaseRelStateData.Schema.__model__ = CurPhaseRelStateData
 ScoreMetadataData.Schema.__model__ = ScoreMetadataData
 ProspectScoreData.Schema.__model__ = ProspectScoreData
-RecalcScoringStart.Schema.__model = RecalcScoringStart
+RecalcScoringStart.Schema.__model__ = RecalcScoringStart
