@@ -27,10 +27,10 @@ else:
 # > ngrok start tsapi tsscoring
 # copy url below
 LOCAL_PUBLIC_URL_DEFAULT = (
-    "https://505c-136-62-38-91.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://bcdd-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 LOCAL_PUBLIC_URL_SCORING = (
-    "https://08fa-136-62-38-91.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://0bb0-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 
 # usage:

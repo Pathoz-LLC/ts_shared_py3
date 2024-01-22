@@ -350,7 +350,7 @@ class CommitLvlSerializedMa(fields.Enum):
         self: CommitLvlSerializedMa, value: CommitLevel_Display, attr, obj, **kwargs
     ) -> str:
         if value is None:
-            return ""
+            return CommitLevel_Display.NONEXCLUSIVE.name
         return value.name
 
     def _deserialize(
@@ -359,7 +359,7 @@ class CommitLvlSerializedMa(fields.Enum):
         try:
             return CommitLevel_Display[value]
         except ValueError as error:
-            raise ValidationError("") from error
+            raise ValidationError(value) from error
 
     # def dump_default(self: CommitLvlSerializedMa) -> CommitLevel_Display:
     #     return CommitLevel_Display.NONEXCLUSIVE

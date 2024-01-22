@@ -22,7 +22,7 @@ class CreateReasonSerializedMa(fields.Enum):
         self: CreateReasonSerializedMa, value: CreateReason, attr, obj, **kwargs
     ) -> str:
         if value is None:
-            return ""
+            return CreateReason.RELATIONSHIP.name
         # print("SexSerialized:")
         # print(value.name, type(value))
         return value.name
@@ -31,7 +31,7 @@ class CreateReasonSerializedMa(fields.Enum):
         self: CreateReasonSerializedMa, value: str, attr, data, **kwargs
     ) -> CreateReason:
         try:
-            return Sex[value]
+            return CreateReason[value]
         except ValueError as error:
             return CreateReason.RELATIONSHIP
 
@@ -103,7 +103,7 @@ class MonitorStatusSerialized(fields.Enum):
         self: MonitorStatusSerialized, value: MonitorStatus, attr, obj, **kwargs
     ) -> str:
         if value is None:
-            return ""
+            return MonitorStatus.ACTIVE.name
         return value.name
 
     def _deserialize(

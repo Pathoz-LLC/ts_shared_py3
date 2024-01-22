@@ -81,7 +81,7 @@ class SexSerializedMa(fields.Enum):
 
     def _serialize(self: SexSerializedMa, value: Sex, attr, obj, **kwargs) -> str:
         if value is None:
-            return ""
+            return Sex.UNKNOWN.name
         elif isinstance(value, str):
             return value
         # print("SexSerialized:")
