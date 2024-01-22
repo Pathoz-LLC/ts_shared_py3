@@ -8,6 +8,7 @@ from marshmallow import Schema, validate
 
 from .base import BaseApiData
 from .tracking import TrackingPayloadMsgDc
+from ..schemas.base import DataClassBaseSchema
 
 """ Important Note:
     it is vital that you set the Schema.__model__
@@ -21,6 +22,7 @@ from .tracking import TrackingPayloadMsgDc
 """
 
 
+# TODO:  add DataClassBaseSchema to all dataclass() decorators
 # example of validation
 @dataclass()
 class BehaviorKeysMessage(BaseApiData):
@@ -79,25 +81,6 @@ class BehaviorRowMsg(BaseApiData):
     categoryCode: str = field(default="general")
     #
     Schema: ClassVar[Type[Schema]] = Schema
-
-
-# what swift is sending is below:
-# note that personId, feelingStrength & significanceStrength are the WRONG data types
-# {
-#   "comments" : "my notes about leftovers",
-#   "lon" : 7.7999999999999998,
-#   "behaviorCode" : "ateMyLeftovers",
-#   "behaviorId" : "-1",
-#   "personId" : "22334",
-#   "feelingStrength" : "3",
-#   "positive" : true,
-#   "lat" : 5.5999999999999996,
-#   "significanceStrength" : "2",
-#   "occurDateTime" : "1963-11-08T06:00:00.000Z",
-#   "categoryCode" : "FIXME",
-#   "shareDetails" : "F:fb12345;T:tw876543;",
-#   "surveyId" : ""
-# }
 
 
 @dataclass()
