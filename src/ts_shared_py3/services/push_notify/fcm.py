@@ -1,5 +1,5 @@
 from random import randint
-from typing import Dict
+from typing import Dict, Union
 from collections import namedtuple
 import google.cloud.ndb as ndb
 from firebase_admin import messaging
@@ -61,12 +61,19 @@ class PushNotifyTasks:
 
     @staticmethod
     def constructAndSendNotification(
-        userID: str, notifyType: NotifyType, dataVals: Dict
+        dbUserOrID: Union[str, DbUser], notifyType: NotifyType, dataVals: Dict
     ):
         """the main push method"""
         try:
-            user = _loadUser(userID)
-            userVals = _loadUserVals(user)  # returns a UserPushConfig
+            if isinstance(dbUserOrID, str):
+                dBUser = _loadUser(dbUserOrID)
+            else:
+                assert isinstance(dbUserOrID, DbUser), "wrong arg type {0}".format(
+                    type(dbUserOrID)
+                )
+                dBUser = dbUserOrID
+            userID = dBUser.user_id
+            userVals = _loadUserVals(dBUser)  # returns a UserPushConfig
         except UserNotFoundErr:  # handle UserNotFound exception
             # TODO: log an error
             # print("Err: UserNotFound: {0} might be missing or nil push token".format(userID))
@@ -152,7 +159,7 @@ class PushNotifyTasks:
 
 def _loadUser(userID: str) -> DbUser:
     return DbUser.loadByEmailOrId(None, userID)
-    # return ndb.Key(User, userID).get()
+    # return ndb.Key(DbUser, userID).get()
 
 
 def _loadUserVals(u: DbUser) -> UserPushConfig:

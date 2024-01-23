@@ -83,7 +83,7 @@ class PersonActivity(BaseNdbModel):  # ndb.model.Expando
 
     @staticmethod
     def _makeKey(userIdStr: str, personIdInt: int):
-        return ndb.Key("User", userIdStr, PersonActivity, personIdInt)
+        return ndb.Key("DbUser", userIdStr, PersonActivity, personIdInt)
 
     @staticmethod
     def loadAllUntouchedFor(days: int = 30) -> List[Tuple]:
