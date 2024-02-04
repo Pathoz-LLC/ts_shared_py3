@@ -3,6 +3,7 @@ from typing import Dict, Union
 from collections import namedtuple
 import google.cloud.ndb as ndb
 from firebase_admin import messaging
+from google.auth.transport.requests import Request as GAuthTransportRequest
 
 # firebase api
 from firebase_admin.messaging import Message, send
@@ -15,7 +16,7 @@ from ...models.user import DbUser
 from ...models.person import PersonLocal
 from .pn_exceptions import UserNotFoundErr, MissingReqFieldErr
 
-from ..firebase.client_admin import tsFirebaseApp
+from ..firebase.client_admin import tsFirebaseApp, serviceCreds
 from ...enums.pushNotifyType import NotifyType
 
 import logging
@@ -268,3 +269,16 @@ def _lookupProspectLocal(customDict) -> PersonLocal:
     userID = customDict.get("userID")
     userKey = ndb.Key(DbUser, userID)
     return PersonLocal.getById(userKey, personID)
+
+
+def get_fcm_send_access_token() -> bytes:
+    """Retrieve a valid FCM access token (short lived -> 1 hour)
+    to be used to authorize REST requests
+    from Notify Coord (to test library only)
+
+    :return: Access token.
+    """
+    credential = serviceCreds.get_credential()
+    request = GAuthTransportRequest()
+    credential.refresh(request)
+    return credential.token
