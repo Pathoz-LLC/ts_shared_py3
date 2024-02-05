@@ -195,6 +195,7 @@ def _makeIOSPayload(notifyType: NotifyType, token: str, fullPayload: Dict) -> Me
         sound=notifyType.sound,
         content_available=notifyType.contentAvail,
         category=notifyType.category,
+        mutable_content=True,  # UNNotificationServiceExtension requires this key
     )
     payload = APNSPayload(aps, **fullPayload)
     config = APNSConfig(payload=payload)
