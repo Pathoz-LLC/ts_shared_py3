@@ -28,7 +28,7 @@ class NotifyType(IntEnum):
     PROSPECT_VALS_MISSING = 6  # new prospect added; update values frequency for them
 
     @staticmethod
-    def all():
+    def all() -> list[NotifyType]:
         return [
             NotifyType.INCIDENT,
             NotifyType.CHAT_REQUEST,
@@ -43,7 +43,7 @@ class NotifyType(IntEnum):
     def allAsStr() -> list[str]:
         return [t.name for t in NotifyType.all()]
 
-    def getMockData(self):
+    def getMockData(self) -> dict[str, str]:
         # for testing push
         rf = self.requiredFields
         d = dict()
@@ -54,7 +54,7 @@ class NotifyType(IntEnum):
         return d
 
     @property
-    def requiredFields(self):
+    def requiredFields(self) -> list[str]:
         # userID & type are reserved for ALL payloads
         # do not use them here or they will get replaced
         if self == NotifyType.INCIDENT:
@@ -70,13 +70,13 @@ class NotifyType(IntEnum):
             return []
 
     @property
-    def isDecrementCl(self):
+    def isDecrementCl(self) -> bool:
         return (
             self == NotifyType.CL_DECREMENT_WARN or self == NotifyType.CL_DECREMENT_DONE
         )
 
     @property
-    def title(self):
+    def title(self) -> str:
         if self == NotifyType.INCIDENT:
             return "Overlap Incident occurred"
         elif self == NotifyType.CHAT_REQUEST:
@@ -101,7 +101,7 @@ class NotifyType(IntEnum):
         return ""  # self.name + " subtitle"
 
     @property
-    def body(self):
+    def body(self) -> str:
         if self == NotifyType.INCIDENT:
             # substitute prospect nickname
             return "A TS user entered dates that overlap your relationship with {0}"
@@ -130,18 +130,21 @@ class NotifyType(IntEnum):
             return self.name + " Body_"
 
     @property
-    def bodyIsConstant(self):
+    def bodyIsConstant(self) -> bool:
         # no template value needed for these types
         return self in [NotifyType.VALS_QUEST_AVAIL]
 
     @property
-    def bodyIncludesProspectName(self):
+    def bodyIncludesProspectName(self) -> bool:
         # NotifyType.CHAT_MSG_RECEIVED is special (2 args)
         return not self.bodyIsConstant
 
     @property
-    def hasCategory(self):
-        return self in [NotifyType.CL_DECREMENT_WARN]  # , NotifyType.CL_DECREMENT_DONE
+    def hasCategory(self) -> bool:
+        return self in [
+            NotifyType.CL_DECREMENT_WARN,
+            NotifyType.CL_DECREMENT_DONE,
+        ]  # , NotifyType.CL_DECREMENT_DONE
 
     @property
     def color(self):
@@ -149,11 +152,11 @@ class NotifyType(IntEnum):
         return None
 
     @property
-    def badge(self):
+    def badge(self) -> int:
         return 1
 
     @property
-    def sound(self):
+    def sound(self) -> str | None:
         return None
 
     @property
@@ -165,21 +168,24 @@ class NotifyType(IntEnum):
         return None
 
     @property
-    def contentAvail(self):
+    def contentAvail(self) -> bool:
         return False
 
     @property
-    def topic(self):
+    def topic(self) -> str:
         return self.name
 
     @property
-    def category(self):
+    def category(self) -> str | None:
         # category allows client side selection UI to appear
-        if self.hasCategory:
-            if self in [NotifyType.CL_DECREMENT_WARN]:  # , NotifyType.CL_DECREMENT_DONE
-                return "commitmentLevel"
+        if not self.hasCategory:
+            return None
 
-        return None
+        if self in [
+            NotifyType.CL_DECREMENT_WARN,
+            NotifyType.CL_DECREMENT_DONE,
+        ]:  #
+            return "commitmentLevel"
 
 
 class NdbNotifyTypeProp(model.IntegerProperty):
