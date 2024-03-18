@@ -28,9 +28,10 @@ MAX_REAL_ALLOC_INT = 32
 
 @unique
 class AllocType(IntEnum):
-    """any given day or bucket can contain a mix of scores from
+    """
+    any given day or bucket can contain a mix of scores from
     the following record types
-    the value for each type is a bitCode (binary & unique)
+    the value for each type is a unique bitCode
     """
 
     PRESCORE = 0  # aka NO ALLOCATION

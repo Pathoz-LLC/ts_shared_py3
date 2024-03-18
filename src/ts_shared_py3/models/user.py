@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Tuple
+import logging
 import time
+from typing import Tuple
 from datetime import date, datetime, timedelta
 import secrets
 import logging
@@ -284,7 +285,9 @@ class DbUser(WaUser):  # BaseUserExpando
         authToken = DbUser.token_model.create(userId, "auth", jwt)
         user = ndb.Key(DbUser, userId).get()
         if user is None:
-            print("This user does not exist!!")
+            logging.error(
+                f"User {userId} is not on this server. Perhaps dev-server or Prod?"
+            )
             return None, None
         bearerToken = DbUser.create_bearer_token(userId)
         user.lastLogin = datetime.now()

@@ -94,8 +94,8 @@ class OpenApiCfg(CfgBaseIfc, metaclass=Singleton):
         return d
 
     title: str = "TS Core API"
-    version: str = "1.0.2"
-    openapi_version: str = "3.0.2"
+    version: str = "1.0.4"
+    openapi_version: str = "3.1.0"
     # openapi_url_prefix: str = "api/"
 
     # openapi_redoc_path: str = "/redoc"
