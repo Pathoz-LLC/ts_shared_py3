@@ -83,7 +83,7 @@ class ActivityType(IntEnum):
 
     @property
     def isIncident(self) -> bool:
-        return self in [ActivityType.INCIDENT_OCCUREDD]
+        return self in [ActivityType.INCIDENT_OCCURED]
 
 
 class NdbActivityTypeProp(model.IntegerProperty):

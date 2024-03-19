@@ -282,7 +282,7 @@ class DbUser(WaUser):  # BaseUserExpando
     def updateLastLogin(userId: str, jwt: str) -> Tuple[DbUser, str]:
         # refresh token & store login date
 
-        authToken = DbUser.token_model.create(userId, "auth", jwt)
+        # authToken = DbUser.token_model.create(userId, "auth", jwt)
         user = ndb.Key(DbUser, userId).get()
         if user is None:
             logging.error(

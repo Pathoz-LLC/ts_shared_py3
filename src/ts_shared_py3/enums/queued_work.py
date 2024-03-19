@@ -133,7 +133,7 @@ class QueuedWorkTyp(AutoName):
         self: QueuedWorkTyp, non_gae_web_host: Union[str, None] = None
     ) -> str:
         # use in creating the task;  handle uri for both local (full URL) and deployed (svc relative)
-        suffix = self.postHandlerUriSuffix
+        suffix: str = self.postHandlerUriSuffix
         if not self.forScoringService:
             suffix = "/queued/" + suffix
         if non_gae_web_host is not None:
