@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 from typing import List
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import google.cloud.ndb as ndb
 from typing import Optional, Iterable  # List
 
@@ -31,8 +31,7 @@ class Tracking(BaseNdbModel):
     """
 
     # userKey = ndb.KeyProperty("User")  # user
-    # personKey = ndb.KeyProperty("Person")  # guy
-
+    personId = ndb.IntegerProperty(indexed=True)  # prospect
     # if enabled is turned off, getIncidents will return empty list....
     enabled: bool = ndb.BooleanProperty(default=True)  # true if active
     # list of all intervals currently being tracked
@@ -64,8 +63,7 @@ class Tracking(BaseNdbModel):
         if track is not None:
             return track
         track = Tracking(
-            # userKey=ndb.Key("User", userId),
-            # personKey=ndb.Key("Person", persId),
+            personId=persId,
             enabled=True,
             intervals=[
                 Interval(
@@ -252,6 +250,65 @@ class Tracking(BaseNdbModel):
             len(self.intervals),
             self.key,
         )
+
+    @staticmethod
+    def loadOrCreateForDiffUser(
+        notThisUserId: str,
+        persId: int,
+        otherUserId: str,
+        *args,
+        startDt: date = None,
+        cl: CommitLevel_Display = CommitLevel_Display.EXCLUSIVE_MA,
+    ) -> Tracking:
+        """
+        not yet using otherUserId to shortcut searching below
+        """
+        # to clean up data;  disable after 5/1/24
+        Tracking._setAllPersonId()
+        #
+        allTrackForPers: List[Tracking] = (
+            ndb.Query(Tracking).filter(Tracking.personId == persId).fetch()
+        )
+
+        startDt = startDt or date.today() - timedelta(days=10 * 365)
+        if len(allTrackForPers) < 2:
+            # no other user's are dating this person;  create a new one
+            curUserTrack = allTrackForPers[0]
+            assert (
+                curUserTrack.key.parent.string_id() == notThisUserId
+            ), "should be this user if only one exists"
+            otherUsers = DbUser.query().fetch(3)
+            otherUsers = [u for u in otherUsers if u.id != notThisUserId]
+
+            firstNewUser = otherUsers[0]
+            newTrack = Tracking.loadOrCreate(
+                firstNewUser.id, persId, startDt=startDt, cl=cl
+            )
+            return newTrack
+
+        # find one for a different user to return
+        for tr in allTrackForPers:
+            if tr.userId != notThisUserId:
+                # logic below is not complete if they have multiple intervals
+                # because we are not clearly forcing overlap
+                earliestIvl = tr.intervals[-1]
+                earliestIvl.startDate = startDt or date.today() - timedelta(
+                    days=4 * 365
+                )
+                earliestIvl.commitLevel = cl
+                # latestInterval = tr.intervals[0]
+                tr.intervals[0].commitLevel = cl.value
+                tr.put()
+                return tr
+        return None
+
+    @staticmethod
+    def _setAllPersonId():
+        qAllRecs = ndb.Query(Tracking).fetch()
+        for rec in qAllRecs:
+            rec.personId = rec.key.integer_id()
+            rec.put()
+
         # print(self.key)
         # TrackingTasks.checkForIncidents(self.key)
         # self._shouldCheckForIncidentsOnPut = False

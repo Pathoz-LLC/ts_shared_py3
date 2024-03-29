@@ -192,7 +192,7 @@ class WaUser(model.Expando):
     # doesn't use password.
     password = model.StringProperty()
 
-    def get_id(self):
+    def get_id(self) -> str:
         """Returns this user's unique ID, which can be an integer or string."""
         return self._key.id()
 
