@@ -31,7 +31,7 @@ class Tracking(BaseNdbModel):
     """
 
     # userKey = ndb.KeyProperty("User")  # user
-    personId = ndb.IntegerProperty(indexed=True)  # prospect
+    personId: int = ndb.IntegerProperty(indexed=True)  # prospect
     # if enabled is turned off, getIncidents will return empty list....
     enabled: bool = ndb.BooleanProperty(default=True)  # true if active
     # list of all intervals currently being tracked
