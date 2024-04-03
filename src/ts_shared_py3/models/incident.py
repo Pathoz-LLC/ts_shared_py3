@@ -51,9 +51,11 @@ class Incident(BaseNdbModel):
     """
 
     # fkeys
-    trackingKey = ndb.KeyProperty(Tracking, required=True)
-    userKey = ndb.KeyProperty("User", required=True)
-    personKey = ndb.KeyProperty("Person", required=True)  # the "playa"
+    trackingKey = ndb.KeyProperty(kind=Tracking, required=True)
+    userKey = ndb.KeyProperty(kind="DbUser", required=True, indexed=True)
+    personKey = ndb.KeyProperty(
+        kind="Person", required=True, indexed=True
+    )  # the "playa"
 
     # # status
     # # userTruthOpinion = ndb.IntegerProperty(indexed=False, default=0)    # 0 means not seen; 1-4 = true->false
@@ -80,6 +82,10 @@ class Incident(BaseNdbModel):
     modDateTime = ndb.DateTimeProperty(
         auto_now=True, indexed=False
     )  # when user updated with their truth opinion
+
+    @property
+    def userId(self) -> str:
+        return self.userKey.string_id()
 
     @property
     def isInvalid(self) -> bool:  # bool
@@ -193,7 +199,7 @@ class Incident(BaseNdbModel):
         """person ID is optional
         return list of found incidents
         """
-        userKey = ndb.Key("User", userId)
+        userKey = ndb.Key("DbUser", userId)
         if persId > 0:
             personKey = ndb.Key("Person", persId)
             query = Incident.query(
@@ -262,27 +268,39 @@ class Incident(BaseNdbModel):
         Returns:
             IncidentRowMessage:
         """
-        irm = IncidentRowMessage()
-        irm.incidentId = self.key.integer_id()
-        # irm.userTruthOpinion = self.userTruthOpinion.number
-        irm.evidenceStatus = self.evidenceStatus.value
-        irm.reportingUserId = self.reportingUserId
-        irm.reportingUserSex = self.reportingUserSex or Sex.UNKNOWN
-        irm.earliestOverlapDate = self.earliestOverlapDate
-        irm.overlapDays = self.overlapDays
+        irm = IncidentRowMessage(
+            earliestOverlapDate=self.earliestOverlapDate,
+            addDateTime=self.addDateTime,
+            modDateTime=self.modDateTime,
+            userInterval=self.userInterval.toMsg(),
+            reportingUserInterval=self.reportingUserInterval.toMsg(),
+            overlapDays=self.overlapDays,
+            reportingUserSex=Sex.MALE,
+            reportingUserId=self.reportingUserId,
+            evidenceStatus=self.evidenceStatus,
+            incidentId=self.key.integer_id(),
+        )
+        # irm.reportingUserSex = self.reportingUserSex
+        irm.evidenceStatus = self.evidenceStatus
         irm.userIntervalRowNum = self.userIntervalRowNum
         irm.reportingUserIntervalRowNum = self.reportingUserIntervalRowNum
         irm.repUserIntervalReviseHistory = self.repUserIntervalReviseHistory
-        irm.addDateTime = self.addDateTime.date()
-        irm.modDateTime = self.modDateTime.date()
+        # irm.incidentId = self.key.integer_id()
+        # irm.userTruthOpinion = self.userTruthOpinion.number
+        # irm.reportingUserId = self.reportingUserId
+        # irm.reportingUserSex = self.reportingUserSex or Sex.UNKNOWN
+        # irm.earliestOverlapDate = self.earliestOverlapDate
+        # irm.overlapDays = self.overlapDays
+        # irm.addDateTime = self.addDateTime.date()
+        # irm.modDateTime = self.modDateTime.date()
         # convert intervals to messages
-
-        irm.userInterval = self.userInterval.toMsg()
-        irm.reportingUserInterval = self.reportingUserInterval.toMsg()
+        # irm.userInterval = self.userInterval.toMsg()
+        # irm.reportingUserInterval = self.reportingUserInterval.toMsg()
 
         # check for unbounded intervals
-        intervalEndDateUser = self.userInterval.endDate
-        intervalEndDateReporter = self.reportingUserInterval.endDate
+        # intervalEndDateUser = self.userInterval.endDate
+        # intervalEndDateReporter = self.reportingUserInterval.endDate
+
         # send a sensible date (today) to the client
         # FIXME:  this is a temp fix:  we should really check the DB
         # to see if that phase was ever ended;  of course that data-change

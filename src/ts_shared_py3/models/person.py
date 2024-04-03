@@ -244,7 +244,7 @@ class PersonLocal(BaseNdbModel):
     @property
     def userKey(self):
         # return user key
-        return ndb.Key("User", self.userId)
+        return ndb.Key("DbUser", self.userId)
 
     @property
     def personKey(self):

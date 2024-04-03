@@ -180,7 +180,7 @@ class PersonBehavior(BaseNdbModel):
 
     # @staticmethod
     # def makeAncestor(userID, personID):
-    #     userKey = ndb.Key("User", userID)
+    #     userKey = ndb.Key("DbUser", userID)
     #     return ndb.Key("Person", personID, parent=userKey)
 
     @staticmethod

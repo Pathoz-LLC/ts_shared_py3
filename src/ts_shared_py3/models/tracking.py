@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import logging
 from typing import List
 from datetime import datetime, date, timedelta
@@ -14,14 +15,17 @@ from .user import DbUser
 from ..enums.commitLevel import CommitLevel_Display, CommitLevel_Logic
 from .interval import Interval
 from ..utils.date_conv import calcOverlappingDays, dateTime_to_epoch
+from ..utils.logging_ctrl import createLogger
 from ..constants import DISTANT_FUTURE_DATE
 
-log = logging.getLogger("tracking")
+
 communityRiskStats = CommImpactConsensus()
 
 # from common.models.person_model import Person   # , PersonLocal, MonitorStatus, CreateReason
 # from common.models.user_model import User
 # from common.models.tracking_model import Tracking
+
+log = createLogger("tracking", level=logging.INFO)
 
 
 class Tracking(BaseNdbModel):
@@ -30,8 +34,8 @@ class Tracking(BaseNdbModel):
     most recent interval is at TOP ie [0]
     """
 
-    # userKey = ndb.KeyProperty("User")  # user
-    personId: int = ndb.IntegerProperty(indexed=True)  # prospect
+    # userKey = ndb.KeyProperty("DbUser")  # user
+    personId: int = ndb.IntegerProperty(default=0, indexed=True)  # prospect
     # if enabled is turned off, getIncidents will return empty list....
     enabled: bool = ndb.BooleanProperty(default=True)  # true if active
     # list of all intervals currently being tracked
@@ -74,7 +78,7 @@ class Tracking(BaseNdbModel):
             ],
             lastCheckDateTime=datetime.now(),
         )
-        track.key = Tracking.makeUserPersKey(userId, persId)
+        track.key = Tracking.makePersUserKey(userId, persId)
         track.put()
         return track
 
@@ -88,12 +92,18 @@ class Tracking(BaseNdbModel):
         ]
 
     @property
-    def userId(self: Tracking) -> str:
-        return self.key.parent.string_id()
+    def userKey(self: Tracking) -> str:
+        return self.key.parent()
 
     @property
-    def personId(self: Tracking) -> int:
-        return self.key.integer_id()
+    def userId(self: Tracking) -> str:
+        return self.userKey.string_id()
+
+    @property
+    def personKey(self: Tracking) -> str:
+        # pk = self.key.integer_id()
+        # assert pk == self.personId, "personId must match key"
+        return ndb.Key("Person", self.personId)
 
     @property
     def intervalCount(self: Tracking) -> int:
@@ -192,23 +202,23 @@ class Tracking(BaseNdbModel):
         return overlapDays
 
     @staticmethod
-    def makeUserPersKey(userId: str, personId: int) -> ndb.Key:
-        return ndb.Key("Tracking", personId, parent=ndb.Key("User", userId))
+    def makePersUserKey(userId: str, personId: int) -> ndb.Key:
+        return ndb.Key("Tracking", personId, parent=ndb.Key("DbUser", userId))
 
     @staticmethod
     def loadByKeys(userKey: ndb.Key, personKey: ndb.Key) -> Tracking:
         # query = Tracking.query(
         #     Tracking.userKey == userKey, Tracking.personKey == personKey
         # )
-        key = Tracking.makeUserPersKey(userKey.string_id(), personKey.integer_id())
+        key = Tracking.makePersUserKey(userKey.string_id(), personKey.integer_id())
         return key.get()
 
     @staticmethod
     def loadByIds(userId: str, personId: int) -> Tracking:
-        # userKey = ndb.Key("User", userId)
+        # userKey = ndb.Key("DbUser", userId)
         # personKey = ndb.Key("Person", personId)
         # return Tracking.loadByKeys(userKey, personKey)
-        key = Tracking.makeUserPersKey(userId, personId)
+        key = Tracking.makePersUserKey(userId, personId)
         return key.get()
 
     @staticmethod
@@ -216,7 +226,7 @@ class Tracking(BaseNdbModel):
         userId: str, personId: int, intervalList: List[Interval]
     ):
         # will update or create (& store) the record
-        userKey = ndb.Key("User", userId)
+        userKey = ndb.Key("DbUser", userId)
         personKey = ndb.Key("Person", personId)
         newTrackRec = Tracking.loadByKeys(userKey, personKey)
         if not newTrackRec:
@@ -225,7 +235,7 @@ class Tracking(BaseNdbModel):
                 intervals=[],
                 lastCheckDateTime=datetime.now(),
             )
-            newTrackRec.key = Tracking.makeUserPersKey(userId, personId)
+            newTrackRec.key = Tracking.makePersUserKey(userId, personId)
 
         newTrackRec.intervals = intervalList
         return newTrackRec.put()
@@ -244,12 +254,12 @@ class Tracking(BaseNdbModel):
 
         # check again anytime this track rec changes
         # print("track after_put for Pers %s has %d" % (self.personKey.integer_id(), len(self.intervals)))
-        log.info(
-            "track after_put for Pers %d has %d (%s)",
-            self.key.integer_id(),
-            len(self.intervals),
-            self.key,
-        )
+        # log.info(
+        #     "track after_put for Pers %d has %d (%s)",
+        #     self.key.integer_id(),
+        #     len(self.intervals),
+        #     self.key,
+        # )
 
     @staticmethod
     def loadOrCreateForDiffUser(
@@ -267,47 +277,76 @@ class Tracking(BaseNdbModel):
         Tracking._setAllPersonId()
         #
         allTrackForPers: List[Tracking] = (
-            ndb.Query(Tracking).filter(Tracking.personId == persId).fetch()
+            Tracking.query().filter(Tracking.personId == persId).fetch()
         )
 
+        log.info("Cnt TrackForPers: %s", len(allTrackForPers))
         startDt = startDt or date.today() - timedelta(days=10 * 365)
         if len(allTrackForPers) < 2:
             # no other user's are dating this person;  create a new one
             curUserTrack = allTrackForPers[0]
             assert (
-                curUserTrack.key.parent.string_id() == notThisUserId
+                curUserTrack.key.parent().string_id() == notThisUserId
             ), "should be this user if only one exists"
-            otherUsers = DbUser.query().fetch(3)
+            otherUsers: list[DbUser] = DbUser.query().fetch(3)
             otherUsers = [u for u in otherUsers if u.id != notThisUserId]
+            log.info("Cnt OtherUsers: %s", len(otherUsers))
 
             firstNewUser = otherUsers[0]
             newTrack = Tracking.loadOrCreate(
                 firstNewUser.id, persId, startDt=startDt, cl=cl
             )
+            log.info("Created new Track w %s intervals", newTrack.intervalCount)
             return newTrack
 
         # find one for a different user to return
         for tr in allTrackForPers:
-            if tr.userId != notThisUserId:
-                # logic below is not complete if they have multiple intervals
-                # because we are not clearly forcing overlap
-                earliestIvl = tr.intervals[-1]
-                earliestIvl.startDate = startDt or date.today() - timedelta(
-                    days=4 * 365
+            if tr.userId == notThisUserId:
+                continue
+            # logic below is not complete if they have multiple intervals
+            # because we are not clearly forcing overlap
+            earliestIvl = tr.intervals[-1]
+            earliestIvl.startDate = startDt or date.today() - timedelta(days=4 * 365)
+            earliestIvl.commitLevel = cl
+            # latestInterval = tr.intervals[0]
+            tr.intervals[0].commitLevel = cl.value
+            tr.put()
+            # Tracking._deleteOldIncidents([notThisUserId, tr.userId])
+            for i in tr.intervals:
+                log.info(
+                    "Ivl: %s %s %s",
+                    i.startDate,
+                    i.endDate,
+                    i.commitLevel,
                 )
-                earliestIvl.commitLevel = cl
-                # latestInterval = tr.intervals[0]
-                tr.intervals[0].commitLevel = cl.value
-                tr.put()
-                return tr
+            return tr
+        log.error("Couldnt create Tracking record for different user to force overlaps")
         return None
 
     @staticmethod
     def _setAllPersonId():
-        qAllRecs = ndb.Query(Tracking).fetch()
-        for rec in qAllRecs:
-            rec.personId = rec.key.integer_id()
-            rec.put()
+        qAllRecs: List[Tracking] = Tracking.query().fetch()
+        for trRec in qAllRecs:
+            trRec.personId = trRec.key.integer_id()
+            trRec.put()
+            u: DbUser = trRec.userKey.get()
+            if u is None:
+                trRec.key.delete()
+
+    @staticmethod
+    def _deleteOldIncidents(userIDs: Iterable[str]):
+        from .incident import Incident
+
+        is_running_local = not os.environ.get("GAE_ENV", "").startswith("standard")
+
+        deleteAll = (False if len(userIDs) > 0 else True) and is_running_local
+        # print("deleteAll: %s" % deleteAll)
+        set_userIDs = set(userIDs)
+        qAllRecs: List[Incident] = Incident.query().fetch()
+        for incdtRec in qAllRecs:
+            # if deleteAll or indRec.userId in set_userIDs:
+            if True:
+                incdtRec.key.delete()
 
         # print(self.key)
         # TrackingTasks.checkForIncidents(self.key)

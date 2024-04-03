@@ -73,7 +73,14 @@ class ScoreDispatchHelper(object):
         cls._dispatchScoreTask(userId, prospectId, eta)
 
     @classmethod
-    def storeIncident(cls, userId, prospectId, incdt, relLength, isFreeUser=True):
+    def storeIncident(
+        cls,
+        userId: str,
+        prospectId: int,
+        incdt,
+        relLength: int,
+        isFreeUser: bool = True,
+    ):
         # incidents created on another server
         iea = InputEntryAdapter.fromIncident(incdt, relLength)
         iea.setKeyProperties(userId, prospectId)

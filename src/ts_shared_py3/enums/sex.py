@@ -55,21 +55,21 @@ class Sex(IntEnum):
 
 #
 class NdbSexProp(model.IntegerProperty):
-    def _validate(self, value: int):
-        if isinstance(value, (int)):
-            return Sex(value)
-        elif isinstance(value, (bytes, str)):
-            return Sex(int(value))
-        elif not isinstance(value, Sex):
-            raise TypeError("expected Sex, int, str or unicd, got %s" % repr(value))
+    def _validate(self, sxInt: int):
+        if isinstance(sxInt, (int)):
+            return Sex(sxInt)
+        elif isinstance(sxInt, (bytes, str)):
+            return Sex(int(sxInt))
+        elif not isinstance(sxInt, Sex):
+            raise TypeError("expected Sex, int, str or unicd, got %s" % repr(sxInt))
 
-    def _to_base_type(self, sx: Sex):
+    def _to_base_type(self, sx: Sex) -> int:
         # convert Sex to int
-        if isinstance(sx, int):
-            return sx
-        return int(sx.value)
+        # if isinstance(sx, int):
+        #     return sx
+        return sx.value
 
-    def _from_base_type(self, value: int):
+    def _from_base_type(self, value: int) -> Sex:
         return Sex(value)
 
 
@@ -79,18 +79,18 @@ class SexSerializedMa(fields.Enum):
     SexSerializedDc (below) is a marshmallow_dataclass type
     """
 
-    def _serialize(self: SexSerializedMa, value: Sex, attr, obj, **kwargs) -> str:
-        if value is None:
+    def _serialize(self: SexSerializedMa, sx: Sex, attr, obj, **kwargs) -> str:
+        if sx is None:
             return Sex.UNKNOWN.name
-        elif isinstance(value, str):
-            return value
+        elif isinstance(sx, str):
+            return sx
         # print("SexSerialized:")
         # print(value.name, type(value))
-        return value.name
+        return sx.name
 
-    def _deserialize(self: SexSerializedMa, value: str, attr, data, **kwargs) -> Sex:
+    def _deserialize(self: SexSerializedMa, sxStr: str, attr, data, **kwargs) -> Sex:
         try:
-            return Sex[value]
+            return Sex[sxStr]
         except ValueError as error:
             return Sex.UNKNOWN
             # raise ValidationError("Pin codes must contain only digits.") from error

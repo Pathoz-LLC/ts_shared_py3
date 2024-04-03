@@ -107,11 +107,11 @@ class UserInteractions(ndb.Model):
 
     @staticmethod
     def loadAllForUser(myUserID: str):
-        userKey = ndb.Key("User", myUserID)
+        userKey = ndb.Key("DbUser", myUserID)
         qry = UserInteractions.query(ancestor=userKey)
         return qry.fetch(40)
 
     @staticmethod
     def _makeKey(myUserID: str, otherUserID: str):
-        userKey = ndb.Key("User", myUserID)
+        userKey = ndb.Key("UbUser", myUserID)
         return ndb.Key("UserInteractions", otherUserID, parent=userKey)

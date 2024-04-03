@@ -197,7 +197,7 @@ class UserValsByBehCat(ndb.Model):
         """returns list of all UserValsByBehCat (across categories) prior answers
         for provided userID
         """
-        key = ndb.Key("User", userID, parent=None)
+        key = ndb.Key("DbUser", userID, parent=None)
         qury = UserValsByBehCat.query(ancestor=key)
         mergedlist: list[UserValsByBehCat] = []
         for rec in qury.fetch():
@@ -221,7 +221,7 @@ class UserValsByBehCat(ndb.Model):
 
     @staticmethod
     def loadAllByUser(userID: str) -> list[UserValsByBehCat]:
-        userKey = ndb.Key("User", userID, parent=None)
+        userKey = ndb.Key("DbUser", userID, parent=None)
         q = UserValsByBehCat.query(ancestor=userKey)
         return q.fetch(500)
 
@@ -254,7 +254,7 @@ class UserValsByBehCat(ndb.Model):
     @staticmethod
     def _makeKey(userID: str, behCategory: str) -> ndb.Key:
         """nest user answers under userID -> behCategory"""
-        userKey = ndb.Key("User", userID, parent=None)
+        userKey = ndb.Key("DbUser", userID, parent=None)
         return ndb.Key(UserValsByBehCat, behCategory, parent=userKey)
 
 

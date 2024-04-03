@@ -33,8 +33,8 @@ class BaseNdbModel(ndb.Model):
         ), "invalid data for key: {0}:{1} -- {2}:{3}".format(
             userID, type(userID), personID, type(personID)
         )
-        # userKey = ndb.Key("User", userID)
-        return ndb.Key("User", userID, "Person", personID)
+        # userKey = ndb.Key("DbUser", userID)
+        return ndb.Key("DbUser", userID, "Person", personID)
 
     @staticmethod
     def keyStrFromDate(dt: date) -> str:

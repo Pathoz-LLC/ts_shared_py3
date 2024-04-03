@@ -232,7 +232,7 @@ class CommitLevel_Display(IntEnum):
     @staticmethod
     def orderedListCodes() -> list[str]:
         # highest index is max commitment
-        return [cl.name for cl in CommitLevel_Display.masterList()]
+        return [cl.name for cl in CommitLevel_Display]
 
     @staticmethod
     def fromStr(idxOrCode: str):  # -> CommitLevel_Display:
@@ -240,7 +240,7 @@ class CommitLevel_Display(IntEnum):
         # should handle str or int
         if isinstance(idxOrCode, (int, float) or len(idxOrCode) < 2):
             return CommitLevel_Display(int(idxOrCode))
-        return CommitLevel_Display.masterDict()[idxOrCode.upper()]
+        return CommitLevel_Display[idxOrCode.upper()]
 
     @staticmethod
     def default() -> CommitLevel_Display:
@@ -256,11 +256,11 @@ class CommitLevel_Display(IntEnum):
 
     @staticmethod
     def typeCount() -> int:
-        return 5  # len(CommitLevel_Display.masterList())
+        return len(CommitLevel_Display)
 
     @staticmethod
     def masterDict() -> map[str, CommitLevel_Display]:
-        # key'd by code
+        # key'd by code;  may be niu
         global _CommitLevelMasterDict
         if _CommitLevelMasterDict is None:
             _CommitLevelMasterDict = {}
@@ -300,26 +300,10 @@ class CommitLevel_Display(IntEnum):
             msg.append(apMsg)
         return msg
 
-    # protorpc translators below
-    # @staticmethod
-    # def to_field(Model, property, count):
-    #     # convert NdbCommitLvlProp to integer msg field
-    #     raise Exception("missing messages.IntegerField", "??")
-    #     return messages.IntegerField(count, repeated=property._repeated)
-
-    # @staticmethod
-    # def to_message(Model, property, field, value):
-    #     return value.value  # value arg is CommitLevel_Display obj
-
-    # @staticmethod
-    # def to_model(Message, property, field, value):
-    #     from common.enums.commitLevel import CommitLevel_Display
-
-    #     return CommitLevel_Display(value)
-
 
 class NdbCommitLvlProp(model.IntegerProperty):
-    def _validate(self, value: int):
+    #
+    def _validate(self, value: int) -> CommitLevel_Display:
         if isinstance(value, (int)):
             return CommitLevel_Display(value)
         elif isinstance(value, (bytes, str)):
@@ -329,13 +313,13 @@ class NdbCommitLvlProp(model.IntegerProperty):
                 "expected CommitLevel_Display, int, str or unicd, got %s" % repr(value)
             )
 
-    def _to_base_type(self, sx: CommitLevel_Display):
+    def _to_base_type(self, sx: CommitLevel_Display) -> int:
         # convert CommitLevel_Display to int
         if isinstance(sx, int):
             return sx
-        return int(sx.value)
+        return sx.value
 
-    def _from_base_type(self, value: int):
+    def _from_base_type(self, value: int) -> CommitLevel_Display:
         return CommitLevel_Display(value)  # return CommitLevel_Display
 
     # @property
@@ -347,22 +331,16 @@ class CommitLvlSerializedMa(fields.Enum):
     """Field that serializes to a string of sex name"""
 
     def _serialize(
-        self: CommitLvlSerializedMa, value: CommitLevel_Display, attr, obj, **kwargs
+        self: CommitLvlSerializedMa, cld: CommitLevel_Display, attr, obj, **kwargs
     ) -> str:
-        if value is None:
+        if cld is None:
             return CommitLevel_Display.NONEXCLUSIVE.name
-        return value.name
+        return cld.name
 
     def _deserialize(
-        self: CommitLvlSerializedMa, value: str, attr, data, **kwargs
+        self: CommitLvlSerializedMa, cldStr: str, attr, data, **kwargs
     ) -> CommitLevel_Display:
         try:
-            return CommitLevel_Display[value]
+            return CommitLevel_Display[cldStr]
         except ValueError as error:
-            raise ValidationError(value) from error
-
-    # def dump_default(self: CommitLvlSerializedMa) -> CommitLevel_Display:
-    #     return CommitLevel_Display.NONEXCLUSIVE
-
-
-# CommitLvlSerializedMsg = NewType("CommitLvlSerialized", str, _CommitLvlSerialized)
+            raise ValidationError(cldStr) from error
