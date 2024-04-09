@@ -101,12 +101,11 @@ class IncidentRowMessage(BaseApiData):
     repUserIntervalReviseHistory: str = field(default="")
 
     reportingUserIntervalRowNum: int = field(default=0)
-    # reportingUserSex: Sex = SexSerializedMa(Sex, default=Sex.UNKNOWN)
     reportingUserSex: Sex = field(default=Sex.UNKNOWN, metadata={"enum": Sex})
     # a sequential user ID starting from 1 to keep privacy
-    reportingUserDisplayID: int = field(default=0, metadata=dict(required=True))
+    reportingUserDisplayID: int = field(default=1, metadata=dict(required=True))
     # how many distinct incidents has this user had with prospect
-    reportingUserIncdSeqNum: int = field(default=0, metadata=dict(required=True))
+    reportingUserIncdSeqNum: int = field(default=1, metadata=dict(required=True))
 
     Schema: ClassVar[Type[Schema]] = Schema
 

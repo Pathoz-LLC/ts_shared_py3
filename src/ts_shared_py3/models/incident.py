@@ -64,7 +64,7 @@ class Incident(BaseNdbModel):
 
     # details: reportingUser is the OTHER user
     reportingUserId = ndb.StringProperty(indexed=True)
-    reportingUserSex = ndb.IntegerProperty(indexed=False, default=0)
+    reportingUserSex = NdbSexProp(indexed=False, default=Sex.FEMALE)
     earliestOverlapDate = ndb.DateProperty(indexed=True)  # to select for new recs
 
     overlapDays = ndb.IntegerProperty(indexed=False, default=0)
@@ -86,6 +86,10 @@ class Incident(BaseNdbModel):
     @property
     def userId(self) -> str:
         return self.userKey.string_id()
+
+    @property
+    def personId(self) -> int:
+        return self.personKey.integer_id()
 
     @property
     def isInvalid(self) -> bool:  # bool
@@ -166,7 +170,7 @@ class Incident(BaseNdbModel):
         Returns:  array of Incident
 
         """
-        foundIncidents = (
+        foundIncidents: list[Incident] = (
             Incident.query(
                 Incident.trackingKey == trackingKey,
                 Incident.earliestOverlapDate > afterDate,
@@ -174,25 +178,27 @@ class Incident(BaseNdbModel):
             .order(-Incident.earliestOverlapDate)
             .fetch()
         )
+        return foundIncidents
 
-        perPersonOverlapCount = dict()
-        seenUserIDs = []
-        shortUserID = 1
-        res: list[Incident] = []
-        for incd in foundIncidents:
-            if incd.evidenceStatus != 3333:
-                if incd.reportingUserId not in seenUserIDs:
-                    seenUserIDs.append(incd.reportingUserId)
+        # perPersonOverlapCount: map[str, int] = dict()
+        # seenUserIDs: list[int] = []
+        # shortUserID: int = 1
+        # res: list[Incident] = []
+        # for incd in foundIncidents:
+        #     if incd.evidenceStatus == 3333:
+        #         continue
+        #     if incd.reportingUserId not in seenUserIDs:
+        #         seenUserIDs.append(incd.reportingUserId)
 
-                shortUserID = seenUserIDs.index(incd.reportingUserId) + 1
+        #     shortUserID = seenUserIDs.index(incd.reportingUserId) + 1
 
-                incdSeqNum = perPersonOverlapCount.setdefault(incd.reportingUserId, 1)
-                perPersonOverlapCount[incd.reportingUserId] = incdSeqNum + 1
+        #     incdSeqNum = perPersonOverlapCount.setdefault(incd.reportingUserId, 1)
+        #     perPersonOverlapCount[incd.reportingUserId] = incdSeqNum + 1
 
-                incd.reportingUserDisplayID = shortUserID
-                incd.reportingUserIncdSeqNum = incdSeqNum
-                res.append(incd)
-        return res
+        #     incd.reportingUserDisplayID = shortUserID
+        #     incd.reportingUserIncdSeqNum = incdSeqNum
+        #     res.append(incd)
+        # return res
 
     @staticmethod
     def loadByUserId(userId: str, persId: int = 0) -> list[Incident]:
@@ -244,16 +250,48 @@ class Incident(BaseNdbModel):
         )
 
     @staticmethod
-    def msgFromList(
-        persId: int, foundIncidents: list[Incident]
-    ) -> IncidentDetailsMessage:
+    def msgFromList(foundIncidents: list[Incident]) -> IncidentDetailsMessage:
+        """
+        Args:
+            persId:
+            foundIncidents:  (for a single user)
+
+            but potentially across multiple other users
+
+            we want to MASK actual user ID's & sequence the overlaps
+            from other individual users;  but we should keep
+        """
+        # setOwnerUserIds: set[str] = set([ic.userId for ic in foundIncidents])
+        assert len(foundIncidents) > 0, "no incidents found"
+        persId: int = foundIncidents[0].personId
+        setReporterUserIds: set[str] = set(
+            [ic.reportingUserId for ic in foundIncidents]
+        )
+
+        setReporterUserIds: list[str] = list(setReporterUserIds)
+
         irmList: list[IncidentRowMessage] = [ic.toMsg for ic in foundIncidents]
-        setUserIds: set[str] = set([ic.userKey.string_id() for ic in foundIncidents])
+        perPersonOverlapCount: map[str, int] = dict()
+        shortUserID: int = 0
+        for incdRowMsg in irmList:
+            # if incdRowMsg.evidenceStatus == 3333:
+            #     continue
+
+            shortUserID = setReporterUserIds.index(incdRowMsg.reportingUserId) + 1
+
+            incdSeqNum: int = perPersonOverlapCount.setdefault(
+                incdRowMsg.reportingUserId, 0
+            )
+            perPersonOverlapCount[incdRowMsg.reportingUserId] = incdSeqNum + 1
+
+            incdRowMsg.reportingUserDisplayID = shortUserID
+            incdRowMsg.reportingUserIncdSeqNum = incdSeqNum
+
         return IncidentDetailsMessage(
             persId=persId,
             items=irmList,
             asOfDate=date.today(),
-            userOverlapCount=len(setUserIds),
+            userOverlapCount=len(setReporterUserIds),
         )
 
     @property
@@ -272,15 +310,14 @@ class Incident(BaseNdbModel):
             earliestOverlapDate=self.earliestOverlapDate,
             addDateTime=self.addDateTime,
             modDateTime=self.modDateTime,
-            userInterval=self.userInterval.toMsg(),
-            reportingUserInterval=self.reportingUserInterval.toMsg(),
+            userInterval=self.userInterval.toMsg(self.personId),
+            reportingUserInterval=self.reportingUserInterval.toMsg(self.personId),
             overlapDays=self.overlapDays,
-            reportingUserSex=Sex.MALE,
+            reportingUserSex=self.reportingUserSex,
             reportingUserId=self.reportingUserId,
             evidenceStatus=self.evidenceStatus,
             incidentId=self.key.integer_id(),
         )
-        # irm.reportingUserSex = self.reportingUserSex
         irm.evidenceStatus = self.evidenceStatus
         irm.userIntervalRowNum = self.userIntervalRowNum
         irm.reportingUserIntervalRowNum = self.reportingUserIntervalRowNum

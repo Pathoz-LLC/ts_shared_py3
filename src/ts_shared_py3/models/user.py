@@ -516,7 +516,7 @@ class DbUser(WaUser):  # BaseUserExpando
             u.handle = "testUserOnly"
             u.expiresOn = datetime.now() + timedelta(weeks=4)
             u.pushNotifyAuthorized = True
-            u.sex = Sex.UNKNOWN
+            u.sex = Sex.FEMALE
             u.put()
         # cls.token_model.create(uid, "bearer", token)
         return u

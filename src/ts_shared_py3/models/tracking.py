@@ -92,7 +92,7 @@ class Tracking(BaseNdbModel):
         ]
 
     @property
-    def userKey(self: Tracking) -> str:
+    def userKey(self: Tracking) -> ndb.Key:
         return self.key.parent()
 
     @property
@@ -100,7 +100,7 @@ class Tracking(BaseNdbModel):
         return self.userKey.string_id()
 
     @property
-    def personKey(self: Tracking) -> str:
+    def personKey(self: Tracking) -> ndb.Key:
         # pk = self.key.integer_id()
         # assert pk == self.personId, "personId must match key"
         return ndb.Key("Person", self.personId)
@@ -117,7 +117,7 @@ class Tracking(BaseNdbModel):
         """
         if self.intervalCount < 1:
             return DISTANT_FUTURE_DATE
-        earliestDate = self.intervals[-1].startDate
+        earliestDate: date = self.intervals[-1].startDate
         assert isinstance(earliestDate, date), "must be date"
         return earliestDate
 
@@ -135,7 +135,7 @@ class Tracking(BaseNdbModel):
             latestDate = date.today()
         else:
             # endDate of most RECENT "together" phase
-            latestDate = recentInterval.endDate  # default for safety
+            latestDate: date = recentInterval.endDate  # default for safety
             for i in range(1, self.intervalCount):
                 if self.intervals[i].isTogetherPhase:
                     latestDate = self.intervals[i].endDate
