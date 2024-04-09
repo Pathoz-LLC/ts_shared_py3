@@ -253,7 +253,7 @@ class DbUser(WaUser):  # BaseUserExpando
     @staticmethod
     def updateFromProfileMsg(msg: UserProfileMsg) -> DbUser:
         # user edited profile
-        user = DbUser.loadByEmailOrId(firAuthUserId=msg.userId)
+        user: DbUser = DbUser.loadByEmailOrId(firAuthUserId=msg.userId)
         if user is None:
             return DbUser()
 
@@ -283,7 +283,7 @@ class DbUser(WaUser):  # BaseUserExpando
         # refresh token & store login date
 
         # authToken = DbUser.token_model.create(userId, "auth", jwt)
-        user = ndb.Key(DbUser, userId).get()
+        user: DbUser = ndb.Key(DbUser, userId).get()
         if user is None:
             logging.error(
                 f"User {userId} is not on this server. Perhaps dev-server or Prod?"
@@ -501,20 +501,21 @@ class DbUser(WaUser):  # BaseUserExpando
 
     @classmethod
     def makeNewAuthorizedUser(cls: DbUser, uid: str, email: str, token: str) -> DbUser:
-        uKey = ndb.Key(DbUser, uid)
-        u = uKey.get()
+        uKey: ndb.Key = ndb.Key(DbUser, uid)
+        u: DbUser = uKey.get()
         # print("user:{0}".format(u))
         if u == None:
             u = DbUser()
             u.key = uKey
             u.email = email
             u.dob = date.today()
+            # these props dont exist on the model but it's expando
             u.authToken = token
             u.refreshToken = token
+            u.expiresOn = datetime.now() + timedelta(weeks=4)
             u.first = "gen by"
             u.last = "admin console"
             u.handle = "testUserOnly"
-            u.expiresOn = datetime.now() + timedelta(weeks=4)
             u.pushNotifyAuthorized = True
             u.sex = Sex.FEMALE
             u.put()
