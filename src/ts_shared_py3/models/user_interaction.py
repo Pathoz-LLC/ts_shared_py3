@@ -11,7 +11,7 @@ class UserInteractions(ndb.Model):
     Key is myUserID-->otherUserID
     """
 
-    otherUserID = ndb.StringProperty(default=0, indexed=True)
+    otherUserID = ndb.StringProperty(default="", indexed=True)
     isBlocked = ndb.BooleanProperty(indexed=False, default=False)
     reportAsSpam = ndb.BooleanProperty(indexed=True, default=False)
     isVerifiedSpam = ndb.BooleanProperty(indexed=False, default=False)
