@@ -21,7 +21,10 @@ class ScoreHistory(ndb.Model):
 
     # userID = ndb.StringProperty(default=0, indexed=False)
     # prospectID = ndb.IntegerProperty(indexed=False, default=False)
-    recent_scores = ndb.LocalStructuredProperty(RescoreEntry, indexed=False, default=[])
+    recent_scores = ndb.LocalStructuredProperty(
+        RescoreEntry,
+        repeated=True,
+    )
 
     def _append_and_truncate(self, rescore_entry: RescoreEntry):
         self.recent_scores.append(rescore_entry)
@@ -34,7 +37,7 @@ class ScoreHistory(ndb.Model):
         prospectID: int,
     ) -> ScoreHistory:
         #
-        sh_key = ndb.Key("Person", prospectID, parent=ndb.Key("User", userID))
+        sh_key = ndb.Key(__class__.__name__, userID, "Person", prospectID)
         score_history: ScoreHistory = sh_key.get()
         if score_history is None:
             score_history = ScoreHistory(key=sh_key, recent_scores=[])
