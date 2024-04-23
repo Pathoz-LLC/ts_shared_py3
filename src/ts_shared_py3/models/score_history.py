@@ -26,6 +26,14 @@ class ScoreHistory(ndb.Model):
         repeated=True,
     )
 
+    @property
+    def user_score(self) -> float:
+        return self.recent_scores[-1].user_score if self.recent_scores else 0.5
+
+    @property
+    def community_score(self) -> float:
+        return self.recent_scores[-1].community_score if self.recent_scores else 0.5
+
     def _append_and_truncate(self, rescore_entry: RescoreEntry):
         self.recent_scores.append(rescore_entry)
         if len(self.recent_scores) > 20:
@@ -67,14 +75,23 @@ class ScoreHistory(ndb.Model):
         userID: str, prospectID: int, past_dttm: datetime = None
     ) -> DeltaSince:
         # default to 60 days ago
+        score_history = ScoreHistory._get_or_create(userID, prospectID)
+        return score_history.get_score_deltas(past_dttm)
+
+    def get_score_deltas(self, past_dttm: datetime = None) -> DeltaSince:
+        # default to 60 days ago
         if past_dttm is None:
             today = datetime.now()
             past_dttm = today - timedelta(days=60)
 
-        score_history = ScoreHistory._get_or_create(userID, prospectID)
-        recent_scores = [
-            rs for rs in score_history.recent_scores if rs.score_dttm > past_dttm
-        ]
+        # prior_scores_count: list[int] = len(self.recent_scores)
+        # if prior_scores_count < 2:
+        #     return DeltaSince(past_dttm, 0, 0)
+
+        recent_scores = [rs for rs in self.recent_scores if rs.score_dttm > past_dttm]
+        if len(recent_scores) < 2:
+            return DeltaSince(past_dttm, 0, 0)
+
         deflt_score = 0.5
         old_user_score = recent_scores[0].user_score if recent_scores else deflt_score
         new_user_score = recent_scores[-1].user_score if recent_scores else deflt_score

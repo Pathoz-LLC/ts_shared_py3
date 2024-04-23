@@ -13,7 +13,8 @@ from ..enums.createAndMonitor import (
 from ..enums.remind_freq import NdbRemindProp, RemindFreq, ReminderFreqSerializedMa
 from ..enums.sex import Sex, NdbSexProp
 from .baseNdb_model import BaseNdbModel
-from .values_beh_cat import UserAnswerStats
+
+# from .values_beh_cat import UserAnswerStats
 
 
 # might set the 1st 5 vals of appUnique (mobile phone) as
@@ -23,6 +24,7 @@ from ..enums.commitLevel import CommitLevel_Display, NdbCommitLvlProp
 from ..api_data_classes.person import PersonFullLocalRowDc, PersonLocalRowDc
 from .person_keys import PersonKeys, KeyTypeEnum, normToIntlPhone
 from .user import DbUser
+from .score_history import ScoreHistory, DeltaSince
 
 # advanced filter building and usage
 # field = "city"
@@ -123,7 +125,10 @@ class Person(BaseNdbModel):
     #     return person
 
     def asFullLocDc(
-        self: Person, perId: int, personLocalRec: PersonLocal
+        self: Person,
+        perId: int,
+        personLocalRec: PersonLocal,
+        scoreHistory: ScoreHistory,
     ) -> PersonFullLocalRowDc:
         selfProps = self.to_dict()
         selfProps["id"] = perId
@@ -134,9 +139,15 @@ class Person(BaseNdbModel):
         pf.nickname = personLocalRec.nickname
         pf.commitLevel = personLocalRec.commitLevel
         pf.reminderFrequency = personLocalRec.reminderFrequency
-        pf.tsConfidenceScore = personLocalRec.recentTsConfidenceScore
         pf.imagePath = personLocalRec.imagePath
         pf.monitorStatus = personLocalRec.monitorStatus
+        # pf.tsConfidenceScore = personLocalRec.recentTsConfidenceScore
+        pf.tsConfidenceScore = scoreHistory.user_score
+        pf.communityScore = scoreHistory.community_score
+        dttm_of_change_window = datetime.now() - timedelta(days=7)
+        delta_since: DeltaSince = scoreHistory.get_score_deltas(dttm_of_change_window)
+        pf.userScoreDelta = delta_since.user_delta
+        pf.communityScoreDelta = delta_since.community_delta
         return pf
 
     def add_identifier(self, value: str, keyType: KeyTypeEnum):

@@ -106,8 +106,12 @@ class PersonFullLocalRowDc(BaseApiData):
 
     nickname: str = field(default="")
     imagePath: str = field(default="")
-    tsConfidenceScore: float = field(default=50.0)
-    # overallScore: int = field(default=0, metadata=dict(required=True))
+    #
+    tsConfidenceScore: float = field(default=50.0)  # aka userScore
+    communityScore: float = field(default=50.0)
+    # recent changes to score
+    userScoreDelta: float = field(default=0)
+    communityScoreDelta: float = field(default=0)
 
     #
     Schema: ClassVar[Type[Schema]] = Schema
