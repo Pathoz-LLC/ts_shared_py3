@@ -88,22 +88,30 @@ class ScoreHistory(ndb.Model):
         # if prior_scores_count < 2:
         #     return DeltaSince(past_dttm, 0, 0)
 
-        recent_scores = [rs for rs in self.recent_scores if rs.score_dttm > past_dttm]
+        recent_scores: list[RescoreEntry] = [
+            rs for rs in self.recent_scores if rs.score_dttm > past_dttm
+        ]
         if len(recent_scores) < 2:
             return DeltaSince(past_dttm, 0, 0)
 
         deflt_score = 0.5
-        old_user_score = recent_scores[0].user_score if recent_scores else deflt_score
-        new_user_score = recent_scores[-1].user_score if recent_scores else deflt_score
-        old_community_score = (
-            recent_scores[0].community_score if recent_scores else deflt_score
+        earliest_prior_rescore: RescoreEntry = recent_scores[0]
+        prior_rescore_dttm: datetime = earliest_prior_rescore.score_dttm
+        old_user_score: float = (
+            earliest_prior_rescore.user_score if recent_scores else deflt_score
         )
-        new_community_score = (
+        new_user_score: float = (
+            recent_scores[-1].user_score if recent_scores else deflt_score
+        )
+        old_community_score: float = (
+            earliest_prior_rescore.community_score if recent_scores else deflt_score
+        )
+        new_community_score: float = (
             recent_scores[-1].community_score if recent_scores else deflt_score
         )
-        user_delta = new_user_score - old_user_score
-        community_delta = new_community_score - old_community_score
-        return DeltaSince(past_dttm, user_delta, community_delta)
+        user_delta: float = new_user_score - old_user_score
+        community_delta: float = new_community_score - old_community_score
+        return DeltaSince(prior_rescore_dttm, user_delta, community_delta)
 
 
 # rescore_entry = 55

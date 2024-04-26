@@ -13,6 +13,7 @@ from ..enums.redFlag import RedFlagType, RedFlagTypeSerializedMa
 from ..enums.remind_freq import RemindFreq, ReminderFreqSerializedMa
 from ..enums.createAndMonitor import MonitorStatus, MonitorStatusSerialized
 from ..api_data_classes.user import *
+from ..constants import EARLY_DEFAULT_DATE
 
 
 @dataclass(base_schema=DataClassBaseSchema)
@@ -78,7 +79,7 @@ class PersonFullLocalRowDc(BaseApiData):
     id: int = field()
     dob: date = field()
     addDateTime: date = field()
-
+    # all fields below MUST have defaults to be legal
     sex: Sex = field(default=Sex.NEVERSET, metadata={"enum": Sex})
 
     commitLevel: CommitLevel_Display = field(
@@ -112,6 +113,7 @@ class PersonFullLocalRowDc(BaseApiData):
     # recent changes to score
     userScoreDelta: float = field(default=0)
     communityScoreDelta: float = field(default=0)
+    priorScoreDttm: datetime = field(default=EARLY_DEFAULT_DATE)
 
     #
     Schema: ClassVar[Type[Schema]] = Schema

@@ -148,6 +148,7 @@ class Person(BaseNdbModel):
         delta_since: DeltaSince = scoreHistory.get_score_deltas(dttm_of_change_window)
         pf.userScoreDelta = delta_since.user_delta
         pf.communityScoreDelta = delta_since.community_delta
+        pf.priorScoreDttm = delta_since.dt
         return pf
 
     def add_identifier(self, value: str, keyType: KeyTypeEnum):
