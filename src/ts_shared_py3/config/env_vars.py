@@ -6,15 +6,11 @@ from enum import IntEnum, unique, auto
 
 from ..utils.singleton import Singleton
 
-# try:
-#     from ...utils.singleton import Singleton
-# except:
-#     from ....ts_shared_py3.utils.singleton import Singleton
-
 """
     reads ENV-vars and also creates OS-path for various
     config & security files
 
+    this is a public repo so no secrets should be stored here
 """
 
 _ROOT_PATH_PREFIX: str = None
@@ -97,7 +93,7 @@ class EnvVarVals(metaclass=Singleton):
 
     @property
     def APP_ID(self: EnvVarVals) -> str:
-        return os.environ.get("APP_ID", "com.pathoz.touchstone.stage")
+        return os.environ.get("APP_ID", "1:695770025165:web:c9f839379c3397c80a6d84")
 
     @property
     def DEBUG(self: EnvVarVals) -> bool:
@@ -164,14 +160,16 @@ class EnvVarVals(metaclass=Singleton):
         self.auth_domain = config["authDomain"]
         self.database_url = config["databaseURL"]
         self.storage_bucket = config["storageBucket"]
+
+        defaults below are for stage2
         """
         return {
-            "apiKey": "YOUR_API_KEY",
-            "authDomain": "YOUR_API_DOMAIN",
+            "apiKey": "_apiKey_",
+            "authDomain": "_authDomain_",
             "databaseURL": self.FIR_DB_URL,
             "projectId": self.PROJ_ID,
             "storageBucket": self.STORAGE_BUCKET_ROOT_PATH,
-            "messagingSenderId": "YOUR_MESSENGER_ID",
+            "messagingSenderId": "_messagingSenderId_",
             "appId": self.APP_ID,
             "measurementId": "YOUR_MEASUREMENT_ID",
             "serviceAccount": self.FIREBASE_ADMIN_CREDENTIAL,

@@ -1,5 +1,5 @@
 common==0.1.2
-firebase_admin==6.0.1
+firebase_admin==6.5.0
 Flask==2.2.5
 marshmallow==3.19.0
 marshmallow_dataclass==8.5.10
