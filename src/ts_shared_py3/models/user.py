@@ -288,6 +288,7 @@ class DbUser(WaUser):  # BaseUserExpando
             logging.error(
                 f"User {userId} is not on this server. Perhaps dev-server or Prod?"
             )
+            raise Exception(f"User {userId} not found in DB")
             return None, None
         bearerToken = DbUser.create_bearer_token(userId)
         user.lastLogin = datetime.now()
