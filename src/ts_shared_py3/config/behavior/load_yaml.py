@@ -13,6 +13,7 @@ Behavior level:
     recordAnEvent()
     shareEvent()
 """
+
 from __future__ import annotations
 from typing import Callable, Tuple, Dict, Any, List
 import random
@@ -609,6 +610,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
     @property
     def countsByCategory(self: BehaviorSourceSingleton) -> Dict[str, int]:
+        # return dict of beh quest counts by top level category
         if self._countsByCategory is None:
             self._countsByCategory = self._makeCategoryCountDict()
         return self._countsByCategory
@@ -693,10 +695,12 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # exclude feeling only reports by both of those codes
         # check remainder for pos/neg
         tot = sum(
-            1
-            if b.behaviorCode not in (FEELING_ONLY_CODE_POS, FEELING_ONLY_CODE_NEG)
-            and self.isPositiveByCode(b.behaviorCode) == countPositive
-            else 0
+            (
+                1
+                if b.behaviorCode not in (FEELING_ONLY_CODE_POS, FEELING_ONLY_CODE_NEG)
+                and self.isPositiveByCode(b.behaviorCode) == countPositive
+                else 0
+            )
             for b in filteredBehaviors
         )
         return tot

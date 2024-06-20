@@ -117,7 +117,11 @@ class UserValsByBehCat(ndb.Model):
         to govern whether user can get another question or not
         loaded on-demand in each vals-client & cached in dict above
         """
-        return UserAnswerStats._loadOrCreate(self.userID)
+        # return UserAnswerStats._loadOrCreate(self.userID)
+        if not hasattr(self, "_uas_cache"):
+            # Compute or set a default value for the temporary property
+            self._uas_cache = UserAnswerStats._loadOrCreate(self.userID)
+        return self._uas_cache
 
     @property
     def newestChangeDt(self: UserValsByBehCat) -> date:
@@ -165,14 +169,17 @@ class UserValsByBehCat(ndb.Model):
         """update both self & UserAnswerStats from SaveValueAssessPayload
         valRateMsg is instance of ValuesClient()
         """
-        isRevisionToExistingAnswer = valRateMsg.origConcernVote > 0  # not == -1
+        # isRevisionToExistingAnswer = (
+        #     valRateMsg.isEditDontBumpCount
+        # )  # not -1 or 0;  or valRateMsg.origConcernVote > 0
         persIDs = [f.personID for f in valRateMsg.frequencies]
+        print(f"_bumpCountAndDateFor {valRateMsg.behCode} {persIDs}")
         self.userCountStats._bumpCountAndDateFor(
             valRateMsg.categoryCode,
             valRateMsg.behCode,
             persIDs,
             valRateMsg.decrementQuota,
-            isRevisionToExistingAnswer,
+            valRateMsg.isEditDontBumpCount,
         )
         idx = self._findOrAppendIdxForBehCode(valRateMsg.behCode)
         self.allBehaviors[idx]._updateVals(valRateMsg)
@@ -295,6 +302,9 @@ class CategoryCount(ndb.Model):
         """
         if not isEditDontBump:
             self.answerCount += 1
+        print(
+            f"""updateFromNewAnswer {behCode} {personIDs} {isEditDontBump} {self.answerCount}"""
+        )
         self.lastAnswerDt = date.today()
 
         for persID in personIDs:
@@ -363,7 +373,7 @@ class UserAnswerStats(ndb.Model):
         decrementQuota: bool = False,
         isEditDontBump: bool = False,
     ) -> None:
-        idx = self._findOrAppendIdxFor(category)
+        idx: int = self._findOrAppendIdxFor(category)
         self.allCategoryCounts[idx].updateFromNewAnswer(
             behCode, personIDs, isEditDontBump
         )
@@ -387,6 +397,7 @@ class UserAnswerStats(ndb.Model):
         return len(self.allCategoryCounts) - 1
 
     def save(self) -> None:
+        print(f"UserAnswerStats.save() {self.key}")
         self.put()
 
     @property
@@ -430,8 +441,9 @@ class UserAnswerStats(ndb.Model):
 
     @staticmethod
     def _loadOrCreate(userID: str) -> UserAnswerStats:
+        # todo  make non private
         userKey = UserAnswerStats._makeKeyFrom(userID)
-        rec = userKey.get()
+        rec: UserAnswerStats = userKey.get()
         if rec is None:
             rec = UserAnswerStats._emptyNewRec(userID)
         return rec

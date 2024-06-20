@@ -1,7 +1,7 @@
 from __future__ import annotations
 import logging
 import time
-from typing import Tuple
+from typing import Tuple, Dict, Any
 from datetime import date, datetime, timedelta
 import secrets
 import logging
@@ -183,7 +183,7 @@ class DbUser(WaUser):  # BaseUserExpando
 
     @classmethod
     def createFromProfileMsg(
-        cls, msg: UserProfileMsg, firUserAsDict
+        cls, msg: UserProfileMsg, firUserAsDict: Dict
     ) -> Tuple[DbUser, str]:
         # sign-up (create account)
 
@@ -246,7 +246,7 @@ class DbUser(WaUser):  # BaseUserExpando
         # user.phone = firUserAsDict.get("phoneNumber", loginMsg.phone)
         # user.photoUrl = firUserAsDict.get("photoURL", loginMsg.imageURL)
 
-        user.key = ndb.Key(cls, msg.userId)
+        user.key = ndb.Key(DbUser, msg.userId)
         user.put()
         return user, bearerToken
 
