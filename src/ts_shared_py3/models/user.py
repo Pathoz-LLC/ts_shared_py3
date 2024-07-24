@@ -267,8 +267,8 @@ class DbUser(WaUser):  # BaseUserExpando
         user.dob = msg.dob
         user.sex = msg.sex
         user.city = msg.city
+        user.zip = msg.zip
         # user.state = msg.state
-        # user.zip = msg.zip
         # user.pushNotifyDeviceType = msg.pushNotifyDeviceType
 
         # user.latitude = msg.latitude
