@@ -27,7 +27,7 @@ class RemindFreq(IntEnum):
     TWICE_WEEKLY = 3
     DAILY = 4
     TWICE_DAILY = 5
-    HOURLY = 6
+    TWICE_MONTHLY = 6
 
     @property
     def toDisplayVal(self) -> str:
