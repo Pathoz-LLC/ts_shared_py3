@@ -256,12 +256,12 @@ class PersonLocal(BaseNdbModel):
     @property
     def userKey(self):
         # return user key
-        return ndb.Key("DbUser", self.userId)
+        return ndb.Key(DbUser, self.userId)
 
     @property
     def personKey(self):
         # return prospect Key
-        return ndb.Key("Person", self.personId)
+        return ndb.Key(Person, self.personId)
 
     def getRelatedTrackingRec(self):
         from .tracking import Tracking
@@ -319,13 +319,13 @@ class PersonLocal(BaseNdbModel):
         return pl.key
 
     @staticmethod
-    def appendRequiredToMsg(msg: PersonRowDc) -> None:
+    def appendRequiredToMsg(msg: PersonLocalRowDc) -> None:
         """provides default vals for messages"""
         # if msg.is_initialized():
         #     return
         # msg.nickname = msg.get_assigned_value("nickname") or "notfound"
         # msg.co = msg.get_assigned_value("devotionLevel") or "na"
-        pass
+        raise NotImplementedError()
 
     @staticmethod
     def loadByUserKey(userKey: ndb.Key, asnc: bool = False):

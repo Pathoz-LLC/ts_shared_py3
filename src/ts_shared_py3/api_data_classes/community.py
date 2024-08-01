@@ -346,6 +346,17 @@ class CommunityFeedEvent(BaseApiData):
         return cfe
 
 
+class CommFeedEncoder(json.JSONEncoder):
+    """convert a CommunityFeedEvent instance to a dict for JSON"""
+
+    def default(self, cfe):
+        # return serializable dict
+        if isinstance(cfe, CommunityFeedEvent):
+            return cfe.toDict
+        else:
+            super(CommFeedEncoder, self).default(cfe)
+
+
 class CommFeedDecoder(json.JSONDecoder):
     """convert Json str into CommunityFeedEvent & return"""
 

@@ -177,10 +177,6 @@ class DbUser(WaUser):  # BaseUserExpando
     # 0==IOS;  1==Android, 2==Web
     pushNotifyDeviceType = ndb.IntegerProperty(indexed=False, default=0)
 
-    @property
-    def id(self: DbUser) -> str:
-        return self.get_id()
-
     @classmethod
     def createFromProfileMsg(
         cls, msg: UserProfileMsg, firUserAsDict: Dict
@@ -361,11 +357,15 @@ class DbUser(WaUser):  # BaseUserExpando
         return self.key.string_id()
 
     @property
+    def id(self: DbUser) -> str:
+        return self.user_id
+
+    @property
     def id_(self: DbUser):  # added 04/08 by DG;
         """firebase auth uid & User.id_
         are equivalent and both strings
         """
-        return self.key.string_id()
+        return self.user_id
 
     @property
     def name_(self: DbUser) -> str:  # added 04/30 by DG

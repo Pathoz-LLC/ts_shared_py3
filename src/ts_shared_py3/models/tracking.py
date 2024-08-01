@@ -1,10 +1,10 @@
 from __future__ import annotations
+from typing import Optional, Iterable  # List
 import os
 import logging
 from typing import List
 from datetime import datetime, date, timedelta
 import google.cloud.ndb as ndb
-from typing import Optional, Iterable  # List
 
 #
 from ..scoring.commBehImpactConsenus import CommImpactConsensus
@@ -203,7 +203,7 @@ class Tracking(BaseNdbModel):
 
     @staticmethod
     def makePersUserKey(userId: str, personId: int) -> ndb.Key:
-        return ndb.Key("Tracking", personId, parent=ndb.Key("DbUser", userId))
+        return ndb.Key(Tracking, personId, parent=ndb.Key(DbUser, userId))
 
     @staticmethod
     def loadByKeys(userKey: ndb.Key, personKey: ndb.Key) -> Tracking:
@@ -271,11 +271,17 @@ class Tracking(BaseNdbModel):
         cl: CommitLevel_Display = CommitLevel_Display.EXCLUSIVE_MA,
     ) -> Tracking:
         """
+        this is ONLY for testing and mocking;  not live code
         not yet using otherUserId to shortcut searching below
         """
         # to clean up data;  disable after 5/1/24
-        Tracking._setAllPersonId()
+        # Tracking._setAllPersonId()
         #
+        from .person import PersonLocal
+        from ..api_data_classes.person import PersonFullLocalRowDc
+        from ts_shared_py3.enums.remind_freq import RemindFreq
+        from ts_shared_py3.enums.createAndMonitor import MonitorStatus
+
         allTrackForPers: List[Tracking] = (
             Tracking.query().filter(Tracking.personId == persId).fetch()
         )
@@ -292,9 +298,24 @@ class Tracking(BaseNdbModel):
             otherUsers = [u for u in otherUsers if u.id != notThisUserId]
             log.info("Cnt OtherUsers: %s", len(otherUsers))
 
-            firstNewUser = otherUsers[0]
-            newTrack = Tracking.loadOrCreate(
+            firstNewUser: DbUser = otherUsers[0]
+            newTrack: Tracking = Tracking.loadOrCreate(
                 firstNewUser.id, persId, startDt=startDt, cl=cl
+            )
+            # PersonLocal must exist for push notifications to work
+            pflr = PersonFullLocalRowDc(
+                id=persId,
+                # dob=date.today(),
+                # addDateTime=date.today(),
+                nickname="test-{0}".format(persId),
+                commitLevel=CommitLevel_Display.EXCLUSIVE_MA,
+                imagePath="test_image_path",
+                monitorStatus=MonitorStatus.ACTIVE,
+                reminderFrequency=RemindFreq.NEVER,
+                recentTsConfidenceScore=0.72,
+            )
+            loc_pers = PersonLocal.createAndStore(
+                firstNewUser.key, ndb.Key("Person", persId), pflr
             )
             log.info("Created new Track w %s intervals", newTrack.intervalCount)
             return newTrack
@@ -344,8 +365,8 @@ class Tracking(BaseNdbModel):
         set_userIDs = set(userIDs)
         qAllRecs: List[Incident] = Incident.query().fetch()
         for incdtRec in qAllRecs:
-            # if deleteAll or indRec.userId in set_userIDs:
-            if True:
+            if deleteAll or incdtRec.userId in set_userIDs:
+                # if True:
                 incdtRec.key.delete()
 
         # print(self.key)

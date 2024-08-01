@@ -442,7 +442,7 @@ class BehaviorSourceSingleton(metaclass=Singleton):
             len(self.topLevelCategoryCodes) > 3
         ), "top level categories missing (%s found)" % (len(self.topLevelCategoryCodes))
 
-        self.graph = self.buildSortedGraph(categoriesDict)
+        self.graph: List[Tuple[str, List[str]]] = self.buildSortedGraph(categoriesDict)
         # NOTE:  Show all and Feelings are not getting augmentation from buildSortedGraph
         self.appendShowAllCategories()
 
@@ -505,12 +505,12 @@ class BehaviorSourceSingleton(metaclass=Singleton):
         # every behavior or subCat has a parent
         # we need a sorted list of every parent's child  codes
         # tempGraphDict first contains tuples & then converted to strings after sorting
-        parentToChildrenDict: Dict[str, List[Tuple(str, int)]] = dict()
+        parentToChildrenDict: Dict[str, List[Tuple[str, int]]] = dict()
         beh: BehCatNode = None
         for cd, beh in self.masterDict.items():
             # only need to process subCats & behaviors (parentCode filters out topLevelCats)
             if beh.parentCode not in ("", "root"):
-                lstForTier2: List[Tuple(str, int)] = parentToChildrenDict.setdefault(
+                lstForTier2: List[Tuple[str, int]] = parentToChildrenDict.setdefault(
                     beh.parentCode, []
                 )
                 lstForTier2.append((cd, beh.sort))
@@ -540,14 +540,13 @@ class BehaviorSourceSingleton(metaclass=Singleton):
 
         # now sort all sublists & build final graph
         # graph is a list of tuples where t.0 == catOrSubCatCode & t.1 == [behCodes]
-        graph: List[Tuple(str, int)] = []
+        graph: List[Tuple[str, List[str]]] = []
         for catCode, lstOfCodeSortTup in parentToChildrenDict.items():
             behCodeOnlyList: list[str] = self.removeDupChildCodesThenSort(
                 lstOfCodeSortTup
             )
             # NOTE:  not updating tempGraphDict
             graph.append((catCode, behCodeOnlyList))
-
         return graph
 
     def removeDupChildCodesThenSort(

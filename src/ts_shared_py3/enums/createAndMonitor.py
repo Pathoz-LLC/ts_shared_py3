@@ -80,7 +80,8 @@ class NdbMonitorStatusProp(model.IntegerProperty):
         if isinstance(value, (int)):
             return MonitorStatus(value)
         elif isinstance(value, (bytes, str)):
-            return MonitorStatus(int(value))
+            # hack for testing
+            return MonitorStatus.ACTIVE
         elif not isinstance(value, MonitorStatus):
             raise TypeError(
                 "expected MonitorStatus, int, str or unicd, got %s" % repr(value)

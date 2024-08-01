@@ -64,17 +64,20 @@ class PushNotifyTasks:
     def constructAndSendNotification(
         dbUserOrID: Union[str, DbUser], notifyType: NotifyType, dataVals: Dict
     ):
-        """the main push method"""
+        """the main push method
+
+        a new "custom" key will be added to dataVals below
+        """
         try:
             if isinstance(dbUserOrID, str):
-                dBUser = _loadUser(dbUserOrID)
+                dBUser: DbUser = _loadUser(dbUserOrID)
             else:
                 assert isinstance(dbUserOrID, DbUser), "wrong arg type {0}".format(
                     type(dbUserOrID)
                 )
                 dBUser = dbUserOrID
-            userID = dBUser.user_id
-            userVals = _loadUserVals(dBUser)  # returns a UserPushConfig
+            userID: str = dBUser.user_id
+            userVals: UserPushConfig = _loadUserVals(dBUser)  # returns a UserPushConfig
         except UserNotFoundErr:  # handle UserNotFound exception
             # TODO: log an error
             # print("Err: UserNotFound: {0} might be missing or nil push token".format(userID))
@@ -101,7 +104,7 @@ class PushNotifyTasks:
         # print(customPayload)
 
         # _makePushPayload returns messaging.Message
-        pushMsg = _makePushPayload(
+        pushMsg: Message = _makePushPayload(
             notifyType, userVals.token, userVals.isIOS, customPayload
         )
 
@@ -164,15 +167,17 @@ def _loadUser(userID: str) -> DbUser:
 
 
 def _loadUserVals(u: DbUser) -> UserPushConfig:
-    if u == None:
+    if u is None:
         raise UserNotFoundErr
-    elif u.pushNotifyRegToken in ["", None]:
+    elif u.pushNotifyRegToken in ["", None] or len(u.pushNotifyRegToken) < 5:
         raise MissingReqFieldErr
 
     return UserPushConfig(u.user_id, u.pushNotifyRegToken, u.isIOS)
 
 
-def _makePushPayload(notifyType, token, isIOS, dataVals):
+def _makePushPayload(
+    notifyType: NotifyType, token: str, isIOS: bool, dataVals: map
+) -> Message:
     """ """
     assert isinstance(notifyType, NotifyType), "Wrong arg passed"
     if isIOS:
@@ -182,7 +187,10 @@ def _makePushPayload(notifyType, token, isIOS, dataVals):
 
 
 def _makeIOSPayload(notifyType: NotifyType, token: str, fullPayload: Dict) -> Message:
-    """construct custom APNS msg"""
+    """construct custom APNS msg
+
+    keep in mind that all dynamic vals in fullPayload are in the 'custom' key
+    """
 
     customBody = _makeCustomBody(notifyType, fullPayload)
 
@@ -223,7 +231,7 @@ def _makeAndroidPayload(
     return Message(android=config, token=token)  # , topic=notifyType.topic
 
 
-def _validateRequiredVals(notifyType, customPayload) -> None:
+def _validateRequiredVals(notifyType: NotifyType, customPayload: map) -> None:
     """only in place for testing
     disable at call point after all push notifications verified
     """
@@ -250,12 +258,12 @@ def _makeCustomBody(notifyType: NotifyType, fullPayload: Dict) -> str:
     if notifyType.bodyIsConstant:
         return bodyTempl
 
-    customDict = fullPayload.get("custom")
+    customDict: map = fullPayload.get("custom")
     assert isinstance(customDict, dict), "oops"
 
     tmplVal = "_"
     if notifyType.bodyIncludesProspectName:
-        personLocal = _lookupProspectLocal(customDict)
+        personLocal: PersonLocal = _lookupProspectLocal(customDict)
         tmplVal = personLocal.nickname
         if notifyType == NotifyType.CHAT_MSG_RECEIVED:
             # display some bs user ID until I can look it up from the incident
@@ -266,8 +274,10 @@ def _makeCustomBody(notifyType: NotifyType, fullPayload: Dict) -> str:
 
 
 def _lookupProspectLocal(customDict) -> PersonLocal:
-    personID = customDict.get("personID")
-    userID = customDict.get("userID")
+    personID: int = int(customDict.get("personID"))
+    userID: str = customDict.get("userID")
+    # assert isinstance(personID, int), "oops {0}".format(customDict)
+    assert isinstance(userID, str), "oops {0}".format(customDict)
     userKey = ndb.Key(DbUser, userID)
     return PersonLocal.getById(userKey, personID)
 
