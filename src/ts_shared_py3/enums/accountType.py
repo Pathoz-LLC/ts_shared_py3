@@ -20,8 +20,14 @@ class AccountType(IntEnum):
     def __equ__(self, other):
         return self.value == other.value or self.value == other
 
+    @property
+    def surveyQuestionsPerDay(self) -> int:
+        if self.value < 1:
+            return 5
+        return 5000
+
     @staticmethod
-    def fromProdID(id):
+    def fromProdID(id) -> AccountType:
         if id == "com.pathoz.touchstone.sub.gold":
             return AccountType.PRO
 
@@ -32,11 +38,11 @@ class AccountType(IntEnum):
             return AccountType.FREE
 
     @property
-    def shouldPushNotifyIncidents(self):
+    def shouldPushNotifyIncidents(self) -> bool:
         return self == AccountType.PREMIUM
 
     @staticmethod
-    def fromString(val):
+    def fromString(val: str) -> AccountType:
         # expect val to be int as str
         return AccountType(int(val))
         # val = val.lower()
@@ -55,16 +61,18 @@ class AccountType(IntEnum):
 
     @property
     def toDisplayVal(self):
-        if self == 0:
+        if self.value == 0:
             return "Free"
-        elif self == 1:
+        elif self.value == 1:
             return "Gold"
-        elif self == 2:
+        elif self.value == 2:
             return "Diamond"
-        elif self == 3:
+        elif self.value == 3:
             return "Moderator"
-        elif self == 4:
+        elif self.value == 4:
             return "Admin"
+        elif self.value == 5:
+            return "God"
         else:
             return "Free"
 

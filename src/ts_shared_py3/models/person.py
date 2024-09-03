@@ -345,6 +345,7 @@ class PersonLocal(BaseNdbModel):
     @staticmethod
     def getById(userKey: ndb.Key, personId: int) -> PersonLocal:
         """ """
+        personId = int(personId)
         plKey = PersonLocal._makeKey(userKey.string_id(), personId)
         return plKey.get()
 
