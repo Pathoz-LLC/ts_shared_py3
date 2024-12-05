@@ -312,7 +312,7 @@ class Tracking(BaseNdbModel):
                 imagePath="test_image_path",
                 monitorStatus=MonitorStatus.ACTIVE,
                 reminderFrequency=RemindFreq.NEVER,
-                recentTsConfidenceScore=0.72,
+                tsConfidenceScore=0.72,
             )
             loc_pers = PersonLocal.createAndStore(
                 firstNewUser.key, ndb.Key("Person", persId), pflr
