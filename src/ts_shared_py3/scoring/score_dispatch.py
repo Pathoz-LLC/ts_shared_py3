@@ -29,7 +29,7 @@ class ScoreDispatchHelper(object):
     @classmethod
     def _dispatchScoreTask(cls: Type, userId: str, prospectId: int, dtTmEta: datetime):
         taskName = "rescore-{0}-{1}".format(userId, prospectId)
-        scoreSvcOrRelUrl = LOCAL_PUBLIC_URL_SCORING if IS_RUNNING_LOCAL else "api"
+        scoreSvcOrRelUrl = LOCAL_PUBLIC_URL_SCORING if IS_RUNNING_LOCAL else ""
         url = scoreSvcOrRelUrl + "/scoring/recalc/{0}/{1}".format(userId, prospectId)
         do_background_work_get(url, GAEQ_FOR_SCORING, None, taskName)
 

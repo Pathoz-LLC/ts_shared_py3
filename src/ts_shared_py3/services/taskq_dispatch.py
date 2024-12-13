@@ -51,7 +51,7 @@ def do_background_work(
 
 def do_background_work_get(
     handlerUri: str,
-    queueName: str = "default",
+    queueName: str = "default",  # GAEQ_FOR_SCORING,
     in_seconds: int = None,
     taskName: str = None,
 ):
@@ -172,9 +172,9 @@ def _create_task_get(
 ):
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
-    taskRequest: Union[
-        tasks_v2.AppEngineHttpRequest, tasks_v2.HttpRequest
-    ] = _createTaskPayload(handlerUri, "", taskName)
+    taskRequest: Union[tasks_v2.AppEngineHttpRequest, tasks_v2.HttpRequest] = (
+        _createTaskPayload(handlerUri, "", taskName)
+    )
     taskRequest.http_method = "GET"
     taskRequest.body = None
     taskRequest.headers = None
@@ -190,7 +190,7 @@ def _create_task_get(
         # task.schedule_time = timestamp
 
     # send task from here:
-    parent = _getQueuePath(queue)
+    parent: str = _getQueuePath(queue)
     t: Task = None
     if IS_RUNNING_LOCAL:
         t = tasks_v2.Task(http_request=taskRequest)
@@ -201,7 +201,7 @@ def _create_task_get(
         parent=parent,
         task=t,
     )
-    queueAck = _getTaskClient().create_task(request=taskRequest)  #
+    queueAck = _getTaskClient().create_task(request=taskRequest)
     logging.info("Created task {} --".format(queueAck.name))
     logging.info(queueAck)
 
