@@ -27,10 +27,10 @@ else:
 # > ngrok start tsapi tsscoring
 # copy url below
 LOCAL_PUBLIC_URL_DEFAULT = (
-    "https://bcdd-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://16a4-136-60-23-137.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 LOCAL_PUBLIC_URL_SCORING = (
-    "https://0bb0-72-182-48-15.ngrok-free.app" if IS_RUNNING_LOCAL else None
+    "https://11ba-136-60-23-137.ngrok-free.app" if IS_RUNNING_LOCAL else None
 )
 
 # usage:
@@ -62,6 +62,7 @@ IMPACT_WEIGHT_DECIMALS = 4
 FINAL_SCORE_DECIMALS = 3  # row scores
 
 COMMIT_CHNG_CODE_CONST = "commitLevelChange"
+INCIDENT_CODE_CONST = "cheatedOnMeWhenTempted"
 
 # FW == FinalWindow
 # prospect scores derived from FW plus events from INCLUDE_DAYS_PRIOR_START_FW

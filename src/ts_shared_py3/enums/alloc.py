@@ -1,4 +1,6 @@
 from __future__ import annotations
+from typing import List, Union
+
 from enum import IntEnum, unique
 from math import floor, log
 
@@ -29,9 +31,11 @@ MAX_REAL_ALLOC_INT = 32
 @unique
 class AllocType(IntEnum):
     """
-    any given day or bucket can contain a mix of scores from
+    progresses from least to most severe
+    any given window (day or bucket) can contain a mix of scores from
     the following record types
     the value for each type is a unique bitCode
+    each BCR in the window holds the sum of those bits
     """
 
     PRESCORE = 0  # aka NO ALLOCATION
@@ -43,15 +47,15 @@ class AllocType(IntEnum):
     BREAKUP = 16
     INCIDENT = 32
 
-    def __str__(self: AllocType):
+    def __str__(self: AllocType) -> str:
         return "{0}".format(self.name)
 
     @staticmethod
-    def maxAllocWeightType(groupBitSum: int):
+    def maxAllocWeightType(groupBitSum: int) -> AllocType:
         return _deriveHighestAlloc(groupBitSum)
 
     @staticmethod
-    def maxAllocWeightInt(groupBitSum: int):
+    def maxAllocWeightInt(groupBitSum: int) -> int:
         return AllocType.maxAllocWeightType(groupBitSum).value
 
 
@@ -65,14 +69,19 @@ def _deriveHighestAlloc(someInt: int) -> AllocType:
     if someInt < 1:
         return AllocType.PRESCORE
 
-    ex = _deriveHighestBitSet(someInt)
+    ex: int = _deriveHighestBitSet(someInt)
     intRepr = int(2**ex)
     assert intRepr < 33, "bit too high to construct AllocType {0}".format(intRepr)
     return AllocType(intRepr)
 
 
 class Alloc(object):
-    """keeps alloc vals for each of the score-type combinations
+    """
+    holds the weight distribution for a given group of score types
+    for example, in a window with both a feeling and a commit change
+    the commit change will carry more weight for the rolled-up day's score
+    our matrix below makes all total 1.0
+    keeps alloc vals for each of the score-type combinations
     in the Numbers.Constants.ScoreGroupWeightMap
     """
 
@@ -87,7 +96,7 @@ class Alloc(object):
         incident: float = 0.0,
     ):
         # values passed are int + floats
-        sum = feeling + behavior + assess + commit + breakup + incident
+        sum: int = int(feeling + behavior + assess + commit + breakup + incident)
         assert sum == 1 or sum == 0, "invalid Alloc construction"
         self.bitCode = int(bitCode)
         # different types of entries
@@ -98,18 +107,13 @@ class Alloc(object):
         self.breakup = float(breakup)
         self.incident = float(incident)
 
-    # @property
-    # def sumOfAllWeights(self):
-    #     # our matrix below makes all total 1.0
-    #     return 1.0
-
-    def weightFor(self: Alloc, weightTyp: AllocType) -> float:
-        """caution: if you send in an int, you automatically get ONLY
-        the weight for the worst part of this alloc rec
+    def weightFor(self: Alloc, weightTyp: Union[AllocType, int]) -> float:
+        """caution: if you send weightTyp as an int, you automatically get ONLY
+        the weight for the most severe part of this alloc rec
         """
         assert isinstance(weightTyp, (AllocType, int)), "Invalid arg"
         if isinstance(weightTyp, int):
-            weightTyp = _deriveHighestAlloc(weightTyp)
+            weightTyp: AllocType = _deriveHighestAlloc(weightTyp)
 
         if weightTyp == AllocType.FEELING:
             return self.feel
@@ -135,7 +139,7 @@ class Alloc(object):
         return Alloc(48, 0, 0, 0, 0, 0.25, 0.75)
 
     @staticmethod
-    def emptyDefault(groupBitSum) -> Alloc:
+    def emptyDefault(groupBitSum: int) -> Alloc:
         return Alloc(groupBitSum)
 
 
@@ -185,6 +189,7 @@ class AllocLookup(metaclass=Singleton):
 def _hydrateLookup() -> map[int, Alloc]:
     """returns a dict of Alloc objects keyed by bitCode
     from 1 to 16
+    above 16 is a special case handled in code
     """
     lstOfAlloc = getAlloc()
     weights: map[int, Alloc] = dict()
@@ -206,7 +211,7 @@ def getAlloc() -> list[Alloc]:
         Alloc(4, 0, 0, 1, 0, 0, 0),
         Alloc(8, 0, 0, 0, 1, 0, 0),
         Alloc(16, 0, 0, 0, 0, 1, 0),
-        Alloc(32, 0, 0, 0, 0, 0, 1),  # this row NIU
+        # Alloc(32, 0, 0, 0, 0, 0, 1),  # this row NIU
         Alloc(3, 0.3, 0.7, 0, 0, 0, 0),
         Alloc(5, 0.25, 0, 0.75, 0, 0, 0),
         Alloc(6, 0, 0.5, 0.5, 0, 0, 0),
@@ -218,4 +223,5 @@ def getAlloc() -> list[Alloc]:
         Alloc(13, 0.2, 0, 0.2, 0.6, 0, 0),
         Alloc(14, 0, 0.2, 0.2, 0.6, 0, 0),
         Alloc(15, 0.05, 0.15, 0.15, 0.65, 0, 0),
+        # Alloc.worstDayEver(),  # this row NIU
     ]

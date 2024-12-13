@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, List, Dict
 from datetime import date
 import google.cloud.ndb as ndb
 
@@ -19,12 +20,14 @@ from ..config.behavior.beh_constants import (
 
 
 class InputEntryAdapter(BaseNdbModel):
-    """intermediate stage between an app input record (entry)
-    and rollup into an actual RawDayScores
-        (stored by month in PersonMonthScoresRaw)
+    """
+    intermediate stage between an app input record (entry)
+    generic copy of one of the 5 input types
+    these rollup into actual RawDayScores
+        (which are stored by month in PersonMonthScoresRaw)
 
-    numArgs:  stores feelings & concern votes
-    strArgs:  stores behCode and commit-lvl code
+    numArgs:  stores feelings (1 val) & concern/freq (2 vals) votes
+    strArgs:  stores behCode or commit-lvl code
     dtArgs:   stores dates (only for commit level changes & incidents)
     ruleTypeInt governs how to parse each series of args
 
@@ -47,6 +50,15 @@ class InputEntryAdapter(BaseNdbModel):
     # saveDtTm used to control the transaction that sets scored flag
     saveDtTm = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     # debugRecId = ndb.StringProperty(indexed=False)
+
+    def __str__(self):
+        # Generate a clean, formatted string for printing
+        attributes: Dict[str, Any] = vars(self)
+        # del attributes["_entity_key"]
+        attributes = attributes["_values"]
+        # del attributes["saveDtTm"]
+        attr_list = [f"{key}: {value}" for key, value in attributes.items()]
+        return f"IEA(\n  " + ",\n  ".join(attr_list) + "\n)"
 
     def setKeyProperties(self: InputEntryAdapter, userId: str, prospId: int):
         # unique ID will be assigned for me  : InputEntryAdapter
@@ -162,7 +174,7 @@ class InputEntryAdapter(BaseNdbModel):
         """
         concern is how much this behavior "would" bother me
         freq is how often my prospect does it
-        even tho these behaviors are negative, I suspect (check me)
+        even tho the associated behCode are negative,
         both concern & freq are stored as positive
         """
         if changeDt == None:
@@ -201,7 +213,7 @@ class InputEntryAdapter(BaseNdbModel):
         we use # of days overlap / relationshipLen to increase
         severity weight for this specific event
         """
-
+        relationshipLen = max(relationshipLen, inc.overlapDays)
         ieAdapt = cls(
             ruleTypeInt=ScoreRuleType.INCIDENT.value,
             occurDt=inc.earliestOverlapDate,

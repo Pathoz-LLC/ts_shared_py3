@@ -45,7 +45,7 @@ class ScoreHistory(ndb.Model):
         prospectID: int,
     ) -> ScoreHistory:
         #
-        sh_key = ndb.Key(__class__.__name__, userID, "Person", prospectID)
+        sh_key = ndb.Key("DbUser", userID, __class__.__name__, prospectID)
         score_history: ScoreHistory = sh_key.get()
         if score_history is None:
             score_history = ScoreHistory(key=sh_key, recent_scores=[])

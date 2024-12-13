@@ -371,10 +371,21 @@ class ScoreRuleType(IntEnum):
         minWeight: float, notchSize: float, dataVals: list[float]
     ) -> float:
         #
-        overlapDays = float(dataVals[0])
-        relationshipLength = float(dataVals[1])
-        overlapRatio = overlapDays / relationshipLength
-        weightIncrease = notchSize * overlapRatio
+        overlapDays: float = float(dataVals[0])
+        # old code was creating incididents with invalid relationshipLength
+        relationshipLength: float = max(float(dataVals[1]), overlapDays)
+        overlapRatio: float = overlapDays / relationshipLength
+        weightIncrease: float = notchSize * overlapRatio
+        # print(
+        #     "IncidentCalc:  Old:{0}  Rl:{1}  Wi:{2} Ns:{3} Olr:{4}  Scr:{5}".format(
+        #         overlapDays,
+        #         relationshipLength,
+        #         weightIncrease,
+        #         notchSize,
+        #         overlapRatio,
+        #         minWeight + weightIncrease,
+        #     )
+        # )
         return minWeight + weightIncrease
 
     @staticmethod
@@ -515,8 +526,6 @@ class ScoreRuleType(IntEnum):
         lookup scale between 0-3
         """
         assert isinstance(freqVote, int), "bad arg"
-        # assert -1 <= normalizedFreqVote <= 0, "vote was %f; should be -1 to 0" % normalizedFreqVote
-        # idx = int(normalizedFreqVote * VALUES_MAX_SLIDER_POSITION) * -1
         return VAL_ASSESS_TYPES[freqVote - 1]
 
     @staticmethod
