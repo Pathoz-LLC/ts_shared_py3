@@ -26,6 +26,7 @@ class NotifyType(IntEnum):
     VALS_QUEST_AVAIL = 5  # new values questions are available
     # from user entry of new prospect
     PROSPECT_VALS_MISSING = 6  # new prospect added; update values frequency for them
+    SCORING_DONE = 7  # scoring has been completed
 
     @staticmethod
     def all() -> list[NotifyType]:
@@ -37,6 +38,7 @@ class NotifyType(IntEnum):
             NotifyType.CL_DECREMENT_DONE,
             NotifyType.VALS_QUEST_AVAIL,
             NotifyType.PROSPECT_VALS_MISSING,
+            NotifyType.SCORING_DONE,
         ]
 
     @staticmethod
@@ -59,21 +61,19 @@ class NotifyType(IntEnum):
         # do not use them here or they will get replaced
         if self == NotifyType.INCIDENT:
             return ["otherUserID", "personID", "overlapCount"]
-        elif self == NotifyType.CHAT_REQUEST or self == NotifyType.CHAT_MSG_RECEIVED:
+        elif self in [NotifyType.CHAT_REQUEST, NotifyType.CHAT_MSG_RECEIVED]:
             return ["otherUserID", "personID"]
         elif self.isDecrementCl:
             return ["personID", "newClCode"]
 
-        elif self == NotifyType.PROSPECT_VALS_MISSING:
+        elif self in [NotifyType.PROSPECT_VALS_MISSING, NotifyType.SCORING_DONE]:
             return ["personID"]
         else:
             return []
 
     @property
     def isDecrementCl(self) -> bool:
-        return (
-            self == NotifyType.CL_DECREMENT_WARN or self == NotifyType.CL_DECREMENT_DONE
-        )
+        return self in [NotifyType.CL_DECREMENT_WARN, NotifyType.CL_DECREMENT_DONE]
 
     @property
     def title(self) -> str:
@@ -91,6 +91,8 @@ class NotifyType(IntEnum):
             return "Survey Questions reminder"
         elif self == NotifyType.PROSPECT_VALS_MISSING:
             return "Update Survey for new prospects"
+        elif self == NotifyType.SCORING_DONE:
+            return "Rescore completed"
 
         else:
             return self.name + " Title_"
@@ -125,7 +127,9 @@ class NotifyType(IntEnum):
         elif self == NotifyType.PROSPECT_VALS_MISSING:
             # substitute prospect nickname
             return "You've added a new prospect! Update your survey for {0}."
-
+        elif self == NotifyType.SCORING_DONE:
+            # substitute prospect nickname
+            return "Scoring Calculations completed for {0}."
         else:
             return self.name + " Body_"
 
@@ -178,14 +182,16 @@ class NotifyType(IntEnum):
     @property
     def category(self) -> str | None:
         # category allows client side selection UI to appear
-        if not self.hasCategory:
-            return None
+        # if not self.hasCategory:
+        #     return None
 
         if self in [
             NotifyType.CL_DECREMENT_WARN,
             NotifyType.CL_DECREMENT_DONE,
         ]:  #
             return "commitmentLevel"
+
+        return None
 
 
 class NdbNotifyTypeProp(model.IntegerProperty):
