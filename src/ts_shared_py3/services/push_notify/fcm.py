@@ -46,7 +46,7 @@ embed token & config type into a msg
 send msg
 """
 
-# user vals from the DB
+# user vals (incl token) loaded from the DB
 UserPushConfig = namedtuple("UserPushConfig", ["userID", "token", "isIOS"])
 
 
@@ -61,11 +61,23 @@ class PushNotifyTasks:
     """
 
     @staticmethod
+    def constructAndSendDataPayload(
+        dbUserOrID: Union[str, DbUser], notifyType: NotifyType, dataVals: Dict
+    ):
+        """for sending background data payloads
+        like when scoring completes
+
+        why not send a visible notification?
+        """
+        # add content-available key for invisible push on IOS
+        dataVals["content-available"] = 1
+        pass
+
+    @staticmethod
     def constructAndSendNotification(
         dbUserOrID: Union[str, DbUser], notifyType: NotifyType, dataVals: Dict
     ):
-        """the main push method
-
+        """the main visible push method for both IOS & Android
         a new "custom" key will be added to dataVals below
         """
         try:
@@ -283,7 +295,8 @@ def _lookupProspectLocal(customDict) -> PersonLocal:
 
 
 def get_fcm_send_access_token() -> bytes:
-    """Retrieve a valid FCM access token (short lived -> 1 hour)
+    """to test library only
+    Retrieve a valid FCM access token (short lived -> 1 hour)
     to be used to authorize REST requests
     from Notify Coord (to test library only)
 
