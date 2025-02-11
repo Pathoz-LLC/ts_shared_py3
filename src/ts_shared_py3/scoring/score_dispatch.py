@@ -31,7 +31,8 @@ class ScoreDispatchHelper(object):
         taskName = "rescore-{0}-{1}".format(userId, prospectId)
         scoreSvcOrRelUrl = LOCAL_PUBLIC_URL_SCORING if IS_RUNNING_LOCAL else ""
         url = scoreSvcOrRelUrl + "/scoring/recalc/{0}/{1}".format(userId, prospectId)
-        do_background_work_get(url, GAEQ_FOR_SCORING, None, taskName)
+        delay_secs: int = (dtTmEta - datetime.now()).total_seconds()
+        do_background_work_get(url, GAEQ_FOR_SCORING, delay_secs, taskName)
 
     @classmethod
     def storeFeelingOrBehavior(

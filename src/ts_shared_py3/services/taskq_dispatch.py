@@ -1,8 +1,10 @@
-import os
-import base64
+# import os
+# import base64
 from typing import Any, Union, Dict
+import numbers
 import logging
 import datetime
+import time
 from json import dumps as json_dumps
 from google.auth import default as authDefault
 from google.protobuf import timestamp_pb2
@@ -11,8 +13,8 @@ from google.cloud.tasks_v2 import (
     Task,
     CloudTasksClient,
     CreateTaskRequest,
-    CloudTasksAsyncClient,
-    RetryConfig,
+    # CloudTasksAsyncClient,
+    # RetryConfig,
 )
 
 #
@@ -182,13 +184,6 @@ def _create_task_get(
     # task["app_engine_http_request"]["body"] = None
     # task["app_engine_http_request"]["headers"] = None
 
-    if in_seconds is not None:
-        d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
-        timestamp = timestamp_pb2.Timestamp()
-        timestamp.FromDatetime(d)
-        # TODO:  fixme
-        # task.schedule_time = timestamp
-
     # send task from here:
     parent: str = _getQueuePath(queue)
     t: Task = None
@@ -196,6 +191,13 @@ def _create_task_get(
         t = tasks_v2.Task(http_request=taskRequest)
     else:
         t = tasks_v2.Task(app_engine_http_request=taskRequest)
+
+    if in_seconds is not None and isinstance(in_seconds, numbers.Number):
+        # set schedule_time to delay task execution
+        in_seconds = int(time.time() + in_seconds)
+        timestamp = timestamp_pb2.Timestamp()
+        timestamp.FromSeconds(in_seconds)
+        t.schedule_time = timestamp
 
     taskRequest = CreateTaskRequest(
         parent=parent,
