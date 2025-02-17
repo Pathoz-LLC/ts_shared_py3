@@ -214,6 +214,12 @@ class Interval(BaseNdbModel):
             interval.commitLevel = im.commitLvl
         elif isinstance(im.commitLvl, CommitLvlUpdateMsg):
             interval.commitLevel = CommitLevel_Display.fromStr(im.commitLvl.displayCode)
-        interval.startDate = im.startDate
-        interval.endDate = im.endDate
+
+        # client should never send a start/end date ahead of today
+        # _sortMergeAndSave will set newest end to dist future
+        today = date.today()
+        interval.startDate = min(im.startDate, today)
+        interval.endDate = min(im.endDate, today)
+        # if interval.endDate == today:
+        #     interval.endDate = DISTANT_FUTURE_DATE
         return interval
