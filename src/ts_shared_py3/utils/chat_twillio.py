@@ -2,16 +2,8 @@ import os
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import ChatGrant
 
-# required for all twilio access tokens
-# account_sid = "ACd6e851e0f16d71160c8dccb0278ae09c"
-# api_key = "SKd182c4c12db7894e1b6f81ad1be65717"
-# api_secret = "SwFkxpRsEXRPGRq4aNhDwSIaVacQa2lA"
-
-# # required for Chat grants
-# service_sid = "IS2c7aa5f3ee9745aba81d31075187d6b2"
-# # identity = 'user@example.com'
-
 # Read environment variables
+# required for all twilio access tokens
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_CHAT_SERVICE_SID = os.getenv("TWILIO_CHAT_SERVICE_SID")
