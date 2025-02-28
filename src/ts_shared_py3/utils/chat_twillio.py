@@ -9,7 +9,7 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_CHAT_SERVICE_SID = os.getenv("TWILIO_CHAT_SERVICE_SID")
 TWILIO_CHAT_API_KEY = os.getenv("TWILIO_CHAT_API_KEY")
 TWILIO_CHAT_API_SECRET = os.getenv("TWILIO_CHAT_API_SECRET")
-# TWILIO_CHAT_ROLE_SID = os.getenv("TWILIO_CHAT_ROLE_SID")
+TWILIO_CHAT_ROLE_SID = os.getenv("TWILIO_CHAT_ROLE_SID")
 
 # Debug Output (Ensure sensitive values are not logged in production)
 # print(f"✅ TWILIO_ACCOUNT_SID: {TWILIO_ACCOUNT_SID}")
@@ -33,7 +33,10 @@ def getTwillioChatAccessToken(userId: str) -> str:
     )
 
     # Create an Chat grant and add to token
-    chat_grant = ChatGrant(service_sid=TWILIO_CHAT_SERVICE_SID)
+    chat_grant = ChatGrant(
+        service_sid=TWILIO_CHAT_SERVICE_SID, deployment_role_sid=TWILIO_CHAT_ROLE_SID
+    )
+
     token.add_grant(chat_grant)
 
     # Return token info as JSON
