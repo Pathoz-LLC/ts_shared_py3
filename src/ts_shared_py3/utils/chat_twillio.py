@@ -36,7 +36,6 @@ def getTwillioChatAccessToken(userId: str) -> str:
     chat_grant = ChatGrant(
         service_sid=TWILIO_CHAT_SERVICE_SID, deployment_role_sid=TWILIO_CHAT_ROLE_SID
     )
-
     token.add_grant(chat_grant)
 
     # Return token info as JSON
