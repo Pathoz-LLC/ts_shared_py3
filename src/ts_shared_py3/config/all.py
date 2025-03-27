@@ -141,6 +141,7 @@ class GcpSvcsCfg(CfgBaseIfc, metaclass=Singleton):
     APP_ID: str = _envVars.APP_ID
     STORAGE_BUCKET_ROOT_PATH: str = _envVars.STORAGE_BUCKET_ROOT_PATH
     GOOGLE_APPLICATION_CREDENTIALS: str = _envVars.GOOGLE_APPLICATION_CREDENTIALS
+    REGION_ID: str = _envVars.REGION_ID
 
     # @property
     def GOOGLE_CRED_CERT(self: GcpSvcsCfg) -> credentials.Certificate:

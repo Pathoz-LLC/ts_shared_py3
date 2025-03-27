@@ -1,5 +1,3 @@
-# import os
-# import base64
 from typing import Any, Union, Dict
 import numbers
 import logging
@@ -88,7 +86,7 @@ def _getPathPrefix(qPath: str) -> str:
 
 
 def _createTaskPayload(
-    handlerUri: str, payload: str, taskName: str = None
+    handlerUri: str, payload: str
 ) -> tasks_v2.AppEngineHttpRequest:  # dict[str, str]:
     #
     # print("task payload type: {0}".format(type(payload)))
@@ -123,6 +121,9 @@ def _createTaskPayload(
         return tasks_v2.AppEngineHttpRequest(d)
 
 
+# task_name = client.task_path(project, location, queue, task_id)
+
+
 def _create_task_post(
     queue: str,
     handlerUri: str,
@@ -137,7 +138,7 @@ def _create_task_post(
     # print("create_task_post:  {0}".format(type(payload)))
     # print(payload)
 
-    requestObj = _createTaskPayload(handlerUri, payload, taskName)  # : Dict[str, str]
+    requestObj = _createTaskPayload(handlerUri, payload)  # : Dict[str, str]
     if in_seconds is not None:
         d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
         timestamp = timestamp_pb2.Timestamp()
@@ -147,18 +148,22 @@ def _create_task_post(
 
     # send task from here:
     parent: str = _getQueuePath(queue)
+    task_client: CloudTasksClient = _getTaskClient()
+    task_name = task_client.task_path(
+        GcpSvcsCfg.PROJ_ID, GcpSvcsCfg.REGION_ID, queue, task_name
+    )
     t: Task = None
     if IS_RUNNING_LOCAL:
-        t = tasks_v2.Task(http_request=requestObj)
+        t = tasks_v2.Task(name=taskName, http_request=requestObj)
     else:
-        t = tasks_v2.Task(app_engine_http_request=requestObj)
+        t = tasks_v2.Task(name=taskName, app_engine_http_request=requestObj)
 
     taskRequest = CreateTaskRequest(
         parent=parent,
         task=t,
     )
 
-    createdTask: Task = _getTaskClient().create_task(request=taskRequest)
+    createdTask: Task = task_client.create_task(request=taskRequest)
     # createdTask: Task = _getTaskClient().create_task(parent=parent, task=taskArgs)  #
     logging.info("Created task at {0}--{1}".format(parent, createdTask))
     # logging.info("web url: " + requestObj)
@@ -175,7 +180,7 @@ def _create_task_get(
     # https://cloud.google.com/tasks/docs/creating-appengine-tasks
 
     taskRequest: Union[tasks_v2.AppEngineHttpRequest, tasks_v2.HttpRequest] = (
-        _createTaskPayload(handlerUri, "", taskName)
+        _createTaskPayload(handlerUri, "")
     )
     taskRequest.http_method = "GET"
     taskRequest.body = None
