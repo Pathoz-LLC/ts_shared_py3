@@ -40,6 +40,7 @@ def do_background_work(
     taskName: str = None,
 ):
     # uses POST
+    assert taskName is not None, "taskName must be set for de-duplication"
     queue = workType.queueName
     non_gae_web_host = LOCAL_PUBLIC_URL_DEFAULT if IS_RUNNING_LOCAL else None
     if workType.forScoringService:
@@ -140,7 +141,9 @@ def _create_task_post(
 
     requestObj = _createTaskPayload(handlerUri, payload)  # : Dict[str, str]
     if in_seconds is not None:
-        d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
+        d = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+            seconds=in_seconds
+        )
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(d)
         # requestObj is no longer a dict/map, but a protobuf object; below won't work
@@ -150,13 +153,13 @@ def _create_task_post(
     parent: str = _getQueuePath(queue)
     task_client: CloudTasksClient = _getTaskClient()
     task_name = task_client.task_path(
-        GcpSvcsCfg.PROJ_ID, GcpSvcsCfg.REGION_ID, queue, task_name
+        GcpSvcsCfg.PROJ_ID, GcpSvcsCfg.REGION_ID, queue, taskName or ""
     )
     t: Task = None
     if IS_RUNNING_LOCAL:
-        t = tasks_v2.Task(name=taskName, http_request=requestObj)
+        t = tasks_v2.Task(name=task_name, http_request=requestObj)
     else:
-        t = tasks_v2.Task(name=taskName, app_engine_http_request=requestObj)
+        t = tasks_v2.Task(name=task_name, app_engine_http_request=requestObj)
 
     taskRequest = CreateTaskRequest(
         parent=parent,
