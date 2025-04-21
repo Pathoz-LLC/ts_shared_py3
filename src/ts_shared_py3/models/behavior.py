@@ -124,14 +124,16 @@ class PersonBehavior(BaseNdbModel):
             self._latestEntry.modifyDateTime = datetime.now(tz=None)
 
     @staticmethod
-    def loadOrInitByCoreIds(user: DbUser, personID: int, occurDate: date):
+    def loadOrInitByCoreIds(
+        user: DbUser, personID: int, occurDate: date
+    ) -> PersonBehavior:
         # load one PersonBehavior (user/person/month) combo rec from the DB
         if isinstance(occurDate, datetime):
             occurDate = occurDate.date()
 
         monthStartDt = occurDate.replace(day=1)
         thisMonthKeyRec = PersonBehavior.makeKey(user.id_, personID, monthStartDt)
-        res = thisMonthKeyRec.get()
+        res: PersonBehavior = thisMonthKeyRec.get()
         if not res:
             res = PersonBehavior(
                 monthStartDt=monthStartDt, personID=personID, entries=[]
