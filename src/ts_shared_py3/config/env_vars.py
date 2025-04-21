@@ -146,7 +146,7 @@ class EnvVarVals(metaclass=Singleton):
     def GOOGLE_APPLICATION_CREDENTIALS(self: EnvVarVals) -> str:
         return os.environ.get(
             "GOOGLE_APPLICATION_CREDENTIALS",
-            "auth/stage/ts-gae-admin.json",
+            "auth/stage/ts-firebase-adminsdk.json",
         )
 
     @property
