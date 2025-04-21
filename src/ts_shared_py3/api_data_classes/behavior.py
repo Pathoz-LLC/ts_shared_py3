@@ -35,6 +35,8 @@ class BehaviorKeysMessage(BaseApiData):
             validate=validate.Range(min=1, max=12),
         ),
     )
+    # optional; for loading a single day of entries
+    entriesDate: date = field(default=None, metadata=dict(required=False))
     #
     Schema: ClassVar[Type[Schema]] = Schema
 
